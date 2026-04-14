@@ -1,0 +1,119 @@
+@model IEnumerable<Cinema.DAL.Models.SuatChieu>
+@{
+    ViewData["Title"] = "Quản lý Suất Chiếu";
+    Layout = "_Layout";
+}
+
+<div class="card shadow border-0 rounded-4">
+    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 fw-bold text-primary">
+            <i class="bi bi-calendar-event me-2"></i>LỊCH CHIẾU PHIM
+        </h5>
+        <a asp-area="Admin" asp-controller="SuatChieu" asp-action="Create" class="btn btn-success rounded-pill shadow-sm">
+            <i class="bi bi-plus-circle me-1"></i> Tạo suất chiếu mới
+        </a>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Tên Phim</th>
+                        <th>Phòng Chiếu</th>
+                        <th>Ngày Chiếu</th>
+                        <th>Khung Giờ</th>
+                        <th>Trạng Thái</th>
+                        <th>Giá Vé</th>
+                        <th class="text-center">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="fw-bold text-dark">
+                                    @item.MaPhimNavigation?.TenPhim
+                                </td>
+                                <td>
+                                    <span class="badge bg-info text-dark">
+                                        @(item.MaPhongNavigation?.TenPhong ?? "Phòng " + item.MaPhong)
+                                    </span>
+                                </td>
+                                <td>
+                                    <i class="bi bi-calendar3 me-1 text-muted"></i>
+                                    @(item.NgayChieu.HasValue ? item.NgayChieu.Value.ToString("dd/MM/yyyy") : "")
+                                </td>
+                                <td class="fw-bold text-primary">
+                                    <i class="bi bi-clock me-1"></i>
+                                    @(item.GioBatDau.HasValue ? item.GioBatDau.Value.ToString("HH:mm") : "")
+                                    @if(item.GioKetThuc.HasValue)
+                                    {
+                                        <span class="text-muted fw-normal"> - @item.GioKetThuc.Value.ToString("HH:mm")</span>
+                                    }
+                                </td>
+                                <td>
+                                    <span class="badge @(item.TrangThai == "Sắp chiếu" ? "bg-warning" : "bg-success") text-dark">
+                                        @(string.IsNullOrEmpty(item.TrangThai) ? "Sắp chiếu" : item.TrangThai)
+                                    </span>
+                                </td>
+                                <td class="text-danger fw-bold">
+                                    @item.GiaVe?.ToString("N0") <small>VNĐ</small>
+                                </td>
+                                <td class="text-center">
+                                    <div class="btn-group">
+                                        <a asp-action="Edit" asp-route-id="@item.MaSuat" class="btn btn-sm btn-outline-warning mx-1">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <button onclick="confirmDelete(@item.MaSuat)" class="btn btn-sm btn-outline-danger mx-1">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-4">Chưa có suất chiếu nào được tạo.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function confirmDelete(id) {
+            Swal.fire({
+                title: 'Xóa suất chiếu này?',
+                text: "Bạn sẽ không thể khôi phục lại dữ liệu!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Đồng ý xóa',
+                cancelButtonText: 'Hủy'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '@Url.Action("Delete", "SuatChieu", new { area = "Admin" })',
+                        type: 'POST',
+                        data: { id: id },
+                        success: function (res) {
+                            if (res.success) {
+                                Swal.fire('Đã xóa!', 'Suất chiếu đã bị loại bỏ.', 'success')
+                                    .then(() => location.reload());
+                            }
+                        }
+                    });
+                }
+            })
+        }
+    </script>
+}

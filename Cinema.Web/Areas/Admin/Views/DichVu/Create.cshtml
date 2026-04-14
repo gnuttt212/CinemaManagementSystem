@@ -1,0 +1,43 @@
+@model Cinema.DAL.Models.DichVu
+@{
+    ViewData["Title"] = "Thêm Dịch Vụ Mới";
+}
+
+<div class="container-fluid">
+    <div class="card shadow border-0 rounded-4">
+        <div class="card-header bg-white py-3">
+            <h5 class="mb-0 fw-bold text-success"><i class="bi bi-plus-circle me-2"></i>THÊM DỊCH VỤ MỚI</h5>
+        </div>
+        <div class="card-body p-4">
+            <form asp-action="Create" method="post">
+                <div class="row">
+                    <div class="col-md-12 mb-4">
+                        <label class="form-label fw-bold">Tên Combo / Dịch Vụ</label>
+                        <input asp-for="TenDv" class="form-control form-control-lg" required placeholder="Nhập tên dịch vụ hấp dẫn (VD: Combo 2 Bắp 1 Nước)" />
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <label class="form-label fw-bold text-danger">Đơn Giá (VNĐ)</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light text-danger fw-bold">₫</span>
+                            <input asp-for="DonGia" type="number" class="form-control fw-bold fs-5 text-danger" required placeholder="80000" min="0" />
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 mb-4">
+                        <label class="form-label fw-bold">Số Lượng Tồn Kho</label>
+                        <input asp-for="SoLuongTon" type="number" class="form-control" required placeholder="100" min="0" />
+                        <small class="text-muted">Hệ thống sẽ dán nhãn "Hết hàng" nếu kho bằng 0.</small>
+                    </div>
+                </div>
+
+                <div class="mt-4 text-end">
+                    <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4">Hủy bỏ</a>
+                    <button type="submit" class="btn btn-success rounded-pill px-5 shadow">Lưu Lên Kệ</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

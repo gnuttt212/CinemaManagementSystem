@@ -1,0 +1,34 @@
+﻿@model Cinema.DTO.CartItemDTO
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8">
+            <h4 class="fw-bold mb-4">THÔNG TIN ĐẶT VÉ</h4>
+            <div class="card shadow-sm p-4 border-0">
+                <h5><i class="bi bi-film"></i> @Model.TenPhim</h5>
+                <p>Ghế đã chọn: <span class="badge bg-primary">@string.Join(", ", Model.DanhSachGhe)</span></p>
+                <hr />
+                <h6>Dịch vụ kèm theo:</h6>
+                @foreach (var dv in Model.DichVus)
+                {
+                    <div class="d-flex justify-content-between">
+                        <span>@dv.TenDV x @dv.SoLuong</span>
+                        <span>@((dv.DonGia * dv.SoLuong).ToString("N0")) đ</span>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm p-4 border-0 bg-light">
+                <h5 class="fw-bold">TỔNG CỘNG</h5>
+                <div class="display-6 text-danger fw-bold">@Model.TongTien.ToString("N0") đ</div>
+                <hr />
+                <form asp-action="ThanhToan" method="post">
+                    <button type="submit" class="btn btn-success btn-lg w-100">XÁC NHẬN THANH TOÁN</button>
+                </form>
+                <p class="small text-muted mt-3 text-center italic">Bằng việc bấm xác nhận, bạn đồng ý với điều khoản của rạp.</p>
+            </div>
+        </div>
+    </div>
+</div>

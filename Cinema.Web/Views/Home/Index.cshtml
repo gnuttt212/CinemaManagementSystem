@@ -1,0 +1,148 @@
+﻿@model List<Cinema.DTO.PhimDTO>
+@{
+    ViewData["Title"] = "Trang Chủ - Cinema.Web";
+}
+
+<div class="hero-section text-white text-center d-flex align-items-center mb-5">
+    <div class="container py-5">
+        <h1 class="display-2 fw-bold mb-3 animate__animated animate__fadeInDown">
+            HÀNH TRÌNH ĐIỆN ẢNH <br /> <span class="text-warning">BẮT ĐẦU TẠI ĐÂY</span>
+        </h1>
+        <p class="lead fs-4 mb-4 opacity-75 animate__animated animate__fadeInUp">
+            Trải nghiệm những bộ phim bom tấn mới nhất với chất lượng âm thanh và hình ảnh đỉnh cao.
+        </p>
+        <div class="d-grid gap-3 d-sm-flex justify-content-sm-center animate__animated animate__zoomIn">
+            <a asp-controller="Phim" asp-action="Index" class="btn btn-warning btn-lg px-5 py-3 fw-bold shadow">
+                <i class="bi bi-ticket-perforated-fill"></i> ĐẶT VÉ NGAY
+            </a>
+            <a asp-controller="Home" asp-action="Privacy" class="btn btn-outline-light btn-lg px-5 py-3 fw-bold">
+                Tìm hiểu thêm
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="container my-5">
+    <div class="row g-4 text-center">
+        <div class="col-md-4">
+            <div class="feature-card p-4 shadow-sm rounded-4 h-100 border-0 bg-white">
+                <div class="icon-box mb-3 mx-auto bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 70px; height: 70px;">
+                    <i class="bi bi-lightning-charge-fill fs-2"></i>
+                </div>
+                <h4 class="fw-bold">Đặt vé cực nhanh</h4>
+                <p class="text-muted">Chỉ với vài click chuột, bạn đã sở hữu ngay chỗ ngồi ưng ý nhất.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="feature-card p-4 shadow-sm rounded-4 h-100 border-0 bg-white">
+                <div class="icon-box mb-3 mx-auto bg-success-subtle text-success rounded-circle d-flex align-items-center justify-content-center" style="width: 70px; height: 70px;">
+                    <i class="bi bi-popcorn-fill fs-2"></i>
+                </div>
+                <h4 class="fw-bold">Combo đa dạng</h4>
+                <p class="text-muted">Thỏa sức lựa chọn bắp nước với các combo ưu đãi đặc biệt.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="feature-card p-4 shadow-sm rounded-4 h-100 border-0 bg-white">
+                <div class="icon-box mb-3 mx-auto bg-danger-subtle text-danger rounded-circle d-flex align-items-center justify-content-center" style="width: 70px; height: 70px;">
+                    <i class="bi bi-shield-check fs-2"></i>
+                </div>
+                <h4 class="fw-bold">Thanh toán an toàn</h4>
+                <p class="text-muted">Hệ thống bảo mật tuyệt đối, hỗ trợ nhiều hình thức thanh toán.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container my-5">
+    <div class="d-flex justify-content-between align-items-end mb-4">
+        <div>
+            <h2 class="fw-bold mb-0 border-start border-warning border-5 ps-3 text-uppercase">Phim Đang Chiếu</h2>
+            <p class="text-muted mb-0 ps-3">Đừng bỏ lỡ những siêu phẩm điện ảnh mới nhất</p>
+        </div>
+        <a asp-controller="Phim" asp-action="Index" class="btn btn-link text-warning fw-bold text-decoration-none">Xem tất cả <i class="bi bi-chevron-right"></i></a>
+    </div>
+
+    <div class="row mb-5">
+        <div class="col-md-6 mx-auto">
+            <form asp-controller="Phim" asp-action="Search" method="get" class="input-group shadow-sm border rounded-pill overflow-hidden">
+                <input type="text" name="query" class="form-control border-0 py-3 ps-4" placeholder="Tìm tên phim, thể loại...">
+                <button class="btn btn-warning px-4" type="submit">
+                    <i class="bi bi-search"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        @foreach (var phim in Model)
+        {
+            <div class="col-lg-3 col-md-4 col-sm-6">
+                <div class="card h-100 border-0 shadow-sm movie-card overflow-hidden rounded-4">
+                    <div class="position-relative overflow-hidden">
+                        <img src="~/images/@phim.Hinh" class="card-img-top" alt="@phim.TenPhim" style="height: 380px; object-fit: cover; transition: 0.5s;">
+                        <div class="movie-overlay d-flex align-items-center justify-content-center">
+                            <a asp-controller="Phim" asp-action="Details" asp-route-id="@phim.MaPhim" class="btn btn-warning fw-bold rounded-pill px-4">XEM CHI TIẾT</a>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <h6 class="fw-bold text-dark text-truncate mb-1">@phim.TenPhim</h6>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="badge bg-light text-dark border">@phim.TheLoai</span>
+                            <small class="text-muted"><i class="bi bi-clock me-1"></i>@phim.ThoiLuong'</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    .hero-section {
+        min-height: 600px;
+        background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+        background-size: cover;
+        background-position: center;
+        border-radius: 0 0 50px 50px;
+    }
+    .feature-card {
+        transition: all 0.3s ease;
+        border-bottom: 5px solid transparent;
+    }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1) !important;
+            border-bottom: 5px solid #ffc107;
+        }
+    .movie-card {
+        transition: transform 0.3s ease;
+    }
+
+        .movie-card img {
+            transition: transform 0.5s ease;
+        }
+
+        .movie-card:hover img {
+            transform: scale(1.1);
+        }
+
+    .movie-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        opacity: 0;
+        transition: 0.3s;
+    }
+
+    .movie-card:hover .movie-overlay {
+        opacity: 1;
+    }
+</style>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />

@@ -1,0 +1,51 @@
+@model List<Cinema.DTO.DichVuDTO>
+
+<div class="container mt-5">
+    <h2 class="text-center fw-bold text-success mb-4">🍿 DỊCH VỤ BẮP NƯỚC</h2>
+    <div class="row">
+        @foreach (var dv in Model)
+        {
+            <div class="col-md-3 mb-4">
+                <div class="card h-100 text-center shadow-sm border-0 rounded-4 overflow-hidden feature-card">
+                    <img src="~/images/@(string.IsNullOrEmpty(dv.HinhAnh) ? "popcorn-default.png" : dv.HinhAnh)"
+                         class="card-img-top p-3" alt="@dv.TenDV" style="height: 180px; object-fit: contain;" onerror="this.onerror=null; this.src='https://via.placeholder.com/200x200?text=Service';">
+
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold">@dv.TenDV</h5>
+
+                        <p class="text-danger fs-5 fw-bold">
+                            @dv.DonGia.ToString("N0") đ
+                        </p>
+                        <p class="small @(dv.SoLuongTon > 0 ? "text-muted" : "text-danger fw-bold")">
+                            @(dv.SoLuongTon > 0 ? $"Còn lại: {dv.SoLuongTon}" : "Hết hàng")
+                        </p>
+
+                        @if (dv.SoLuongTon > 0)
+                        {
+                            <button class="btn btn-success w-100 rounded-pill shadow-sm"
+                                    onclick="addToCart(@dv.MaDV, '@dv.TenDV')">
+                                <i class="bi bi-cart-plus"></i> Thêm vào giỏ
+                            </button>
+                        }
+                        else
+                        {
+                            <button class="btn btn-secondary w-100 rounded-pill disabled">Tạm hết</button>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<script>
+    function addToCart(maDv, tenDv) {
+        fetch(`/DichVu/AddToCart?id=${maDv}`, { method: 'POST' })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert(`Đã thêm ${tenDv} vào giỏ hàng!`);
+                }
+            });
+    }
+</script>

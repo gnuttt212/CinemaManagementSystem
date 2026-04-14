@@ -1,0 +1,49 @@
+﻿@model Cinema.DAL.Models.SuatChieu
+@{
+    ViewData["Title"] = "Sửa Suất Chiếu";
+    Layout = "_Layout";
+}
+
+<div class="container-fluid">
+    <div class="card shadow border-0 rounded-4">
+        <div class="card-header bg-white py-3">
+            <h5 class="mb-0 fw-bold text-warning"><i class="bi bi-pencil-square me-2"></i>CẬP NHẬT SUẤT CHIẾU</h5>
+        </div>
+        <div class="card-body p-4">
+            <form asp-action="Edit" method="post">
+                <input type="hidden" asp-for="MaSuat" />
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Chọn Phim</label>
+                        <select asp-for="MaPhim" class="form-select" asp-items="@(new SelectList(ViewBag.MaPhim, "MaPhim", "TenPhim"))"></select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Chọn Phòng</label>
+                        <select asp-for="MaPhong" class="form-select" asp-items="@(new SelectList(ViewBag.MaPhong, "MaPhong", "TenPhong"))"></select>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label fw-bold">Ngày Chiếu</label>
+                        <input asp-for="NgayChieu" type="date" class="form-control" required />
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label fw-bold">Giờ Bắt Đầu</label>
+                        <input asp-for="GioBatDau" type="time" class="form-control" required />
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label fw-bold">Giá Vé (VNĐ)</label>
+                        <input asp-for="GiaVe" type="number" class="form-control" required />
+                    </div>
+                </div>
+
+                <div class="mt-4 text-end">
+                    <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4">Hủy bỏ</a>
+                    <button type="submit" class="btn btn-warning rounded-pill px-4 shadow">Cập Nhật</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

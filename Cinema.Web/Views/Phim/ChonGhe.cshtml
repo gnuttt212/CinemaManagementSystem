@@ -1,0 +1,174 @@
+﻿@model List<Cinema.DAL.Models.Ghe>
+
+<div class="container py-5">
+    <div class="screen w-75 mx-auto mb-5 text-center shadow-sm p-2 bg-light border">MÀN HÌNH</div>
+
+    <div class="row justify-content-center mb-4">
+        @if (Model != null && Model.Any())
+        {
+            var dsGheDaDat = (List<int>)ViewBag.GheDaDat;
+
+            @foreach (var ghe in Model)
+            {
+                bool isOccupied = dsGheDaDat.Contains(ghe.MaGhe);
+
+                <div class="col-1 mb-3 text-center">
+                    @if (isOccupied)
+                    {
+                        <button class="btn btn-danger btn-sm w-100 shadow-none" disabled
+                                style="cursor: not-allowed; opacity: 0.7;">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+                    }
+                    else
+                    {
+                        <button class="btn @(ghe.LoaiGhe == "VIP" ? "btn-warning" : "btn-outline-secondary") btn-sm w-100 btn-ghe"
+                                data-id="@ghe.MaGhe"
+                                data-name="@ghe.TenGhe"
+                                data-price="@(ghe.LoaiGhe == "VIP" ? 1.2 : 1)">
+                            @ghe.TenGhe
+                        </button>
+                    }
+                </div>
+            }
+        }
+        else
+        {
+            <div class="col-12 text-center">
+                <div class="alert alert-warning">⚠️ Không tìm thấy ghế cho suất chiếu này!</div>
+            </div>
+        }
+    </div>
+</div>
+
+    <div class="d-flex justify-content-center gap-4 mb-5">
+        <div><span class="badge bg-outline-secondary border text-dark">Ghế Thường</span></div>
+        <div><span class="badge bg-warning text-dark">Ghế VIP (+20%)</span></div>
+        <div><span class="badge bg-danger">Đã đặt</span></div>
+        <div><span class="badge bg-success">Đang chọn</span></div>
+    </div>
+
+    <h3 class="mt-5 text-primary text-center"><i class="bi bi-cup-straw"></i> COMBO BẮP & NƯỚC</h3>
+    <div class="row mt-4 px-5">
+        @if (ViewBag.DichVus != null)
+        {
+            @foreach (var dv in (List<Cinema.DTO.DichVuDTO>)ViewBag.DichVus)
+            {
+                <div class="col-md-6 mb-3">
+                    <div class="card p-3 shadow-sm d-flex flex-row align-items-center justify-content-between">
+                        <div>
+                            <h6 class="mb-0 fw-bold">@dv.TenDV</h6>
+                            <small class="text-danger">@dv.DonGia.ToString("N0") đ</small>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <button type="button" class="btn btn-sm btn-outline-primary btn-minus" data-id="@dv.MaDV">-</button>
+                            <input type="text" class="form-control text-center input-qty"
+                                   style="width: 50px;" value="0" readonly
+                                   data-id="@dv.MaDV" data-price="@dv.DonGia" data-name="@dv.TenDV">
+                            <button type="button" class="btn btn-sm btn-outline-primary btn-plus" data-id="@dv.MaDV">+</button>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+
+    <div class="card p-4 shadow-sm mt-5">
+        <h5>Thông tin chọn: <span id="listGhe" class="text-primary fw-bold">Chưa chọn gì</span></h5>
+        <h4>Tổng cộng: <span id="totalPrice" class="text-danger fw-bold">0</span> đ</h4>
+        <button onclick="booking()" class="btn btn-success btn-lg mt-3 fw-bold">XÁC NHẬN CHỌN GHẾ & DỊCH VỤ</button>
+    </div>
+</div>
+<style>
+    .screen {
+        border-top: 5px solid #ffc107;
+        border-radius: 50% / 10px;
+        font-weight: bold;
+        color: #666;
+    }
+
+    .btn-ghe.active {
+        background-color: #198754 !important;
+        color: white !important;
+        border-color: #198754 !important;
+    }
+</style>
+
+@section Scripts {
+    <script>
+        let selectedSeats = [];
+        let giaVeGoc = @(ViewBag.GiaVeGoc ?? 0);
+
+        $(document).ready(function () {
+            $('.btn-ghe').click(function () {
+                $(this).toggleClass('active');
+                let seatName = $(this).data('name');
+                let priceMultiplier = parseFloat($(this).data('price'));
+
+                if ($(this).hasClass('active')) {
+                    selectedSeats.push({ name: seatName, price: giaVeGoc * priceMultiplier });
+                } else {
+                    selectedSeats = selectedSeats.filter(s => s.name !== seatName);
+                }
+                updateUI();
+            });
+            $('.btn-plus').click(function () {
+                let input = $(this).siblings('.input-qty');
+                input.val(parseInt(input.val()) + 1);
+                updateUI();
+            });
+            $('.btn-minus').click(function () {
+                let input = $(this).siblings('.input-qty');
+                let val = parseInt(input.val()) - 1;
+                if (val >= 0) {
+                    input.val(val);
+                    updateUI();
+                }
+            });
+        });
+
+        function updateUI() {
+            let totalGhe = selectedSeats.reduce((sum, s) => sum + s.price, 0);
+            let totalDV = 0;
+            let serviceDetails = [];
+            $('.input-qty').each(function () {
+                let qty = parseInt($(this).val());
+                if (qty > 0) {
+                    let price = parseFloat($(this).data('price'));
+                    let name = $(this).data('name');
+                    totalDV += qty * price;
+                    serviceDetails.push(name + " (x" + qty + ")");
+                }
+            });
+
+            let seatStr = selectedSeats.map(s => s.name).join(', ') || "Chưa chọn ghế";
+            let dvStr = serviceDetails.join(', ') || "Chưa chọn combo";
+            $('#listGhe').html(`Ghế: <span class="text-success">${seatStr}</span> | Dịch vụ: <span class="text-info">${dvStr}</span>`);
+            let finalTotal = totalGhe + totalDV;
+            $('#totalPrice').text(finalTotal.toLocaleString('vi-VN'));
+        }
+
+        function booking() {
+            if (selectedSeats.length === 0) {
+                alert("Vui lòng chọn ít nhất một ghế!");
+                return;
+            }
+            let selectedServices = [];
+            $('.input-qty').each(function () {
+                let qty = parseInt($(this).val());
+                if (qty > 0) {
+                    selectedServices.push({ MaDV: $(this).data('id'), SoLuong: qty });
+                }
+            });
+
+            $.post('/Phim/LuuGheVaoSession', {
+                ghes: selectedSeats.map(s => s.name),
+                maSuat: @(ViewBag.MaSuat ?? 0),
+                dichVus: selectedServices 
+            }, function (res) {
+                if (res.success) window.location.href = '/HoaDon/GioHang';
+                else alert("Lỗi: " + res.message);
+            });
+        }
+    </script>
+}

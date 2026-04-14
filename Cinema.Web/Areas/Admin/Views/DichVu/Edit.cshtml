@@ -1,0 +1,45 @@
+@model Cinema.DAL.Models.DichVu
+@{
+    ViewData["Title"] = "Chỉnh Sửa Dịch Vụ";
+}
+
+<div class="container-fluid">
+    <div class="card shadow border-0 rounded-4">
+        <div class="card-header bg-white py-3">
+            <h5 class="mb-0 fw-bold text-warning"><i class="bi bi-pencil-square me-2"></i>CẬP NHẬT DỊCH VỤ</h5>
+        </div>
+        <div class="card-body p-4">
+            <form asp-action="Edit" method="post">
+                <input type="hidden" asp-for="MaDv" />
+
+                <div class="row">
+                    <div class="col-md-12 mb-4">
+                        <label class="form-label fw-bold">Tên Combo / Dịch Vụ</label>
+                        <input asp-for="TenDv" class="form-control form-control-lg" required />
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <label class="form-label fw-bold text-danger">Đơn Giá (VNĐ)</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light text-danger fw-bold">₫</span>
+                            <input asp-for="DonGia" type="number" class="form-control fw-bold fs-5 text-danger" required min="0" />
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 mb-4">
+                        <label class="form-label fw-bold">Số Lượng Tồn Kho</label>
+                        <input asp-for="SoLuongTon" type="number" class="form-control" required min="0" />
+                        <small class="text-muted">Nhập 0 để đánh dấu món này "Hết hàng".</small>
+                    </div>
+                </div>
+
+                <div class="mt-4 text-end">
+                    <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4">Đóng</a>
+                    <button type="submit" class="btn btn-warning rounded-pill px-5 shadow fw-bold">Lưu Thay Đổi</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

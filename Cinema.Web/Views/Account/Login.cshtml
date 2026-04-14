@@ -1,0 +1,72 @@
+﻿@model Cinema.DTO.LoginRequest
+
+@{
+    ViewData["Title"] = "Đăng nhập hệ thống";
+}
+
+<div class="container">
+    <div class="row justify-content-center align-items-center" style="min-height: 80vh;">
+        <div class="col-md-5">
+            <div class="card shadow-lg border-0" style="border-radius: 15px;">
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <h2 class="fw-bold text-primary">CHÀO MỪNG TRỞ LẠI</h2>
+                        <p class="text-muted">Vui lòng đăng nhập để tiếp tục đặt vé</p>
+                    </div>
+
+                   
+                    @if (ViewBag.Error != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill"></i> @ViewBag.Error
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+
+                    <form asp-controller="Account" asp-action="Login" method="post">
+                        <div class="form-floating mb-3">
+                            <input asp-for="TaiKhoan" class="form-control" id="floatingInput" placeholder="Tên đăng nhập" required>
+                            <label for="floatingInput"><i class="bi bi-person"></i> Tên đăng nhập</label>
+                            <span asp-validation-for="TaiKhoan" class="text-danger small"></span>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input asp-for="MatKhau" type="password" class="form-control" id="floatingPassword" placeholder="Mật khẩu" required>
+                            <label for="floatingPassword"><i class="bi bi-lock"></i> Mật khẩu</label>
+                            <span asp-validation-for="MatKhau" class="text-danger small"></span>
+                        </div>
+
+                        <div class="d-flex justify-content-between mb-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="rememberMe">
+                                <label class="form-check-label small" for="rememberMe">Ghi nhớ tôi</label>
+                            </div>
+                            <a href="#" class="small text-decoration-none">Quên mật khẩu?</a>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-lg w-100 fw-bold shadow-sm" style="border-radius: 10px;">
+                            ĐĂNG NHẬP
+                        </button>
+
+                        <p class="small">
+                            Chưa có tài khoản?
+                            <a asp-controller="Account" asp-action="Register" class="text-primary fw-bold text-decoration-none">
+                                Đăng ký ngay
+                            </a>
+                        </p>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="text-center mt-3">
+                <a asp-controller="Phim" asp-action="Index" class="text-muted small text-decoration-none">
+                    <i class="bi bi-arrow-left"></i> Quay lại trang chủ
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

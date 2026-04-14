@@ -1,0 +1,46 @@
+@model Cinema.DTO.NguoiDungDTO
+
+@{
+    ViewData["Title"] = "Chỉnh sửa thông tin";
+}
+
+<div class="container mt-5 mb-5 d-flex justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow border-0 rounded-4 p-4">
+            <h3 class="fw-bold mb-4 text-center">CẬP NHẬT HỒ SƠ</h3>
+            
+            <form asp-action="EditProfile" method="post">
+                <input type="hidden" name="MaNd" value="@Model.MaND" />
+                <input type="hidden" name="TaiKhoan" value="@Model.TaiKhoan" />
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Tài khoản</label>
+                    <input type="text" class="form-control" value="@Model.TaiKhoan" disabled />
+                    <small class="text-muted">Tên tài khoản không thể thay đổi.</small>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Họ và Tên</label>
+                    <input type="text" class="form-control" name="HoTen" value="@Model.HoTen" required />
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-bold">Thư điện tử (Email)</label>
+                    <input type="email" class="form-control" name="Email" value="@Model.Email" />
+                </div>
+
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    <div class="alert alert-danger">
+                        @Html.ValidationSummary(false, "", new { @class = "mb-0" })
+                    </div>
+                }
+
+                <div class="d-flex justify-content-between">
+                    <a asp-action="Profile" class="btn btn-secondary px-4 rounded-pill">Quay lại</a>
+                    <button type="submit" class="btn btn-primary px-4 rounded-pill fw-bold">Lưu thay đổi</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

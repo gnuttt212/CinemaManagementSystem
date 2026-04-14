@@ -1,0 +1,96 @@
+@model IEnumerable<Cinema.DTO.PhimDTO>
+
+@{
+    ViewData["Title"] = "Trang chủ - Cinema";
+}
+
+<div class="container mt-4">
+    <h1 class="text-center mb-5 text-uppercase fw-bold text-primary">
+        <i class="bi bi-film"></i> Phim Đang Chiếu
+    </h1>
+
+    <div class="row">
+        @foreach (var item in Model)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm border-0 transition-hover" style="border-radius: 15px; overflow: hidden;">
+                    <div style="position: relative;">
+                        @{
+                            var imgUrl = string.IsNullOrEmpty(item.Hinh)
+                            ? "https://via.placeholder.com/300x400?text=No+Image"
+                            : item.Hinh.StartsWith("http") ? item.Hinh : "/images/phim/" + item.Hinh;
+                        }
+                        <img src="@imgUrl" class="card-img-top" alt="@item.TenPhim" style="height: 400px; object-fit: cover;" onerror="this.onerror=null; this.src='https://via.placeholder.com/300x400?text=No+Image';">
+                    </div>
+
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold text-truncate text-primary">@item.TenPhim</h5>
+                        <div class="mt-3">
+                            @if (item.DanhSachSuatChieu != null && item.DanhSachSuatChieu.Any())
+                            {
+                                <p class="small text-muted mb-2"><i class="bi bi-calendar3"></i> Lịch chiếu:</p>
+                                <div class="d-flex flex-wrap gap-2">
+                                    @foreach (var suat in item.DanhSachSuatChieu)
+                                    {
+                                        <a asp-controller="Phim" asp-action="ChonGhe" asp-route-maSuat="@suat.MaSuat"
+                                           class="btn btn-outline-primary btn-sm fw-bold px-3 py-1 shadow-sm">
+                                            @suat.GioBatDau
+                                        </a>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="py-2">
+                                    <span class="badge bg-light text-secondary border">
+                                        <i class="bi bi-calendar-x"></i> Sắp có suất chiếu
+                                    </span>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="card-footer bg-transparent border-0 pb-3">
+                        <a asp-action="Details" asp-route-id="@item.MaPhim" class="btn btn-outline-secondary w-100 btn-sm">
+                            Xem Thông Tin Phim
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="row mt-5 mb-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-lg text-white"
+                 style="background: linear-gradient(45deg, #0d6efd, #6610f2); border-radius: 20px;">
+                <div class="card-body p-5 text-center">
+                    <div class="display-4 mb-3">🍿🥤</div>
+                    <h2 class="fw-bold">COMBO BẮP NƯỚC SIÊU TIẾT KIỆM</h2>
+                    <p class="lead opacity-75">Tiết kiệm đến 20% khi mua trực tuyến cùng vé xem phim!</p>
+                    <a asp-controller="DichVu" asp-action="Index" class="btn btn-light btn-lg px-5 fw-bold text-primary mt-3 shadow">
+                        XEM MENU DỊCH VỤ
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .transition-hover {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+        .transition-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 1rem 3rem rgba(0,0,0,.15) !important;
+        }
+
+    .btn-outline-primary:hover {
+        background-color: #0d6efd;
+        color: white;
+        transform: scale(1.05);
+        transition: 0.2s;
+    }
+</style>

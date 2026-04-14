@@ -1,0 +1,89 @@
+﻿@{
+    ViewData["Title"] = "Chính Sách Bảo Mật";
+}
+
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <div class="icon-box bg-primary-subtle text-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+            <i class="bi bi-shield-lock-fill fs-1"></i>
+        </div>
+        <h1 class="fw-bold display-5">@ViewData["Title"]</h1>
+        <p class="text-muted lead">Chúng tôi cam kết bảo vệ thông tin cá nhân của bạn một cách tuyệt đối.</p>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="card-body p-4 p-md-5">
+
+                    <div class="mb-5">
+                        <h4 class="fw-bold text-primary mb-3"><i class="bi bi-info-circle me-2"></i>1. Thông tin chúng tôi thu thập</h4>
+                        <p class="text-secondary">Để cung cấp dịch vụ đặt vé tốt nhất, chúng tôi thu thập các thông tin sau khi bạn đăng ký tài khoản:</p>
+                        <ul class="list-group list-group-flush mb-3">
+                            <li class="list-group-item border-0 ps-0"><i class="bi bi-check2 text-success me-2"></i>Họ tên và địa chỉ Email.</li>
+                            <li class="list-group-item border-0 ps-0"><i class="bi bi-check2 text-success me-2"></i>Thông tin tài khoản đăng nhập (Tên tài khoản, mật khẩu đã mã hóa).</li>
+                            <li class="list-group-item border-0 ps-0"><i class="bi bi-check2 text-success me-2"></i>Lịch sử đặt vé và các dịch vụ đi kèm.</li>
+                        </ul>
+                    </div>
+
+                    <div class="mb-5">
+                        <h4 class="fw-bold text-primary mb-3"><i class="bi bi-eye me-2"></i>2. Cách chúng tôi sử dụng thông tin</h4>
+                        <p class="text-secondary">Thông tin của bạn được sử dụng vào các mục đích chính đáng:</p>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="p-3 border rounded-3 bg-light">
+                                    <h6 class="fw-bold">Xác nhận đặt vé</h6>
+                                    <small class="text-muted">Gửi mã vé điện tử về Email cho bạn ngay sau khi thanh toán.</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="p-3 border rounded-3 bg-light">
+                                    <h6 class="fw-bold">Cải thiện dịch vụ</h6>
+                                    <small class="text-muted">Phân tích thị hiếu phim để gợi ý các bộ phim phù hợp với bạn.</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-5">
+                        <h4 class="fw-bold text-primary mb-3"><i class="bi bi-lock me-2"></i>3. Bảo mật dữ liệu</h4>
+                        <p class="text-secondary">
+                            Chúng tôi sử dụng công nghệ mã hóa <strong>SSL/TLS</strong> cho toàn bộ giao diện thanh toán. Mật khẩu của bạn được băm (hashing) trước khi lưu vào cơ sở dữ liệu để đảm bảo ngay cả quản trị viên cũng không thể đọc được.
+                        </p>
+                    </div>
+
+                    <div class="alert alert-warning border-0 rounded-3 d-flex align-items-center" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill fs-4 me-3"></i>
+                        <div>
+                            <strong>Lưu ý quan trọng:</strong> Chúng tôi không bao giờ yêu cầu bạn cung cấp mật khẩu qua điện thoại hoặc Email.
+                        </div>
+                    </div>
+
+                </div>
+                <div class="card-footer bg-light border-0 py-3 text-center">
+                    <p class="mb-0 text-muted small">Cập nhật lần cuối: @DateTime.Now.ToString("dd/MM/yyyy")</p>
+                </div>
+            </div>
+
+            <div class="text-center mt-4">
+                <a asp-controller="Home" asp-action="Index" class="btn btn-link text-decoration-none">
+                    <i class="bi bi-arrow-left"></i> Quay lại trang chủ
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    body {
+        background-color: #f8f9fa;
+    }
+
+    .icon-box {
+        transition: transform 0.3s ease;
+    }
+
+        .icon-box:hover {
+            transform: rotate(15deg);
+        }
+</style>

@@ -1,0 +1,130 @@
+@model Cinema.DTO.PhimDTO
+
+@{
+    ViewData["Title"] = Model.TenPhim;
+}
+
+<div class="container mt-5">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-action="Index">Trang chủ</a></li>
+            <li class="breadcrumb-item active">@Model.TenPhim</li>
+        </ol>
+    </nav>
+
+    <div class="row mt-4">
+        <div class="col-md-4">
+            <div class="position-relative">
+                <img src="@(string.IsNullOrEmpty(Model.Hinh) ? $"https://via.placeholder.com/400x600?text={Model.TenPhim}" : Model.Hinh.StartsWith("http") ? Model.Hinh : $"/images/phim/{Model.Hinh}")"
+                     class="img-fluid rounded shadow-lg" alt="@Model.TenPhim" />
+
+                @if (Model.GioiHanTuoi >= 18)
+                {
+                    <div class="position-absolute top-0 start-0 m-2">
+                        <span class="badge bg-danger p-2">CẤM TRẺ EM</span>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <h1 class="display-4 fw-bold text-uppercase">@Model.TenPhim</h1>
+            <hr />
+
+            <div class="d-flex gap-4 mb-4">
+                <p class="fs-5">
+                    <i class="bi bi-clock-history text-primary"></i>
+                    <strong>Thời lượng:</strong> @Model.ThoiLuong phút
+                </p>
+                <p class="fs-5">
+                    <i class="bi bi-shield-exclamation text-danger"></i>
+                    <strong>Độ tuổi:</strong>
+                    <span class="badge bg-danger">@(Model.GioiHanTuoi)</span>
+                </p>
+            </div>
+
+            <div class="card bg-light border-0 p-3 mb-4">
+                <h5 class="fw-bold">Nội dung phim</h5>
+                <p class="text-muted" style="text-align: justify;">
+                    @(string.IsNullOrEmpty(Model.MoTa) ? "Thông tin mô tả phim đang được cập nhật..." : Model.MoTa)
+                </p>
+            </div>
+
+            <h3 class="mt-5 text-primary"><i class="bi bi-calendar-check"></i> CHỌN SUẤT CHIẾU</h3>
+            <div class="d-flex flex-wrap gap-3 mt-3">
+                @if (Model.SuatChieus != null && Model.SuatChieus.Any())
+                {
+                    @foreach (var suat in Model.SuatChieus)
+                    {
+                        <button type="button"
+                                class="btn btn-outline-dark btn-lg px-4 btn-suat"
+                                data-id="@suat.MaSuat">
+                            <i class="bi bi-play-circle"></i> @suat.GioBatDau.Value.ToString(@"hh\:mm")
+                        </button>
+                    }
+                }
+                else
+                {
+                    <div class="alert alert-warning w-100">
+                        <i class="bi bi-info-circle"></i> Hiện chưa có suất chiếu nào cho phim này. Vui lòng quay lại sau!
+                    </div>
+                }
+            </div>
+
+            <div class="mt-5 pt-3">
+                <a id="btnDatVe" href="javascript:void(0)" onclick="checkSelection()"
+                   class="btn btn-success btn-lg px-5 py-3 shadow w-100 fw-bold border-3">
+                    <i class="bi bi-ticket-perforated"></i> TIẾN HÀNH ĐẶT VÉ NGAY
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('.btn-suat').click(function () {
+                $('.btn-suat').removeClass('active btn-dark text-white').addClass('btn-outline-dark');
+                $(this).addClass('active btn-dark text-white').removeClass('btn-outline-dark');
+
+                let maSuat = $(this).data('id');
+                $('#btnDatVe').attr('data-selected-id', maSuat);
+
+                $('#btnDatVe').attr('href', '/Phim/ChonGhe?maSuat=' + maSuat);
+            });
+        });
+
+        function checkSelection() {
+            let selectedId = $('#btnDatVe').attr('data-selected-id');
+            let finalHref = $('#btnDatVe').attr('href');
+
+            if (!selectedId || finalHref === "javascript:void(0)") {
+                alert("Bạn chưa chọn giờ chiếu! Vui lòng chọn một khung giờ để tiếp tục.");
+            } else {
+                window.location.href = finalHref;
+            }
+        }
+    </script>
+}
+
+<style>
+    .btn-suat {
+        transition: all 0.3s ease;
+        border-radius: 10px;
+    }
+
+        .btn-suat:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+    .breadcrumb-item a {
+        text-decoration: none;
+        color: #6c757d;
+    }
+
+    .breadcrumb-item.active {
+        color: #0d6efd;
+        font-weight: bold;
+    }
+</style>
