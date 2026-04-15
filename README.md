@@ -2,7 +2,7 @@
 
 ## Giới thiệu
 
-Đồ án cuối kỳ môn Lập trình Cơ sở dữ liệu — Xây dựng ứng dụng web quản lý rạp chiếu phim với đầy đủ chức năng: đặt vé, chọn ghế, mua combo bắp nước, quản lý phim/suất chiếu, báo cáo doanh thu.
+Đồ án cuối kỳ môn Lập trình Cơ sở dữ liệu — Xây dựng ứng dụng web quản lý rạp chiếu phim với đầy đủ chức năng: đặt vé, chọn ghế, lọc suất chiếu theo ngày giờ trực quan, mua combo bắp nước, quản lý phim/suất chiếu/dịch vụ, báo cáo doanh thu và bảo vệ an toàn danh tính người dùng bằng thuật toán băm mật khẩu BCrypt.
 
 ## Thành viên nhóm
 
@@ -76,6 +76,11 @@ CinemaManagementSystem/
 - `DichVuApiController` — CRUD dịch vụ
 - Trả dữ liệu định dạng **JSON** chuẩn RESTful
 
+### 6. Các tính năng nâng cao
+
+- **Bộ lọc động:** Bộ chọn lịch ngày tháng cho suất chiếu hiển thị trực quan ở trang chủ.
+- **Bảo mật:** Mã hóa mật khẩu an toàn tuyến tính tự động với **BCrypt**.
+
 ## Hướng dẫn cài đặt & chạy
 
 ### Yêu cầu
@@ -96,7 +101,7 @@ cd CinemaManagementSystem
 2. **Tạo Database**
 
 - Mở SSMS, tạo database `QuanLyRapPhim`
-- Chạy script tạo bảng (nếu có)
+- Khởi tạo toàn bộ Cấu trúc Bảng và Khóa ngoại bằng bằng việc chạy script: `DatabaseScripts/CreateAllTables_EF.sql`
 - Chạy file `DatabaseScripts/CinemaManagement.sql` để tạo View, Function, SP, Trigger
 
 3. **Cấu hình Connection String**
@@ -113,6 +118,7 @@ dotnet run
 
 5. **Truy cập**
 
-- Website: `https://localhost:7059`
-- Admin: `https://localhost:7059//Admin`
-- API: `https://localhost:7059/api/phimapi`
+- Dành cho Khách Hàng (Website MVC): `https://localhost:7059` (hoặc `/Phim/Index`)
+- Khu vực Quản Trị Hệ Thống (Admin): `https://localhost:7059/Admin`
+- RESTful Web API Phim (trả dữ liệu JSON): `https://localhost:7059/api/phimapi`
+- RESTful Web API Dịch vụ (trả dữ liệu JSON): `https://localhost:7059/api/dichvuapi`
