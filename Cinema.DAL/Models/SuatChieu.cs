@@ -21,8 +21,6 @@ public partial class SuatChieu
 
     public string? TrangThai { get; set; }
 
-    public virtual ICollection<Ghe> Ghes { get; set; } = new List<Ghe>();
-
     public virtual Phim? MaPhimNavigation { get; set; }
 
     public virtual Phong? MaPhongNavigation { get; set; }

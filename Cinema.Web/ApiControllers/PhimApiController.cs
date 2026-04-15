@@ -75,10 +75,11 @@ namespace Cinema.Web.ApiControllers
                 return BadRequest(new { message = "Dữ liệu phim không hợp lệ" });
             }
 
-            bool result = _phimBus.ThemPhim(dto);
-            if (result)
+            int newId = _phimBus.ThemPhim(dto);
+            if (newId > 0)
             {
-                return CreatedAtAction(nameof(GetPhim), new { id = dto.MaPhim }, dto);
+                dto.MaPhim = newId;
+                return CreatedAtAction(nameof(GetPhim), new { id = newId }, dto);
             }
             return StatusCode(500, new { message = "Không thể thêm phim" });
         }
@@ -150,11 +151,7 @@ namespace Cinema.Web.ApiControllers
             }
         }
 
-        /// <summary>
-        /// GET: api/phimapi/adonet-dataset
-        /// Lấy dữ liệu bằng ADO.NET DataSet (chứa nhiều DataTable: Phim + SuatChieu)
-        /// Minh họa mô hình phi kết nối hoàn chỉnh
-        /// </summary>
+        
         [HttpGet("adonet-dataset")]
         public IActionResult GetPhimsDataSet()
         {

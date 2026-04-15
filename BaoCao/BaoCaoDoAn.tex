@@ -75,7 +75,6 @@ BoldItalicFont=Times New Roman Bold Italic.ttf,
 \renewcommand{\listfigurename}{\hfill\bfseries\Large DANH MỤC HÌNH ẢNH} 
 \renewcommand{\cftafterloftitle}{\hfill}
 
-% SQL Code listing style
 \lstdefinestyle{sqlstyle}{
     language=SQL,
     basicstyle=\ttfamily\small,
@@ -91,7 +90,6 @@ BoldItalicFont=Times New Roman Bold Italic.ttf,
     tabsize=4,
 }
 
-% C# Code listing style
 \lstdefinestyle{csharpstyle}{
     language=[Sharp]C,
     basicstyle=\ttfamily\small,
@@ -107,11 +105,9 @@ BoldItalicFont=Times New Roman Bold Italic.ttf,
     tabsize=4,
 }
 
-% ============================================================
 \begin{document}
 \thispagestyle{empty}
 
-% TRANG BÌA
 \begin{figure}[h!]
 \begin{center}
 \includegraphics[width=7.5cm]{HCMCOU_Logo.png}
@@ -152,7 +148,6 @@ BoldItalicFont=Times New Roman Bold Italic.ttf,
 \textbf{TRƯỜNG ĐẠI HỌC MỞ TP.HCM (HCMCOU)}
 \end{center}
 
-% ============================================================
 \newpage
 \pagenumbering{roman}
 
@@ -181,7 +176,6 @@ Báo cáo được tổ chức theo các chương: Chương 1 trình bày tổng
 
 \noindent{\textbf{Từ khóa:}} ASP.NET Core MVC, Entity Framework Core, SQL Server T-SQL, ADO.NET, LINQ, LINQ to XML, RESTful Web API, Kiến trúc 3 lớp, Quản lý rạp phim.
 
-% ============================================================
 \newpage
 \tableofcontents
 
@@ -193,7 +187,6 @@ Báo cáo được tổ chức theo các chương: Chương 1 trình bày tổng
 \addcontentsline{toc}{chapter}{DANH MỤC BẢNG}
 \listoftables
 
-% ============================================================
 \newpage
 \pagenumbering{arabic}
 
@@ -268,7 +261,6 @@ Báo cáo được tổ chức theo các chương: Chương 1 trình bày tổng
     \caption{Bảng công nghệ sử dụng}\label{table_tech}
 \end{table}
 
-% ============================================================
 \chapter{Phân tích và Thiết kế Cơ sở Dữ liệu (T-SQL)}
 
 \section{Sơ đồ thực thể mối quan hệ (ERD)}\label{Sec2.1}
@@ -456,19 +448,18 @@ public int LuuVaThanhToan(CartItemDTO cart, string username)
                 });
             }
             _context.SaveChanges();
-            transaction.Commit();   // Commit toàn bộ khi thành công
+            transaction.Commit();   
             return hoaDon.MaHd;
         }
         catch (Exception)
         {
-            transaction.Rollback(); // Hoàn tác nếu có lỗi
+            transaction.Rollback(); 
             return 0;
         }
     }
 }
 \end{lstlisting}
 
-% ============================================================
 \chapter{Kiến trúc Phần mềm (3-Layer Architecture)}
 
 \noindent Hệ thống được tổ chức theo kiến trúc \textbf{3 lớp} tách biệt hoàn toàn gồm bốn dự án (project) riêng trong một Solution:
@@ -588,7 +579,6 @@ public int LuuVaThanhToan(CartItemDTO cart, string username)
     \item \textbf{ADO.NET:} Lớp \texttt{CinemaAdoNetDAL} (triển khai \texttt{ICinemaAdoNetDAL}) cung cấp các phương thức truy cập thuần túy bằng \texttt{SqlConnection}, \texttt{SqlCommand}, \texttt{SqlDataAdapter}, \texttt{DataTable} và \texttt{DataSet}.
 \end{itemize}
 
-% ============================================================
 \chapter{Thực thi Kỹ thuật và Công nghệ}
 
 \section{Entity Framework Core: Database First và Code First}\label{Sec4.1}

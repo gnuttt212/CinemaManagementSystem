@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using BCrypt.Net;
 
 namespace Cinema.BUS
 {
@@ -24,7 +25,7 @@ namespace Cinema.BUS
             var newUser = new NguoiDung
             {
                 TaiKhoan = req.TaiKhoan,
-                MatKhau = req.MatKhau,
+                MatKhau = BCrypt.Net.BCrypt.HashPassword(req.MatKhau),
                 HoTen = req.HoTen,
                 Email = req.Email
             };
@@ -34,7 +35,25 @@ namespace Cinema.BUS
 
         public bool DangNhap(LoginRequest req)
         {
-            return _db.NguoiDungs.Any(u => u.TaiKhoan == req.TaiKhoan && u.MatKhau == req.MatKhau);
+            var user = _db.NguoiDungs.FirstOrDefault(u => u.TaiKhoan == req.TaiKhoan);
+            if (user == null) return false;
+            return BCrypt.Net.BCrypt.Verify(req.MatKhau, user.MatKhau);
+        }
+
+        public NguoiDungDTO? LayNguoiDungSauDangNhap(LoginRequest req)
+        {
+            var user = _db.NguoiDungs.FirstOrDefault(u => u.TaiKhoan == req.TaiKhoan);
+            if (user == null || !BCrypt.Net.BCrypt.Verify(req.MatKhau, user.MatKhau))
+                return null;
+
+            return new NguoiDungDTO
+            {
+                MaND = user.MaNd,
+                TaiKhoan = user.TaiKhoan ?? "",
+                HoTen = user.HoTen ?? "",
+                Email = user.Email ?? "",
+                IsAdmin = user.IsAdmin ?? false
+            };
         }
 
         public NguoiDungDTO LayThongTinProfile(string taiKhoan)
@@ -61,11 +80,11 @@ namespace Cinema.BUS
                 }).ToList()
             };
         }
-        public bool CapNhatProfile(NguoiDung model)
+        public bool CapNhatProfile(NguoiDungDTO model)
         {
             try
             {
-                var user = _db.NguoiDungs.Find(model.MaNd);
+                var user = _db.NguoiDungs.Find(model.MaND);
                 if (user == null) return false;
                 user.HoTen = model.HoTen;
                 user.Email = model.Email;
@@ -82,9 +101,9 @@ namespace Cinema.BUS
                 var user = _db.NguoiDungs.FirstOrDefault(u => u.TaiKhoan == taiKhoan);
                 if (user == null) return false;
 
-                if (user.MatKhau != matKhauCu) return false;
+                if (!BCrypt.Net.BCrypt.Verify(matKhauCu, user.MatKhau)) return false;
 
-                user.MatKhau = matKhauMoi;
+                user.MatKhau = BCrypt.Net.BCrypt.HashPassword(matKhauMoi);
                 return _db.SaveChanges() > 0;
             }
             catch { return false; }

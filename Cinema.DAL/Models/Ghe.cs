@@ -9,15 +9,11 @@ public partial class Ghe
 
     public string? TenGhe { get; set; }
 
-    public int? MaSuat { get; set; }
-
-    public bool? DaDat { get; set; }
-
     public string? LoaiGhe { get; set; }
 
     public int? MaPhong { get; set; }
 
-    public virtual SuatChieu? MaSuatNavigation { get; set; }
+    public virtual Phong? MaPhongNavigation { get; set; }
 
     public virtual ICollection<Ve> Ves { get; set; } = new List<Ve>();
 }

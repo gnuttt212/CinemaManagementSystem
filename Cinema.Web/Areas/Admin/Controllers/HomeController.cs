@@ -7,6 +7,7 @@ using System.Text.Json;
 namespace Cinema.Web.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [AdminAuthorize]
     public class HomeController : Controller
     {
         private readonly QuanLyRapPhimContext _context;

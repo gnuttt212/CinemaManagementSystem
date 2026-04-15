@@ -33,13 +33,14 @@ namespace Cinema.BUS
                 .ToList();
         }
 
-        public List<PhimDTO> LayDanhSachPhimDangChieu()
+        public List<PhimDTO> LayDanhSachPhimDangChieu(DateTime? selectedDate = null)
         {
-            var today = DateTime.Today; 
+            var targetDate = selectedDate.HasValue ? DateOnly.FromDateTime(selectedDate.Value) : DateOnly.FromDateTime(DateTime.Today);
 
             return _db.Phims
-                .Include(p => p.SuatChieus) 
-                .Where(p => p.ThoiLuong > 0)
+                .Include(p => p.SuatChieus)
+                .Include(p => p.MaLoaiPhimNavigation)
+                .Where(p => p.ThoiLuong > 0 && p.SuatChieus.Any(s => s.NgayChieu == targetDate))
                 .Select(p => new PhimDTO
                 {
                     MaPhim = p.MaPhim,
@@ -48,9 +49,9 @@ namespace Cinema.BUS
                     GioiHanTuoi = p.GioiHanTuoi,
                     NgayKhoiChieu = p.NgayKhoiChieu,
                     Hinh = p.Hinh,
-                    TheLoai = "Phim Đang Chiếu",
+                    TheLoai = p.MaLoaiPhimNavigation != null ? p.MaLoaiPhimNavigation.TenLoai : "Chưa phân loại",
                     DanhSachSuatChieu = p.SuatChieus
-                        .Where(s => s.NgayChieu >= DateOnly.FromDateTime(DateTime.Today))
+                        .Where(s => s.NgayChieu == targetDate)
                         .OrderBy(s => s.GioBatDau)
                         .Select(s => new SuatChieuHienThiDTO
                         {
@@ -63,7 +64,7 @@ namespace Cinema.BUS
 
         public List<PhimDTO> LayDanhSachPhimDangChieu_SP()
         {
-            var phims = _db.Phims.FromSqlRaw("EXEC sp_LayDanhSachPhimDangChieu").ToList();
+            var phims = _db.Phims.FromSqlRaw("EXEC sp_LayDanhSachPhimDangChieu").Include(p => p.MaLoaiPhimNavigation).ToList();
             var maPhims = phims.Select(p => p.MaPhim).ToList();
 
             var today = DateOnly.FromDateTime(DateTime.Today);
@@ -79,7 +80,7 @@ namespace Cinema.BUS
                 GioiHanTuoi = p.GioiHanTuoi,
                 NgayKhoiChieu = p.NgayKhoiChieu,
                 Hinh = p.Hinh,
-                TheLoai = "Phim Đang Chiếu (SP)",
+                TheLoai = p.MaLoaiPhimNavigation != null ? p.MaLoaiPhimNavigation.TenLoai : "Chưa phân loại",
                 DanhSachSuatChieu = suatChieusToday
                     .Where(s => s.MaPhim == p.MaPhim)
                     .OrderBy(s => s.GioBatDau)
@@ -99,6 +100,7 @@ namespace Cinema.BUS
 
             return _db.Phims
                 .Include(p => p.SuatChieus)
+                .Include(p => p.MaLoaiPhimNavigation)
                 .Where(p => p.TenPhim.ToLower().Contains(q))
                 .Select(p => new PhimDTO
                 {
@@ -108,7 +110,7 @@ namespace Cinema.BUS
                     GioiHanTuoi = p.GioiHanTuoi,
                     NgayKhoiChieu = p.NgayKhoiChieu,
                     Hinh = p.Hinh,
-                    TheLoai = "Kết quả tìm kiếm",
+                    TheLoai = p.MaLoaiPhimNavigation != null ? p.MaLoaiPhimNavigation.TenLoai : "Chưa phân loại",
                     DanhSachSuatChieu = p.SuatChieus
                         .Where(s => s.NgayChieu >= DateOnly.FromDateTime(DateTime.Today))
                         .OrderBy(s => s.GioBatDau)
@@ -134,6 +136,7 @@ namespace Cinema.BUS
                 NgayKhoiChieu = phim.NgayKhoiChieu,
                 GioiHanTuoi = phim.GioiHanTuoi ?? 0,
                 Hinh = phim.Hinh,
+                MaLoaiPhim = phim.MaLoaiPhim,
                 SuatChieus = _db.SuatChieus.Where(s => s.MaPhim == maPhim)
                     .Select(s => new SuatChieuDTO
                     {
@@ -143,7 +146,7 @@ namespace Cinema.BUS
             };
         }
 
-        public bool ThemPhim(PhimDTO dto)
+        public int ThemPhim(PhimDTO dto)
         {
             try
             {
@@ -154,12 +157,13 @@ namespace Cinema.BUS
                     GioiHanTuoi = dto.GioiHanTuoi,
                     NgayKhoiChieu = dto.NgayKhoiChieu,
                     Hinh = dto.Hinh,
-                    MaLoaiPhim = 1
+                    MaLoaiPhim = dto.MaLoaiPhim ?? 1
                 };
                 _db.Phims.Add(phim);
-                return _db.SaveChanges() > 0;
+                _db.SaveChanges();
+                return phim.MaPhim;
             }
-            catch { return false; }
+            catch { return 0; }
         }
 
         public bool SuaPhim(PhimDTO dto)
@@ -174,6 +178,7 @@ namespace Cinema.BUS
                 phim.GioiHanTuoi = dto.GioiHanTuoi;
                 phim.NgayKhoiChieu = dto.NgayKhoiChieu;
                 phim.Hinh = dto.Hinh;
+                phim.MaLoaiPhim = dto.MaLoaiPhim;
 
                 return _db.SaveChanges() > 0;
             }
@@ -207,5 +212,37 @@ namespace Cinema.BUS
                     DaDat = _db.Ves.Any(v => v.MaGhe == g.MaGhe && v.MaSuat == maSuat)
                 }).ToList();
         }
+
+        // === Các method hỗ trợ luồng chọn ghế (tránh Controller gọi _db trực tiếp) ===
+
+        public SuatChieu? LaySuatChieu(int maSuat)
+        {
+            return _db.SuatChieus.Find(maSuat);
+        }
+
+        public SuatChieu? LaySuatChieuChiTiet(int maSuat)
+        {
+            return _db.SuatChieus
+                .Include(s => s.MaPhimNavigation)
+                .FirstOrDefault(s => s.MaSuat == maSuat);
+        }
+
+        public List<Ghe> LayDanhSachGheTheoPhong(int maPhong)
+        {
+            return _db.Ghes
+                .Where(g => g.MaPhong == maPhong)
+                .OrderBy(g => g.TenGhe)
+                .ToList();
+        }
+
+        public Ghe? LayGheTheoTenVaPhong(string tenGhe, int maPhong)
+        {
+            return _db.Ghes.FirstOrDefault(g => g.TenGhe == tenGhe && g.MaPhong == maPhong);
+        }
+
+        public DichVu? LayDichVu(int maDV)
+        {
+            return _db.DichVus.Find(maDV);
+        }
     }
-}
+}
