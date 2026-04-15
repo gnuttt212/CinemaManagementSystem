@@ -1,5 +1,6 @@
 using Cinema.BUS;
 using Cinema.DAL.Models;
+using Cinema.DTO;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -38,7 +39,7 @@ namespace Cinema.Web.Controllers
             return View(user);
         }
         [HttpPost]
-        public IActionResult EditProfile(NguoiDung model)
+        public IActionResult EditProfile(NguoiDungDTO model)
         {
             if (ModelState.IsValid)
             {

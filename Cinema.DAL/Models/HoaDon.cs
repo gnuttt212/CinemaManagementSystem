@@ -11,8 +11,6 @@ public partial class HoaDon
 
     public decimal? TongTien { get; set; }
 
-    public string? TaiKhoan { get; set; }
-
     public int? MaNd { get; set; }
 
     public virtual ICollection<ChiTietDv> ChiTietDvs { get; set; } = new List<ChiTietDv>();

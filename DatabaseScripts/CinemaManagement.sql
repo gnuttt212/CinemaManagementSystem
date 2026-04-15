@@ -54,13 +54,7 @@ BEGIN
         p.MaLoaiPhim, 
         p.GioiHanTuoi, 
         p.NgayKhoiChieu, 
-        p.NgayKetThuc, 
-        p.Hinh, 
-        p.TrangThai, 
-        p.MoTa,
-        p.DaoDien,
-        p.DienVien,
-        p.NamPhatHanh
+        p.Hinh
     FROM Phim p
     WHERE EXISTS (
         SELECT 1 

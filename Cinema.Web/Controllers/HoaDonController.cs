@@ -54,6 +54,11 @@ namespace Cinema.Web.Controllers
                 });
             }
 
+            if (maHDMoi == -1)
+            {
+                return Json(new { success = false, message = "Ghế đã bị người khác đặt trước. Vui lòng chọn ghế khác!" });
+            }
+
             return Json(new { success = false, message = "Lưu hóa đơn thất bại. Vui lòng thử lại sau!" });
         }
         public IActionResult ThanhToanThanhCong(int id)

@@ -1,9 +1,7 @@
 using Cinema.BUS;
-using Cinema.DAL.Models;
 using Cinema.DTO;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,20 +12,25 @@ namespace Cinema.Web.Controllers
     {
         private readonly IPhimBUS _phimBus;
         private readonly IDichVuBUS _dichVuBus;
-        private readonly IHoaDonBUS _hoaDonBus; 
-        private readonly QuanLyRapPhimContext _db;
+        private readonly IHoaDonBUS _hoaDonBus;
 
-        public PhimController(IPhimBUS phimBus, IDichVuBUS dichVuBus, IHoaDonBUS hoaDonBus, QuanLyRapPhimContext db)
+        public PhimController(IPhimBUS phimBus, IDichVuBUS dichVuBus, IHoaDonBUS hoaDonBus)
         {
             _phimBus = phimBus;
             _dichVuBus = dichVuBus;
-            _hoaDonBus = hoaDonBus; 
-            _db = db;
+            _hoaDonBus = hoaDonBus;
         }
 
-        public IActionResult Index()
+        public IActionResult Index(string date)
         {
-            var dsPhim = _phimBus.LayDanhSachPhimDangChieu();
+            DateTime? selectedDate = null;
+            if (!string.IsNullOrEmpty(date) && DateTime.TryParseExact(date, "yyyy-MM-dd", null, System.Globalization.DateTimeStyles.None, out var parsedDate))
+            {
+                selectedDate = parsedDate;
+            }
+            
+            var dsPhim = _phimBus.LayDanhSachPhimDangChieu(selectedDate);
+            ViewBag.SelectedDate = selectedDate;
             return View(dsPhim);
         }
 
@@ -48,32 +51,29 @@ namespace Cinema.Web.Controllers
             if (phim == null) return NotFound();
             return View(phim);
         }
+
         public IActionResult ChonGhe(int maSuat)
         {
-            var suatChieu = _db.SuatChieus.FirstOrDefault(s => s.MaSuat == maSuat);
+            var suatChieu = _phimBus.LaySuatChieu(maSuat);
             if (suatChieu == null) return NotFound();
 
-            var danhSachGhe = _db.Ghes
-                .Where(g => g.MaPhong == suatChieu.MaPhong)
-                .OrderBy(g => g.TenGhe)
-                .ToList();
+            var danhSachGhe = _phimBus.LayDanhSachGheTheoPhong(suatChieu.MaPhong ?? 0);
             var gheDaDat = _hoaDonBus.LayDanhSachMaGheDaDat(maSuat);
 
             ViewBag.DichVus = _dichVuBus.LayDanhSachDichVu();
             ViewBag.MaSuat = maSuat;
             ViewBag.GiaVeGoc = suatChieu.GiaVe ?? 0;
-            ViewBag.GheDaDat = gheDaDat; 
+            ViewBag.GheDaDat = gheDaDat;
 
             return View(danhSachGhe);
         }
+
         [HttpPost]
         public IActionResult LuuGheVaoSession(List<string> ghes, int maSuat, List<DichVuChonDTO> dichVus)
         {
             try
             {
-                var suatChieu = _db.SuatChieus
-                    .Include(s => s.MaPhimNavigation)
-                    .FirstOrDefault(s => s.MaSuat == maSuat);
+                var suatChieu = _phimBus.LaySuatChieuChiTiet(maSuat);
 
                 if (suatChieu == null)
                 {
@@ -82,8 +82,7 @@ namespace Cinema.Web.Controllers
 
                 foreach (var tenGhe in ghes)
                 {
-                    var gheInfo = _db.Ghes.FirstOrDefault(g => g.TenGhe == tenGhe &&
-                                  g.MaPhong == suatChieu.MaPhong);
+                    var gheInfo = _phimBus.LayGheTheoTenVaPhong(tenGhe, suatChieu.MaPhong ?? 0);
 
                     if (gheInfo != null)
                     {
@@ -93,9 +92,6 @@ namespace Cinema.Web.Controllers
                         }
                     }
                 }
-
-                if (suatChieu == null)
-                    return Json(new { success = false, message = "Suất chiếu không tồn tại!" });
 
                 var cart = HttpContext.Session.Get<CartItemDTO>("GioHang") ?? new CartItemDTO();
 
@@ -109,7 +105,7 @@ namespace Cinema.Web.Controllers
                 if (dichVus != null && dichVus.Any())
                 {
                     cart.DichVus = dichVus.Select(d => {
-                        var dvInfo = _db.DichVus.Find(d.MaDV);
+                        var dvInfo = _phimBus.LayDichVu(d.MaDV);
                         return new DichVuDTO
                         {
                             MaDV = d.MaDV,

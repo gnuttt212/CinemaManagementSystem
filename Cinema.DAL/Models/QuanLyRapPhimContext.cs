@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 
@@ -35,11 +35,11 @@ public partial class QuanLyRapPhimContext : DbContext
 
     public virtual DbSet<Ve> Ves { get; set; }
 
-    // Code First: Bảng mới tạo bằng Migration (không scaffold từ DB)
-    public virtual DbSet<NhatKyHeThong> NhatKyHeThongs { get; set; }
+    public virtual DbSet<VwDoanhThuTheoPhim> VwDoanhThuTheoPhims { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseSqlServer("Name=DefaultConnection");
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+        => optionsBuilder.UseSqlServer("Server=DESKTOP-0CBT09R\\SQLEXPRESS;Database=QuanLyRapPhim;Trusted_Connection=True;TrustServerCertificate=True");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -79,33 +79,31 @@ public partial class QuanLyRapPhimContext : DbContext
 
         modelBuilder.Entity<Ghe>(entity =>
         {
-            entity.HasKey(e => e.MaGhe).HasName("PK__Ghe__3CD3C67BD2850B1A");
+            entity.HasKey(e => e.MaGhe).HasName("DF__Ghe__DaDat__3D5E1FD2");
 
             entity.ToTable("Ghe");
 
-            entity.Property(e => e.DaDat).HasDefaultValue(false);
             entity.Property(e => e.LoaiGhe).HasMaxLength(20);
             entity.Property(e => e.TenGhe)
                 .HasMaxLength(10)
                 .IsUnicode(false);
 
-            entity.HasOne(d => d.MaSuatNavigation).WithMany(p => p.Ghes)
-                .HasForeignKey(d => d.MaSuat)
-                .HasConstraintName("FK__Ghe__MaSuat__3C69FB99");
+            entity.HasOne(d => d.MaPhongNavigation).WithMany(p => p.Ghes)
+                .HasForeignKey(d => d.MaPhong)
+                .HasConstraintName("FK_Ghe_Phong");
         });
 
         modelBuilder.Entity<HoaDon>(entity =>
         {
             entity.HasKey(e => e.MaHd).HasName("PK__HoaDon__2725A6E0E68C72B0");
 
-            entity.ToTable("HoaDon");
+            entity.ToTable("HoaDon", tb => tb.HasTrigger("trg_NganXoaHoaDonCoVe"));
 
             entity.Property(e => e.MaHd).HasColumnName("MaHD");
             entity.Property(e => e.MaNd).HasColumnName("MaND");
             entity.Property(e => e.NgayLap)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
-            entity.Property(e => e.TaiKhoan).HasMaxLength(100);
             entity.Property(e => e.TongTien)
                 .HasDefaultValue(0m)
                 .HasColumnType("money");
@@ -203,7 +201,7 @@ public partial class QuanLyRapPhimContext : DbContext
 
             entity.HasOne(d => d.MaGheNavigation).WithMany(p => p.Ves)
                 .HasForeignKey(d => d.MaGhe)
-                .HasConstraintName("FK__Ve__MaGhe__4E88ABD4");
+                .HasConstraintName("FK_Ve_Ghe");
 
             entity.HasOne(d => d.MaHdNavigation).WithMany(p => p.Ves)
                 .HasForeignKey(d => d.MaHd)
@@ -212,6 +210,16 @@ public partial class QuanLyRapPhimContext : DbContext
             entity.HasOne(d => d.MaSuatNavigation).WithMany(p => p.Ves)
                 .HasForeignKey(d => d.MaSuat)
                 .HasConstraintName("FK__Ve__MaSuat__4D94879B");
+        });
+
+        modelBuilder.Entity<VwDoanhThuTheoPhim>(entity =>
+        {
+            entity
+                .HasNoKey()
+                .ToView("vw_DoanhThuTheoPhim");
+
+            entity.Property(e => e.TenPhim).HasMaxLength(200);
+            entity.Property(e => e.TongDoanhThu).HasColumnType("money");
         });
 
         OnModelCreatingPartial(modelBuilder);

@@ -1,38 +1,40 @@
-using Cinema.DAL.Models;
+using Cinema.BUS;
+using Cinema.DTO;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
-using System.Linq;
 
 namespace Cinema.Web.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly QuanLyRapPhimContext _db;
+        private readonly INguoiDungBUS _nguoiDungBus;
 
-        public AccountController(QuanLyRapPhimContext db)
+        public AccountController(INguoiDungBUS nguoiDungBus)
         {
-            _db = db;
+            _nguoiDungBus = nguoiDungBus;
         }
 
         [HttpGet]
         public IActionResult Login()
         {
-            
             if (HttpContext.Session.GetString("UserAccount") != null)
             {
                 return RedirectToAction("Index", "Home");
             }
             return View();
         }
+
         [HttpPost]
-        public IActionResult Login(string TaiKhoan, string MatKhau)
+        public IActionResult Login(LoginRequest req)
         {
-            var user = _db.NguoiDungs.FirstOrDefault(u => u.TaiKhoan == TaiKhoan && u.MatKhau == MatKhau);
+            if (!ModelState.IsValid) return View();
+
+            var user = _nguoiDungBus.LayNguoiDungSauDangNhap(req);
 
             if (user != null)
             {
                 HttpContext.Session.SetString("UserAccount", user.TaiKhoan);
-                if (user.IsAdmin == true)
+                if (user.IsAdmin)
                 {
                     HttpContext.Session.SetString("Role", "Admin");
                     return RedirectToAction("Index", "Home", new { area = "Admin" });
@@ -54,15 +56,18 @@ namespace Cinema.Web.Controllers
         }
 
         [HttpPost]
-        public IActionResult Register(NguoiDung user)
+        public IActionResult Register(RegisterRequest req)
         {
             if (ModelState.IsValid)
             {
-                _db.NguoiDungs.Add(user);
-                _db.SaveChanges();
-                return RedirectToAction("Login");
+                bool result = _nguoiDungBus.DangKy(req);
+                if (result)
+                {
+                    return RedirectToAction("Login");
+                }
+                ModelState.AddModelError("", "Tài khoản đã tồn tại hoặc có lỗi xảy ra!");
             }
-            return View(user);
+            return View(req);
         }
 
         public IActionResult Logout()

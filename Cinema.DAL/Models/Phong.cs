@@ -11,5 +11,7 @@ public partial class Phong
 
     public int? SoLuongGhe { get; set; }
 
+    public virtual ICollection<Ghe> Ghes { get; set; } = new List<Ghe>();
+
     public virtual ICollection<SuatChieu> SuatChieus { get; set; } = new List<SuatChieu>();
 }

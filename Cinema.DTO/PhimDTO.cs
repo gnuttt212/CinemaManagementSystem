@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Cinema.DTO
@@ -13,6 +13,7 @@ namespace Cinema.DTO
         public string? MoTa { get; set; }
         public string Hinh { get; set; } = string.Empty;
         public string TheLoai { get; set; } = string.Empty;
+        public int? MaLoaiPhim { get; set; }
         public string? LoaiGhe { get; set; }
         public List<SuatChieuDTO> SuatChieus { get; set; } = new List<SuatChieuDTO>();
         public List<SuatChieuHienThiDTO> DanhSachSuatChieu { get; set; } = new List<SuatChieuHienThiDTO>();

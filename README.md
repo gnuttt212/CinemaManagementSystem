@@ -6,11 +6,13 @@
 
 ## Thành viên nhóm
 
-| STT | Họ và Tên | MSSV | Vai trò     |
-| --- | --------- | ---- | ----------- |
-| 1   |           |      | Trưởng nhóm |
-| 2   |           |      | Thành viên  |
-
+| STT | Họ và Tên       | MSSV       | Vai trò     |
+| --- | --------------- | ---------- | ----------- |
+| 1   | Trần Thanh Tung | 2351010232 | Trưởng nhóm |
+| 2   |                 |            | Thành viên  |
+| 3   |                 |            | Thành viên  |
+| 4   |                 |            | Thành viên  |
+| 5   |                 |            | Thành viên  |
 ## Phiên bản phần mềm sử dụng
 
 | Phần mềm                            | Phiên bản     |
@@ -87,7 +89,7 @@ CinemaManagementSystem/
 1. **Clone dự án**
 
 ```bash
-git clone <repo-url>
+git clone https://github.com/gnuttt212/CinemaManagementSystem.git
 cd CinemaManagementSystem
 ```
 
@@ -111,6 +113,6 @@ dotnet run
 
 5. **Truy cập**
 
-- Website: `https://localhost:5001`
-- Admin: `https://localhost:5001/Admin`
-- API: `https://localhost:5001/api/phimapi`
+- Website: `https://localhost:7059`
+- Admin: `https://localhost:7059//Admin`
+- API: `https://localhost:7059/api/phimapi`

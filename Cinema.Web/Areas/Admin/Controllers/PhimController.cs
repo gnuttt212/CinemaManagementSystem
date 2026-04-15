@@ -1,4 +1,4 @@
-﻿using Cinema.BUS;
+using Cinema.BUS;
 using Cinema.DTO;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -56,9 +56,9 @@ namespace Cinema.Web.Areas.Admin.Controllers
                 phimDto.Hinh = "no-image.jpg";
             }
 
-            bool result = _phimBus.ThemPhim(phimDto);
+            int newId = _phimBus.ThemPhim(phimDto);
 
-            if (result)
+            if (newId > 0)
             {
                 return RedirectToAction(nameof(Index));
             }

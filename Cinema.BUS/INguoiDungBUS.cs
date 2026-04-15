@@ -10,10 +10,11 @@ namespace Cinema.BUS
 {
     public interface INguoiDungBUS
     {
-        bool CapNhatProfile(NguoiDung model);
+        bool CapNhatProfile(NguoiDungDTO model);
         bool DangKy(RegisterRequest request);
         bool DangNhap(LoginRequest request);
+        NguoiDungDTO? LayNguoiDungSauDangNhap(LoginRequest request);
         NguoiDungDTO LayThongTinProfile(string taiKhoan);
         bool DoiMatKhau(string taiKhoan, string matKhauCu, string matKhauMoi);
     }
-}
+}
