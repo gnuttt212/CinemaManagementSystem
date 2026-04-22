@@ -9,7 +9,7 @@
                 <p class="fs-5">Ghế đã chọn: <span class="badge bg-success">@string.Join(", ", Model.DanhSachGhe)</span></p>
                 <hr />
                 <h5><i class="bi bi-box-seam"></i> Dịch vụ bắp nước:</h5>
-                @if (Model.DichVus != null && Model.DichVus.Any())
+                @if (Model.DoAns != null && Model.DoAns.Any())
                 {
                     <table class="table table-borderless">
                         <thead>
@@ -20,12 +20,12 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var dv in Model.DichVus)
+                            @foreach (var dv in Model.DoAns)
                             {
                                 <tr>
-                                    <td>@dv.TenDV</td>
+                                    <td>@dv.TenDoAn</td>
                                     <td>x @dv.SoLuong</td>
-                                    <td class="text-end">@((dv.DonGia * dv.SoLuong).ToString("N0")) đ</td>
+                                    <td class="text-end">@((dv.Gia * dv.SoLuong).ToString("N0")) đ</td>
                                 </tr>
                             }
                         </tbody>

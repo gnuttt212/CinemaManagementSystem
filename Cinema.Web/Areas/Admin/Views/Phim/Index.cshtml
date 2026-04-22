@@ -28,11 +28,11 @@
                     <tr id="row-@item.MaPhim">
                         <td>
                             @{
-                                var imagePath = string.IsNullOrEmpty(item.Hinh)
+                                var imagePath = string.IsNullOrEmpty(item.Poster)
                                     ? "/images/no-image.jpg"
-                                    : item.Hinh.StartsWith("http") 
-                                        ? item.Hinh 
-                                        : "/images/phim/" + item.Hinh;
+                                    : item.Poster.StartsWith("http") 
+                                        ? item.Poster 
+                                        : "/images/phim/" + item.Poster;
                             }
                             <img src="@imagePath"
                                  class="rounded shadow-sm"

@@ -3,15 +3,17 @@ using System.Collections.Generic;
 
 namespace Cinema.DAL.Models;
 
-public partial class Phong
+public partial class PhongChieu
 {
     public int MaPhong { get; set; }
 
     public string TenPhong { get; set; } = null!;
 
-    public int? SoLuongGhe { get; set; }
+    public string? LoaiPhong { get; set; }
+
+    public int? SucChua { get; set; }
 
     public virtual ICollection<Ghe> Ghes { get; set; } = new List<Ghe>();
 
-    public virtual ICollection<SuatChieu> SuatChieus { get; set; } = new List<SuatChieu>();
+    public virtual ICollection<LichChieu> LichChieus { get; set; } = new List<LichChieu>();
 }

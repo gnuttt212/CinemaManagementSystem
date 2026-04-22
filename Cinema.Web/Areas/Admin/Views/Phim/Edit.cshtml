@@ -1,4 +1,4 @@
-﻿@model Cinema.DTO.PhimDTO
+@model Cinema.DTO.PhimDTO
 @{
     ViewData["Title"] = "Sửa Phim";
     Layout = "_Layout";
@@ -12,7 +12,7 @@
         <div class="card-body p-4">
             <form asp-action="Edit" method="post" enctype="multipart/form-data">
                 <input type="hidden" asp-for="MaPhim" />
-                <input type="hidden" asp-for="Hinh" /> 
+                <input type="hidden" asp-for="Poster" /> 
 
                 <div class="row">
                     <div class="col-md-8">
@@ -31,6 +31,16 @@
                                        value="@(Model.NgayKhoiChieu?.ToString("yyyy-MM-dd"))" />
                             </div>
                         </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Thể loại</label>
+                                <input asp-for="TheLoai" class="form-control" placeholder="Hành động, Hài hước..." />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Đạo diễn</label>
+                                <input asp-for="DaoDien" class="form-control" placeholder="Tên đạo diễn" />
+                            </div>
+                        </div>
                         <div class="mb-3">
                             <label class="form-label fw-bold">Mô tả</label>
                             <textarea asp-for="MoTa" class="form-control" rows="5"></textarea>
@@ -40,7 +50,7 @@
                     <div class="col-md-4 text-center border-start">
                         <label class="form-label fw-bold d-block mb-3">Poster Hiện Tại</label>
                         <div class="mb-3">
-                            <img id="previewImg" src="/images/phim/@Model.Hinh"
+                            <img id="previewImg" src="/images/phim/@Model.Poster"
                                  class="img-thumbnail shadow-sm mb-3"
                                  style="height: 300px; width: 200px; object-fit: cover;"
                                  onerror="this.src='/images/no-image.jpg';" />

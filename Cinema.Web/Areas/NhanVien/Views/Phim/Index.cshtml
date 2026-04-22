@@ -1,0 +1,104 @@
+@model IEnumerable<Cinema.DTO.PhimDTO>
+@{
+    ViewData["Title"] = "Danh sách Phim";
+}
+
+<div class="card shadow border-0 rounded-4">
+    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 fw-bold text-primary">DANH SÁCH PHIM</h5>
+        <a asp-area="NhanVien" asp-controller="Phim" asp-action="Create" class="btn btn-primary rounded-pill">
+            <i class="bi bi-plus-circle me-1"></i> Thêm phim mới
+        </a>
+    </div>
+    <div class="card-body">
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Poster</th>
+                    <th>Tên Phim</th>
+                    <th>Thể Loại</th>
+                    <th>Thời Lượng</th>
+                    <th>Ngày Khởi Chiếu</th>
+                    <th class="text-center">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr id="row-@item.MaPhim">
+                        <td>
+                            @{
+                                var imagePath = string.IsNullOrEmpty(item.Poster)
+                                    ? "/images/no-image.jpg"
+                                    : item.Poster.StartsWith("http") 
+                                        ? item.Poster 
+                                        : "/images/phim/" + item.Poster;
+                            }
+                            <img src="@imagePath"
+                                 class="rounded shadow-sm"
+                                 width="60" height="85"
+                                 style="object-fit: cover;"
+                                 onerror="this.src='/images/no-image.jpg';" />
+                        </td>
+                        <td class="fw-bold">@item.TenPhim</td>
+                        <td>
+                            <span class="badge bg-info text-dark">@item.TheLoai</span>
+                        </td>
+                        <td>@item.ThoiLuong phút</td>
+                        <td>
+                            <i class="bi bi-calendar3 me-1 text-muted"></i>
+                            @item.NgayKhoiChieu?.ToString("dd/MM/yyyy")
+                        </td>
+                        <td class="text-center">
+                            <div class="btn-group">
+                                <a asp-area="NhanVien" asp-controller="Phim" asp-action="Edit" asp-route-id="@item.MaPhim"
+                                   class="btn btn-sm btn-outline-warning mx-1">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <button onclick="confirmDelete(@item.MaPhim)" class="btn btn-sm btn-outline-danger mx-1">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function confirmDelete(id) {
+            Swal.fire({
+                title: 'Bạn có chắc chắn?',
+                text: "Phim sẽ bị xóa vĩnh viễn khỏi hệ thống!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Đồng ý xóa',
+                cancelButtonText: 'Hủy'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '@Url.Action("Delete", "Phim", new { area = "NhanVien" })',
+                        type: 'POST',
+                        data: { id: id },
+                        success: function (res) {
+                            if (res.success) {
+                                Swal.fire('Đã xóa!', 'Phim đã được loại bỏ.', 'success')
+                                    .then(() => {
+                                        $("#row-" + id).fadeOut(500);
+                                    });
+                            } else {
+                                Swal.fire('Lỗi!', res.message || 'Không thể xóa phim này.', 'error');
+                            }
+                        }
+                    });
+                }
+            })
+        }
+    </script>
+}

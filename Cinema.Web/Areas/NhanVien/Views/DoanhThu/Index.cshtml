@@ -1,0 +1,68 @@
+﻿@model Cinema.Web.Areas.Admin.Models.DoanhThuViewModel
+@{
+    ViewData["Title"] = "Thống kê doanh thu";
+}
+
+<div class="container-fluid">
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm bg-primary text-white p-3 rounded-4">
+                <h6>TỔNG DOANH THU</h6>
+                <h2 class="fw-bold">@Model.TongDoanhThu.ToString("N0") VNĐ</h2>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm bg-success text-white p-3 rounded-4">
+                <h6>VÉ ĐÃ BÁN</h6>
+                <h2 class="fw-bold">@Model.TongVeDaBan</h2>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm bg-warning text-dark p-3 rounded-4">
+                <h6>HÓA ĐƠN</h6>
+                <h2 class="fw-bold">@Model.TongHoaDon</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card border-0 shadow-sm rounded-4 p-4">
+                <h5 class="fw-bold mb-4">Doanh thu theo Phim</h5>
+                <canvas id="revenueChart" style="height: 300px;"></canvas>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm rounded-4 p-4">
+                <h5 class="fw-bold mb-4">Ghi chú</h5>
+                <p class="text-muted small">Số liệu được cập nhật dựa trên các hóa đơn đã thanh toán thành công trong hệ thống.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const ctx = document.getElementById('revenueChart').getContext('2d');
+        const data = {
+            labels: @Html.Raw(Json.Serialize(Model.ThongKePhim.Select(x => x.TenPhim))),
+            datasets: [{
+                label: 'Doanh thu (VNĐ)',
+                data: @Html.Raw(Json.Serialize(Model.ThongKePhim.Select(x => x.DoanhThu))),
+                backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        };
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: data,
+            options: {
+                responsive: true,
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+    </script>
+}

@@ -15,15 +15,8 @@
     <div class="row mt-4">
         <div class="col-md-4">
             <div class="position-relative">
-                <img src="@(string.IsNullOrEmpty(Model.Hinh) ? $"https://via.placeholder.com/400x600?text={Model.TenPhim}" : Model.Hinh.StartsWith("http") ? Model.Hinh : $"/images/phim/{Model.Hinh}")"
+                <img src="@(string.IsNullOrEmpty(Model.Poster) ? $"https://via.placeholder.com/400x600?text={Model.TenPhim}" : Model.Poster.StartsWith("http") ? Model.Poster : $"/images/phim/{Model.Poster}")"
                      class="img-fluid rounded shadow-lg" alt="@Model.TenPhim" />
-
-                @if (Model.GioiHanTuoi >= 18)
-                {
-                    <div class="position-absolute top-0 start-0 m-2">
-                        <span class="badge bg-danger p-2">CẤM TRẺ EM</span>
-                    </div>
-                }
             </div>
         </div>
 
@@ -37,10 +30,23 @@
                     <strong>Thời lượng:</strong> @Model.ThoiLuong phút
                 </p>
                 <p class="fs-5">
-                    <i class="bi bi-shield-exclamation text-danger"></i>
-                    <strong>Độ tuổi:</strong>
-                    <span class="badge bg-danger">@(Model.GioiHanTuoi)</span>
+                    <i class="bi bi-tags-fill text-warning"></i>
+                    <strong>Thể loại:</strong> @(Model.TheLoai ?? "N/A")
                 </p>
+            </div>
+
+            <div class="d-flex gap-4 mb-4">
+                <p class="fs-5">
+                    <i class="bi bi-camera-reels text-info"></i>
+                    <strong>Đạo diễn:</strong> @(Model.DaoDien ?? "N/A")
+                </p>
+                @if (Model.NgayKhoiChieu.HasValue)
+                {
+                    <p class="fs-5">
+                        <i class="bi bi-calendar-event text-success"></i>
+                        <strong>Khởi chiếu:</strong> @Model.NgayKhoiChieu.Value.ToString("dd/MM/yyyy")
+                    </p>
+                }
             </div>
 
             <div class="card bg-light border-0 p-3 mb-4">
@@ -52,14 +58,14 @@
 
             <h3 class="mt-5 text-primary"><i class="bi bi-calendar-check"></i> CHỌN SUẤT CHIẾU</h3>
             <div class="d-flex flex-wrap gap-3 mt-3">
-                @if (Model.SuatChieus != null && Model.SuatChieus.Any())
+                @if (Model.LichChieus != null && Model.LichChieus.Any())
                 {
-                    @foreach (var suat in Model.SuatChieus)
+                    @foreach (var suat in Model.LichChieus)
                     {
                         <button type="button"
                                 class="btn btn-outline-dark btn-lg px-4 btn-suat"
-                                data-id="@suat.MaSuat">
-                            <i class="bi bi-play-circle"></i> @suat.GioBatDau.Value.ToString(@"hh\:mm")
+                                data-id="@suat.MaLich">
+                            <i class="bi bi-play-circle"></i> @(suat.GioChieu.HasValue ? suat.GioChieu.Value.ToString(@"hh\:mm") : "N/A")
                         </button>
                     }
                 }
@@ -88,10 +94,10 @@
                 $('.btn-suat').removeClass('active btn-dark text-white').addClass('btn-outline-dark');
                 $(this).addClass('active btn-dark text-white').removeClass('btn-outline-dark');
 
-                let maSuat = $(this).data('id');
-                $('#btnDatVe').attr('data-selected-id', maSuat);
+                let maLich = $(this).data('id');
+                $('#btnDatVe').attr('data-selected-id', maLich);
 
-                $('#btnDatVe').attr('href', '/Phim/ChonGhe?maSuat=' + maSuat);
+                $('#btnDatVe').attr('href', '/Phim/ChonGhe?maLich=' + maLich);
             });
         });
 

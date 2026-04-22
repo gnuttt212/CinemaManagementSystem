@@ -1,5 +1,4 @@
 using Cinema.BUS;
-using Cinema.DAL.Models;
 using Cinema.DTO;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -8,11 +7,11 @@ namespace Cinema.Web.Controllers
 {
     public class NguoiDungController : Controller
     {
-        private readonly INguoiDungBUS _nguoiDungBus;
+        private readonly IKhachHangBUS _khachHangBus;
 
-        public NguoiDungController(INguoiDungBUS nguoiDungBus)
+        public NguoiDungController(IKhachHangBUS khachHangBus)
         {
-            _nguoiDungBus = nguoiDungBus;
+            _khachHangBus = khachHangBus;
         }
 
         public IActionResult Profile()
@@ -23,27 +22,29 @@ namespace Cinema.Web.Controllers
                 return RedirectToAction("Login", "Account");
             }
 
-            var model = _nguoiDungBus.LayThongTinProfile(taiKhoan);
+            var model = _khachHangBus.LayThongTinProfile(taiKhoan);
             if (model == null) return NotFound();
 
             return View(model);
         }
+
         [HttpGet]
         public IActionResult EditProfile()
         {
             var username = HttpContext.Session.GetString("UserAccount");
             if (string.IsNullOrEmpty(username)) return RedirectToAction("Login", "Account");
-            var user = _nguoiDungBus.LayThongTinProfile(username); ;
+            var user = _khachHangBus.LayThongTinProfile(username);
             if (user == null) return NotFound();
 
             return View(user);
         }
+
         [HttpPost]
-        public IActionResult EditProfile(NguoiDungDTO model)
+        public IActionResult EditProfile(KhachHangDTO model)
         {
             if (ModelState.IsValid)
             {
-                bool result = _nguoiDungBus.CapNhatProfile(model);
+                bool result = _khachHangBus.CapNhatProfile(model);
 
                 if (result)
                 {
@@ -73,7 +74,7 @@ namespace Cinema.Web.Controllers
 
             if (ModelState.IsValid)
             {
-                bool result = _nguoiDungBus.DoiMatKhau(taiKhoan, model.MatKhauHienTai, model.MatKhauMoi);
+                bool result = _khachHangBus.DoiMatKhau(taiKhoan, model.MatKhauHienTai, model.MatKhauMoi);
                 if (result)
                 {
                     TempData["SuccessMessage"] = "Đổi mật khẩu thành công!";

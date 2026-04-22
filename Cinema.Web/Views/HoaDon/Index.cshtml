@@ -1,4 +1,4 @@
-﻿@model Cinema.DTO.CartItemDTO
+@model Cinema.DTO.CartItemDTO
 
 <div class="container mt-5">
     <div class="row">
@@ -9,11 +9,11 @@
                 <p>Ghế đã chọn: <span class="badge bg-primary">@string.Join(", ", Model.DanhSachGhe)</span></p>
                 <hr />
                 <h6>Dịch vụ kèm theo:</h6>
-                @foreach (var dv in Model.DichVus)
+                @foreach (var dv in Model.DoAns)
                 {
                     <div class="d-flex justify-content-between">
-                        <span>@dv.TenDV x @dv.SoLuong</span>
-                        <span>@((dv.DonGia * dv.SoLuong).ToString("N0")) đ</span>
+                        <span>@dv.TenDoAn x @dv.SoLuong</span>
+                        <span>@((dv.Gia * dv.SoLuong).ToString("N0")) đ</span>
                     </div>
                 }
             </div>

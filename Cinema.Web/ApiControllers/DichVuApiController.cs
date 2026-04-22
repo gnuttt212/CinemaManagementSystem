@@ -7,124 +7,99 @@ using System.Linq;
 
 namespace Cinema.Web.ApiControllers
 {
-    /// <summary>
-    /// RESTful Web API cho Dịch Vụ (Combo/Bắp nước)
-    /// Đáp ứng yêu cầu: Web API có khả năng thao tác với CSDL + JSON
-    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
-    public class DichVuApiController : ControllerBase
+    public class DoAnApiController : ControllerBase
     {
         private readonly QuanLyRapPhimContext _db;
 
-        public DichVuApiController(QuanLyRapPhimContext db)
+        public DoAnApiController(QuanLyRapPhimContext db)
         {
             _db = db;
         }
 
-        /// <summary>
-        /// GET: api/dichvuapi
-        /// Lấy toàn bộ danh sách dịch vụ (LINQ to Entities)
-        /// </summary>
         [HttpGet]
-        public ActionResult<IEnumerable<DichVuDTO>> GetAll()
+        public ActionResult<IEnumerable<DoAnDTO>> GetAll()
         {
-            var dichVus = _db.DichVus
-                .Select(d => new DichVuDTO
+            var doAns = _db.DoAns
+                .Select(d => new DoAnDTO
                 {
-                    MaDV = d.MaDv,
-                    TenDV = d.TenDv ?? "",
-                    DonGia = d.DonGia ?? 0,
-                    SoLuongTon = d.SoLuongTon ?? 0
+                    MaDoAn = d.MaDoAn,
+                    TenDoAn = d.TenDoAn,
+                    Gia = d.Gia ?? 0,
+                    Loai = d.Loai
                 })
                 .ToList();
 
-            return Ok(dichVus);
+            return Ok(doAns);
         }
 
-        /// <summary>
-        /// GET: api/dichvuapi/5
-        /// Lấy chi tiết 1 dịch vụ theo ID
-        /// </summary>
         [HttpGet("{id}")]
-        public ActionResult<DichVuDTO> GetById(int id)
+        public ActionResult<DoAnDTO> GetById(int id)
         {
-            var dv = _db.DichVus.Find(id);
-            if (dv == null) return NotFound(new { message = $"Không tìm thấy dịch vụ mã {id}" });
+            var doAn = _db.DoAns.Find(id);
+            if (doAn == null) return NotFound(new { message = $"Không tìm thấy đồ ăn mã {id}" });
 
-            return Ok(new DichVuDTO
+            return Ok(new DoAnDTO
             {
-                MaDV = dv.MaDv,
-                TenDV = dv.TenDv ?? "",
-                DonGia = dv.DonGia ?? 0,
-                SoLuongTon = dv.SoLuongTon ?? 0
+                MaDoAn = doAn.MaDoAn,
+                TenDoAn = doAn.TenDoAn,
+                Gia = doAn.Gia ?? 0,
+                Loai = doAn.Loai
             });
         }
 
-        /// <summary>
-        /// POST: api/dichvuapi
-        /// Thêm dịch vụ mới (RESTful Create)
-        /// </summary>
         [HttpPost]
-        public IActionResult Create([FromBody] DichVuDTO dto)
+        public IActionResult Create([FromBody] DoAnDTO dto)
         {
-            if (dto == null || string.IsNullOrWhiteSpace(dto.TenDV))
+            if (dto == null || string.IsNullOrWhiteSpace(dto.TenDoAn))
             {
-                return BadRequest(new { message = "Tên dịch vụ không được để trống" });
+                return BadRequest(new { message = "Tên đồ ăn không được để trống" });
             }
 
-            var dichVu = new DichVu
+            var doAn = new DoAn
             {
-                TenDv = dto.TenDV,
-                DonGia = dto.DonGia,
-                SoLuongTon = dto.SoLuongTon ?? 0
+                TenDoAn = dto.TenDoAn,
+                Gia = dto.Gia,
+                Loai = dto.Loai
             };
 
-            _db.DichVus.Add(dichVu);
+            _db.DoAns.Add(doAn);
             _db.SaveChanges();
 
-            dto.MaDV = dichVu.MaDv;
-            return CreatedAtAction(nameof(GetById), new { id = dichVu.MaDv }, dto);
+            dto.MaDoAn = doAn.MaDoAn;
+            return CreatedAtAction(nameof(GetById), new { id = doAn.MaDoAn }, dto);
         }
 
-        /// <summary>
-        /// PUT: api/dichvuapi/5
-        /// Cập nhật dịch vụ (RESTful Update)
-        /// </summary>
         [HttpPut("{id}")]
-        public IActionResult Update(int id, [FromBody] DichVuDTO dto)
+        public IActionResult Update(int id, [FromBody] DoAnDTO dto)
         {
-            var dichVu = _db.DichVus.Find(id);
-            if (dichVu == null) return NotFound(new { message = $"Không tìm thấy dịch vụ mã {id}" });
+            var doAn = _db.DoAns.Find(id);
+            if (doAn == null) return NotFound(new { message = $"Không tìm thấy đồ ăn mã {id}" });
 
-            dichVu.TenDv = dto.TenDV;
-            dichVu.DonGia = dto.DonGia;
-            dichVu.SoLuongTon = dto.SoLuongTon ?? 0;
+            doAn.TenDoAn = dto.TenDoAn;
+            doAn.Gia = dto.Gia;
+            doAn.Loai = dto.Loai;
 
             _db.SaveChanges();
-            return Ok(new { message = "Cập nhật dịch vụ thành công", data = dto });
+            return Ok(new { message = "Cập nhật đồ ăn thành công", data = dto });
         }
 
-        /// <summary>
-        /// DELETE: api/dichvuapi/5
-        /// Xóa dịch vụ (RESTful Delete)
-        /// </summary>
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            var dichVu = _db.DichVus.Find(id);
-            if (dichVu == null) return NotFound(new { message = $"Không tìm thấy dịch vụ mã {id}" });
+            var doAn = _db.DoAns.Find(id);
+            if (doAn == null) return NotFound(new { message = $"Không tìm thấy đồ ăn mã {id}" });
 
-            // Kiểm tra ràng buộc dữ liệu
-            var hasOrders = _db.ChiTietDvs.Any(ct => ct.MaDv == id);
+            var hasOrders = _db.ChiTietDoAns.Any(ct => ct.MaDoAn == id);
             if (hasOrders)
             {
-                return Conflict(new { message = "Không thể xóa vì dịch vụ đã có trong hóa đơn" });
+                return Conflict(new { message = "Không thể xóa vì đồ ăn đã có trong hóa đơn" });
             }
 
-            _db.DichVus.Remove(dichVu);
+            _db.DoAns.Remove(doAn);
             _db.SaveChanges();
-            return Ok(new { message = $"Đã xóa dịch vụ mã {id}" });
+            return Ok(new { message = $"Đã xóa đồ ăn mã {id}" });
         }
     }
 }

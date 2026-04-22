@@ -1,4 +1,4 @@
-﻿@model List<Cinema.DAL.Models.Ghe>
+@model List<Cinema.DAL.Models.Ghe>
 
 <div class="container py-5">
     <div class="screen w-75 mx-auto mb-5 text-center shadow-sm p-2 bg-light border">MÀN HÌNH</div>
@@ -11,6 +11,7 @@
             @foreach (var ghe in Model)
             {
                 bool isOccupied = dsGheDaDat.Contains(ghe.MaGhe);
+                string tenGhe = $"{ghe.Hang}{ghe.SoGhe}";
 
                 <div class="col-1 mb-3 text-center">
                     @if (isOccupied)
@@ -24,9 +25,9 @@
                     {
                         <button class="btn @(ghe.LoaiGhe == "VIP" ? "btn-warning" : "btn-outline-secondary") btn-sm w-100 btn-ghe"
                                 data-id="@ghe.MaGhe"
-                                data-name="@ghe.TenGhe"
+                                data-name="@tenGhe"
                                 data-price="@(ghe.LoaiGhe == "VIP" ? 1.2 : 1)">
-                            @ghe.TenGhe
+                            @tenGhe
                         </button>
                     }
                 </div>
@@ -50,22 +51,22 @@
 
     <h3 class="mt-5 text-primary text-center"><i class="bi bi-cup-straw"></i> COMBO BẮP & NƯỚC</h3>
     <div class="row mt-4 px-5">
-        @if (ViewBag.DichVus != null)
+        @if (ViewBag.DoAns != null)
         {
-            @foreach (var dv in (List<Cinema.DTO.DichVuDTO>)ViewBag.DichVus)
+            @foreach (var dv in (List<Cinema.DTO.DoAnDTO>)ViewBag.DoAns)
             {
                 <div class="col-md-6 mb-3">
                     <div class="card p-3 shadow-sm d-flex flex-row align-items-center justify-content-between">
                         <div>
-                            <h6 class="mb-0 fw-bold">@dv.TenDV</h6>
-                            <small class="text-danger">@dv.DonGia.ToString("N0") đ</small>
+                            <h6 class="mb-0 fw-bold">@dv.TenDoAn</h6>
+                            <small class="text-danger">@dv.Gia.ToString("N0") đ</small>
                         </div>
                         <div class="d-flex align-items-center gap-2">
-                            <button type="button" class="btn btn-sm btn-outline-primary btn-minus" data-id="@dv.MaDV">-</button>
+                            <button type="button" class="btn btn-sm btn-outline-primary btn-minus" data-id="@dv.MaDoAn">-</button>
                             <input type="text" class="form-control text-center input-qty"
                                    style="width: 50px;" value="0" readonly
-                                   data-id="@dv.MaDV" data-price="@dv.DonGia" data-name="@dv.TenDV">
-                            <button type="button" class="btn btn-sm btn-outline-primary btn-plus" data-id="@dv.MaDV">+</button>
+                                   data-id="@dv.MaDoAn" data-price="@dv.Gia" data-name="@dv.TenDoAn">
+                            <button type="button" class="btn btn-sm btn-outline-primary btn-plus" data-id="@dv.MaDoAn">+</button>
                         </div>
                     </div>
                 </div>
@@ -157,14 +158,14 @@
             $('.input-qty').each(function () {
                 let qty = parseInt($(this).val());
                 if (qty > 0) {
-                    selectedServices.push({ MaDV: $(this).data('id'), SoLuong: qty });
+                    selectedServices.push({ MaDoAn: $(this).data('id'), SoLuong: qty });
                 }
             });
 
             $.post('/Phim/LuuGheVaoSession', {
                 ghes: selectedSeats.map(s => s.name),
-                maSuat: @(ViewBag.MaSuat ?? 0),
-                dichVus: selectedServices 
+                maLich: @(ViewBag.MaLich ?? 0),
+                doAns: selectedServices 
             }, function (res) {
                 if (res.success) window.location.href = '/HoaDon/GioHang';
                 else alert("Lỗi: " + res.message);

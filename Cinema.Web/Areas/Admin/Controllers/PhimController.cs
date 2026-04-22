@@ -32,38 +32,47 @@ namespace Cinema.Web.Areas.Admin.Controllers
 
         public IActionResult Create()
         {
-            ViewBag.MaLoaiPhim = _db.LoaiPhims.ToList();
             return View();
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(PhimDTO phimDto, IFormFile ImageFile)
         {
-            if (ImageFile != null)
-            {
-                string wwwRootPath = _hostEnvironment.WebRootPath;
-                string fileName = Guid.NewGuid().ToString() + "_" + ImageFile.FileName;
-                string path = Path.Combine(wwwRootPath, "images/phim", fileName);
+            ModelState.Remove("LichChieus");
+            ModelState.Remove("DanhSachLichChieu");
 
-                using (var fileStream = new FileStream(path, FileMode.Create))
+            if (ModelState.IsValid)
+            {
+                if (ImageFile != null)
                 {
-                    await ImageFile.CopyToAsync(fileStream);
+                    string wwwRootPath = _hostEnvironment.WebRootPath;
+                    string folderPath = Path.Combine(wwwRootPath, "images", "phim");
+                    if (!Directory.Exists(folderPath))
+                    {
+                        Directory.CreateDirectory(folderPath);
+                    }
+                    string fileName = Guid.NewGuid().ToString() + "_" + ImageFile.FileName;
+                    string path = Path.Combine(folderPath, fileName);
+
+                    using (var fileStream = new FileStream(path, FileMode.Create))
+                    {
+                        await ImageFile.CopyToAsync(fileStream);
+                    }
+                    phimDto.Poster = fileName;
                 }
-                phimDto.Hinh = fileName;
-            }
-            else
-            {
-                phimDto.Hinh = "no-image.jpg";
+                else
+                {
+                    phimDto.Poster = "no-image.jpg";
+                }
+
+                int newId = _phimBus.ThemPhim(phimDto);
+
+                if (newId > 0)
+                {
+                    return RedirectToAction(nameof(Index));
+                }
             }
 
-            int newId = _phimBus.ThemPhim(phimDto);
-
-            if (newId > 0)
-            {
-                return RedirectToAction(nameof(Index));
-            }
-
-            ViewBag.MaLoaiPhim = _db.LoaiPhims.ToList();
             return View(phimDto);
         }
         public IActionResult Edit(int id)
@@ -71,33 +80,39 @@ namespace Cinema.Web.Areas.Admin.Controllers
             var phimDto = _phimBus.LayChiTietPhim(id);
             if (phimDto == null) return NotFound();
 
-            ViewBag.MaLoaiPhim = _db.LoaiPhims.ToList();
             return View(phimDto);
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(PhimDTO phimDto, IFormFile? ImageFile)
         {
+            ModelState.Remove("LichChieus");
+            ModelState.Remove("DanhSachLichChieu");
+
             if (ModelState.IsValid)
             {
                 if (ImageFile != null)
                 {
                     string wwwRootPath = _hostEnvironment.WebRootPath;
+                    string folderPath = Path.Combine(wwwRootPath, "images", "phim");
+                    if (!Directory.Exists(folderPath))
+                    {
+                        Directory.CreateDirectory(folderPath);
+                    }
                     string fileName = Guid.NewGuid().ToString() + "_" + ImageFile.FileName;
-                    string path = Path.Combine(wwwRootPath, "images/phim", fileName);
+                    string path = Path.Combine(folderPath, fileName);
 
                     using (var fileStream = new FileStream(path, FileMode.Create))
                     {
                         await ImageFile.CopyToAsync(fileStream);
                     }
-                    phimDto.Hinh = fileName;
+                    phimDto.Poster = fileName;
                 }
 
                 bool result = _phimBus.SuaPhim(phimDto);
                 if (result) return RedirectToAction(nameof(Index));
             }
 
-            ViewBag.MaLoaiPhim = _db.LoaiPhims.ToList();
             return View(phimDto);
         }
 

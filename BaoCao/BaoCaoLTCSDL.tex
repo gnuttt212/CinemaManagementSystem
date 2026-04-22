@@ -266,12 +266,12 @@ Báo cáo được tổ chức theo các chương: Chương 1 trình bày tổng
 \section{Sơ đồ thực thể mối quan hệ (ERD)}\label{Sec2.1}
 
 \begin{de}\label{def1}
-    \textbf{Các thực thể chính} trong hệ thống bao gồm: \texttt{NguoiDung}, \texttt{Phim}, \texttt{LoaiPhim}, \texttt{Phong}, \texttt{SuatChieu}, \texttt{Ghe}, \texttt{HoaDon}, \texttt{Ve}, \texttt{DichVu} và \texttt{ChiTietDV}. Mỗi thực thể ánh xạ tương ứng với một bảng trong cơ sở dữ liệu \texttt{QuanLyRapPhim}. Toàn bộ ánh xạ này được thể hiện trong \texttt{QuanLyRapPhimContext.cs} thông qua phương thức \texttt{OnModelCreating()}.
+    \textbf{Các thực thể chính} trong hệ thống bao gồm: \texttt{NhanVien}, \texttt{KhachHang}, \texttt{Phim}, \texttt{PhongChieu}, \texttt{LichChieu}, \texttt{Ghe}, \texttt{HoaDon}, \texttt{ChiTietHoaDon}, \texttt{DoAn} và \texttt{ChiTietDoAn}. Mỗi thực thể ánh xạ tương ứng với một bảng trong cơ sở dữ liệu \texttt{QuanLyRapPhim}. Toàn bộ ánh xạ này được thể hiện trong \texttt{QuanLyRapPhimContext.cs} thông qua phương thức \texttt{OnModelCreating()}.
 \end{de}
 
 \vspace{0.5cm}
 
-\noindent Cơ sở dữ liệu gồm 10 bảng chính với các mối quan hệ khóa ngoại được mô tả trong Bảng~\ref{table_db}.
+\noindent Cơ sở dữ liệu gồm các bảng chính với các mối quan hệ khóa ngoại được mô tả trong Bảng~\ref{table_db}.
 
 \begin{table}[H]
     \begin{center}
@@ -279,25 +279,25 @@ Báo cáo được tổ chức theo các chương: Chương 1 trình bày tổng
             \hline
             \textbf{Bảng (Table)} & \textbf{Khóa chính (PK)} & \textbf{Mô tả} \\
             \hline
-            NguoiDung   & MaND (MaNd)  & Tài khoản người dùng, IsAdmin phân quyền \\
+            NhanVien    & MaNV         & Tài khoản nhân viên/quản lý, chứa hash BCrypt \\
             \hline
-            Phim        & MaPhim       & Thông tin bộ phim + thể loại \\
+            KhachHang   & MaKH         & Thông tin khách hàng \\
             \hline
-            LoaiPhim    & MaLoai       & Thể loại phim (Hành động, Hoạt hình...) \\
+            Phim        & MaPhim       & Thông tin bộ phim (Tên, Thể loại, Đạo diễn) \\
             \hline
-            Phong       & MaPhong      & Phòng chiếu với số lượng ghế \\
+            PhongChieu  & MaPhong      & Phòng chiếu phim \\
             \hline
-            SuatChieu   & MaSuat       & Suất chiếu: ngày, giờ, giá vé, trạng thái \\
+            LichChieu   & MaLich       & Lịch chiếu: Phim, Phòng, Ngày, Giờ, Giá vé \\
             \hline
             Ghe         & MaGhe        & Ghế trong phòng, loại ghế \\
             \hline
-            HoaDon      & MaHD (MaHd)  & Hóa đơn đặt vé, liên kết NguoiDung \\
+            HoaDon      & MaHD         & Hóa đơn đặt vé \\
             \hline
-            Ve          & MaVe         & Vé xem phim, khóa duy nhất (MaSuat, MaGhe) \\
+            ChiTietHoaDon & MaCTHD     & Chi tiết hóa đơn (Vé xem phim) liên kết Lịch chiếu, Ghế \\
             \hline
-            DichVu      & MaDV (MaDv)  & Dịch vụ bắp nước/combo, số lượng tồn \\
+            DoAn        & MaDoAn       & Dịch vụ bắp nước, đồ ăn \\
             \hline
-            ChiTietDV   & (MaHD, MaDV) & Chi tiết dịch vụ trong hóa đơn, giá bán lúc mua \\
+            ChiTietDoAn & (MaHD, MaDoAn) & Chi tiết đồ ăn trong hóa đơn \\
             \hline
         \end{tabular}
     \end{center}
@@ -309,10 +309,10 @@ Báo cáo được tổ chức theo các chương: Chương 1 trình bày tổng
 \begin{lem}\label{lem1}
     Các \textbf{ràng buộc toàn vẹn dữ liệu} được áp dụng trong \texttt{QuanLyRapPhimContext.cs} qua \texttt{OnModelCreating()} bao gồm:
     \begin{itemize}
-        \item \textbf{Khóa ngoại (FK):} \texttt{Ve.MaGhe} $\to$ \texttt{Ghe.MaGhe}; \texttt{Ve.MaHD} $\to$ \texttt{HoaDon.MaHD}; \texttt{Ve.MaSuat} $\to$ \texttt{SuatChieu.MaSuat}; \texttt{SuatChieu.MaPhim} $\to$ \texttt{Phim.MaPhim}; \texttt{Phim.MaLoaiPhim} $\to$ \texttt{LoaiPhim.MaLoai}; v.v.
-        \item \textbf{Duy nhất (Unique Index):} \texttt{NguoiDung.TaiKhoan} là duy nhất (\texttt{UQ\_\_NguoiDun\_...}); cặp \texttt{(Ve.MaSuat, Ve.MaGhe)} không trùng lặp (\texttt{UC\_SuatChieu\_Ghe}).
-        \item \textbf{Giá trị mặc định (Default):} \texttt{HoaDon.NgayLap = GETDATE()}; \texttt{HoaDon.TongTien = 0}; \texttt{Ghe.DaDat = false}; \texttt{SuatChieu.TrangThai = N'Sắp chiếu'}.
-        \item \textbf{Kiểu tiền tệ:} Các cột \texttt{DonGia}, \texttt{GiaVe}, \texttt{TongTien}, \texttt{DonGiaBan} sử dụng kiểu \texttt{money} của SQL Server.
+        \item \textbf{Khóa ngoại (FK):} \texttt{ChiTietHoaDon.MaGhe} $\to$ \texttt{Ghe.MaGhe}; \texttt{ChiTietHoaDon.MaHD} $\to$ \texttt{HoaDon.MaHD}; \texttt{ChiTietHoaDon.MaLich} $\to$ \texttt{LichChieu.MaLich}; \texttt{LichChieu.MaPhim} $\to$ \texttt{Phim.MaPhim}; v.v.
+        \item \textbf{Duy nhất (Unique Index):} \texttt{NhanVien.TaiKhoan} là duy nhất; cặp \texttt{(ChiTietHoaDon.MaLich, ChiTietHoaDon.MaGhe)} không trùng lặp (\texttt{UC\_LichChieu\_Ghe}).
+        \item \textbf{Giá trị mặc định (Default):} \texttt{HoaDon.NgayLap = GETDATE()}; \texttt{HoaDon.TongTien = 0}; \texttt{Ghe.DaDat = false}; \texttt{LichChieu.GiaVe = 0}.
+        \item \textbf{Kiểu tiền tệ:} Các cột \texttt{GiaVe}, \texttt{TongTien}, \texttt{DonGiaBan} sử dụng kiểu \texttt{money} của SQL Server.
     \end{itemize}
 \end{lem}
 
@@ -330,9 +330,9 @@ SELECT
     COUNT(DISTINCT hd.MaHD) AS SoLuongHoaDon,
     ISNULL(SUM(hd.TongTien), 0) AS TongDoanhThu
 FROM Phim p
-LEFT JOIN SuatChieu s  ON p.MaPhim = s.MaPhim
-LEFT JOIN Ve v         ON s.MaSuat = v.MaSuat
-LEFT JOIN HoaDon hd    ON v.MaHD = hd.MaHD
+LEFT JOIN LichChieu lc ON p.MaPhim = lc.MaPhim
+LEFT JOIN ChiTietHoaDon cthd ON lc.MaLich = cthd.MaLich
+LEFT JOIN HoaDon hd ON cthd.MaHD = hd.MaHD
 GROUP BY p.MaPhim, p.TenPhim;
 \end{lstlisting}
 
@@ -349,10 +349,10 @@ BEGIN
     DECLARE @TongTienDV MONEY = 0;
     
     SELECT @TongTienVe = ISNULL(SUM(GiaVe), 0)
-    FROM Ve WHERE MaHD = @MaHD;
+    FROM ChiTietHoaDon WHERE MaHD = @MaHD;
     
     SELECT @TongTienDV = ISNULL(SUM(DonGiaBan * SoLuong), 0)
-    FROM ChiTietDV WHERE MaHD = @MaHD;
+    FROM ChiTietDoAn WHERE MaHD = @MaHD;
     
     RETURN @TongTienVe + @TongTienDV;
 END
@@ -368,33 +368,33 @@ AS
 BEGIN
     SET NOCOUNT ON;
     SELECT p.MaPhim, p.TenPhim, p.ThoiLuong, 
-           p.MaLoaiPhim, p.GioiHanTuoi, 
-           p.NgayKhoiChieu, p.Hinh
+           p.DaoDien, p.TheLoai, 
+           p.NgayKhoiChieu, p.Poster
     FROM Phim p
     WHERE EXISTS (
-        SELECT 1 FROM SuatChieu s 
-        WHERE s.MaPhim = p.MaPhim 
-          AND CAST(s.NgayChieu AS DATE) >= CAST(GETDATE() AS DATE)
+        SELECT 1 FROM LichChieu lc 
+        WHERE lc.MaPhim = p.MaPhim 
+          AND CAST(lc.NgayChieu AS DATE) >= CAST(GETDATE() AS DATE)
     );
 END
 \end{lstlisting}
 
 \subsection{Trigger T-SQL}
 
-\noindent Trigger \texttt{trg\_NganXoaHoaDonCoVe} sử dụng \texttt{INSTEAD OF DELETE} để bảo vệ các hóa đơn đã được xuất vé:
+\noindent Trigger \texttt{trg\_NganXoaHoaDonCoCTHD} sử dụng \texttt{INSTEAD OF DELETE} để bảo vệ các hóa đơn đã được xuất vé:
 
 \begin{lstlisting}[style=sqlstyle, caption={Trigger ngăn xóa hóa đơn đã có vé}]
-CREATE TRIGGER trg_NganXoaHoaDonCoVe
+CREATE TRIGGER trg_NganXoaHoaDonCoCTHD
 ON HoaDon
 INSTEAD OF DELETE
 AS
 BEGIN
     IF EXISTS (
-        SELECT 1 FROM Ve v
-        INNER JOIN deleted d ON v.MaHD = d.MaHD
+        SELECT 1 FROM ChiTietHoaDon cthd
+        INNER JOIN deleted d ON cthd.MaHD = d.MaHD
     )
     BEGIN
-        RAISERROR(N'Khong the xoa hoa don da co du lieu xuat ve!',
+        RAISERROR(N'Không thể xóa hóa đơn đã có chi tiết đặt vé!',
                   16, 1);
         ROLLBACK TRANSACTION;
         RETURN;
@@ -407,7 +407,7 @@ END
 \subsection{Transaction (Xử lý giao tác)}
 
 \begin{thm}\label{thm_transaction}
-    Toàn bộ tiến trình thanh toán (lưu \texttt{HoaDon}, \texttt{Ve} và \texttt{ChiTietDV}) được bao bọc trong một \textbf{Database Transaction} của Entity Framework Core. Nếu bất kỳ bước nào thất bại, toàn bộ sẽ bị \texttt{Rollback}, đảm bảo tính nguyên tử (Atomicity).
+    Toàn bộ tiến trình thanh toán (lưu \texttt{HoaDon}, \texttt{ChiTietHoaDon} và \texttt{ChiTietDoAn}) được bao bọc trong một \textbf{Database Transaction} của Entity Framework Core. Nếu bất kỳ bước nào thất bại, toàn bộ sẽ bị \texttt{Rollback}, đảm bảo tính nguyên tử (Atomicity).
 \end{thm}
 
 \begin{lstlisting}[style=csharpstyle, caption={Transaction trong \texttt{HoaDonBUS.LuuVaThanhToan()}}]
@@ -429,7 +429,7 @@ public int LuuVaThanhToan(CartItemDTO cart, string username)
             // 2. Lưu Vé cho từng ghế đã chọn
             foreach (var ghe in dsGheTrongPhong)
             {
-                _context.Ves.Add(new Ve {
+                _context.ChiTietHoaDons.Add(new ChiTietHoaDon {
                     MaHd = hoaDon.MaHd,
                     MaSuat = cart.MaSuat,
                     MaGhe = ghe.MaGhe,
@@ -438,9 +438,9 @@ public int LuuVaThanhToan(CartItemDTO cart, string username)
             }
             
             // 3. Lưu Chi tiết Dịch vụ (Combo bắp nước)
-            foreach (var dv in cart.DichVus)
+            foreach (var dv in cart.DoAns)
             {
-                _context.ChiTietDvs.Add(new ChiTietDv {
+                _context.ChiTietDoAns.Add(new ChiTietDoAn {
                     MaHd = hoaDon.MaHd,
                     MaDv = dv.MaDV,
                     SoLuong = dv.SoLuong,
@@ -489,13 +489,13 @@ public int LuuVaThanhToan(CartItemDTO cart, string username)
             \hline
             \texttt{NguoiDungController}         & Hồ sơ (Profile), cập nhật thông tin, đổi mật khẩu \\
             \hline
-            \texttt{DichVuController}            & Danh sách dịch vụ bắp nước/combo \\
+            \texttt{DoAnController}            & Danh sách dịch vụ bắp nước/combo \\
             \hline
             \texttt{Admin/PhimController}        & Quản trị phim: CRUD + upload ảnh lên \texttt{/images/phim/} \\
             \hline
             \texttt{Admin/SuatChieuController}   & Quản trị suất chiếu: CRUD, tự tính giờ kết thúc \\
             \hline
-            \texttt{Admin/DichVuController}      & Quản trị dịch vụ: CRUD (thêm mới trong phiên này) \\
+            \texttt{Admin/DoAnController}      & Quản trị dịch vụ: CRUD (thêm mới trong phiên này) \\
             \hline
             \texttt{Admin/DoanhThuController}    & Báo cáo doanh thu theo phim + biểu đồ Chart.js \\
             \hline
@@ -528,7 +528,7 @@ public int LuuVaThanhToan(CartItemDTO cart, string username)
             \hline
             \texttt{INguoiDungBUS / NguoiDungBUS} & Đăng ký, đăng nhập, xem profile, đổi mật khẩu \\
             \hline
-            \texttt{IDichVuBUS / DichVuBUS}       & Lấy danh sách dịch vụ theo ID \\
+            \texttt{IDoAnBUS / DoAnBUS}       & Lấy danh sách dịch vụ theo ID \\
             \hline
         \end{tabular}
     \end{center}
@@ -553,9 +553,9 @@ public int LuuVaThanhToan(CartItemDTO cart, string username)
             \hline
             \texttt{GheDTO}             & Mã ghế, tên ghế, loại ghế, trạng thái đã đặt \\
             \hline
-            \texttt{DichVuDTO}          & Thông tin dịch vụ, số lượng chọn, thành tiền \\
+            \texttt{DoAnDTO}          & Thông tin dịch vụ, số lượng chọn, thành tiền \\
             \hline
-            \texttt{DichVuChonDTO}      & Dịch vụ người dùng chọn (MaDV, SoLuong, DonGia) \\
+            \texttt{DoAnChonDTO}      & Dịch vụ người dùng chọn (MaDV, SoLuong, DonGia) \\
             \hline
             \texttt{CartItemDTO}        & Giỏ hàng: phim, ghế, dịch vụ, tổng tiền \\
             \hline
@@ -635,9 +635,9 @@ dotnet ef database update
 
 \begin{lstlisting}[style=csharpstyle, caption={LINQ Eager Loading trong \texttt{HoaDonBUS.LayChiTietHoaDonFull()}}]
 var hd = _context.HoaDons
-    .Include(h => h.Ves)
+    .Include(h => h.ChiTietHoaDons)
         .ThenInclude(v => v.MaGheNavigation)
-    .Include(h => h.Ves)
+    .Include(h => h.ChiTietHoaDons)
         .ThenInclude(v => v.MaSuatNavigation)
             .ThenInclude(s => s!.MaPhimNavigation)
     .Include(h => h.ChiTietDvs)
@@ -817,15 +817,26 @@ public static T Get<T>(this ISession session, string key)
             \texttt{POST}   & \texttt{/api/phimapi/import-xml}   & Import phim từ XML \\
             \hline
             \hline
-            \texttt{GET}    & \texttt{/api/dichvuapi}            & Lấy tất cả dịch vụ \\
+            \texttt{GET}    & \texttt{/api/doanapi}              & Lấy tất cả đồ ăn (bắp nước) \\
             \hline
-            \texttt{GET}    & \texttt{/api/dichvuapi/\{id\}}     & Chi tiết 1 dịch vụ \\
+            \texttt{GET}    & \texttt{/api/doanapi/\{id\}}       & Chi tiết 1 đồ ăn \\
             \hline
-            \texttt{POST}   & \texttt{/api/dichvuapi}            & Thêm dịch vụ \\
+            \texttt{POST}   & \texttt{/api/doanapi}              & Thêm đồ ăn \\
             \hline
-            \texttt{PUT}    & \texttt{/api/dichvuapi/\{id\}}     & Cập nhật dịch vụ \\
+            \texttt{PUT}    & \texttt{/api/doanapi/\{id\}}       & Cập nhật đồ ăn \\
             \hline
-            \texttt{DELETE} & \texttt{/api/dichvuapi/\{id\}}     & Xóa dịch vụ (kiểm tra FK) \\
+            \texttt{DELETE} & \texttt{/api/doanapi/\{id\}}       & Xóa đồ ăn (kiểm tra rỗng) \\
+            \hline
+            \hline
+            \texttt{GET}    & \texttt{/api/lichchieuapi}         & Lấy danh sách lịch chiếu \\
+            \hline
+            \texttt{GET}    & \texttt{/api/lichchieuapi/\{id\}}  & Chi tiết 1 lịch chiếu \\
+            \hline
+            \texttt{POST}   & \texttt{/api/lichchieuapi}         & Thêm lịch chiếu \\
+            \hline
+            \texttt{PUT}    & \texttt{/api/lichchieuapi/\{id\}}  & Cập nhật lịch chiếu \\
+            \hline
+            \texttt{DELETE} & \texttt{/api/lichchieuapi/\{id\}}  & Xóa lịch chiếu (kiểm tra tồn tại vé) \\
             \hline
         \end{tabular}
     \end{center}
@@ -867,12 +878,12 @@ public static T Get<T>(this ISession session, string key)
 \noindent Đồ án đã hoàn thành các mục tiêu đề ra:
 
 \begin{itemize}
-    \item \textbf{Lập trình CSDL T-SQL:} Xây dựng 10 bảng quan hệ trong SQL Server với đầy đủ View (\texttt{vw\_DoanhThuTheoPhim}), Function (\texttt{fn\_TinhTongTienHoaDon}), Stored Procedure (\texttt{sp\_LayDanhSachPhimDangChieu}), Trigger (\texttt{trg\_NganXoaHoaDonCoVe}) và Transaction (EF Core \texttt{BeginTransaction/Commit/Rollback}).
+    \item \textbf{Lập trình CSDL T-SQL:} Xây dựng 10 bảng quan hệ trong SQL Server với đầy đủ View (\texttt{vw\_DoanhThuTheoPhim}), Function (\texttt{fn\_TinhTongTienHoaDon}), Stored Procedure (\texttt{sp\_LayDanhSachPhimDangChieu}), Trigger (\texttt{trg\_NganXoaHoaDonCoCTHD}) và Transaction (EF Core \texttt{BeginTransaction/Commit/Rollback}).
     \item \textbf{Kiến trúc 3 lớp:} Tách biệt hoàn toàn Presentation (Cinema.Web), Business Logic (Cinema.BUS) và Data Access (Cinema.DAL), giao tiếp qua DTO và Interface.
     \item \textbf{ADO.NET:} Triển khai cả mô hình kết nối (\texttt{SqlDataReader}) và phi kết nối (\texttt{SqlDataAdapter}, \texttt{DataTable}, \texttt{DataSet} với \texttt{DataRelation}).
     \item \textbf{LINQ:} Sử dụng LINQ to Objects/Entities xuyên suốt tầng BUS và LINQ to XML cho tính năng Export/Import dữ liệu.
     \item \textbf{Entity Framework:} Cấu hình song song Database First (scaffold 10 entity) và Code First (model \texttt{NhatKyHeThong} với Data Annotation). Biên dịch tự động toàn bộ Model sang mã T-SQL qua lệnh \texttt{dotnet-ef}.
-    \item \textbf{Web API RESTful:} 2 Controller API (\texttt{PhimApiController}, \texttt{DichVuApiController}) với 14 endpoint trả JSON chuẩn REST (GET/POST/PUT/DELETE).
+    \item \textbf{Web API RESTful:} 3 Controller API (\texttt{PhimApiController}, \texttt{DoAnApiController}, \texttt{LichChieuApiController}) với các endpoint trả JSON chuẩn REST (GET/POST/PUT/DELETE).
     \item \textbf{Tính năng người dùng:} Đặt vé, chọn ghế, dịch vụ combo, thanh toán, E-Ticket QR, hồ sơ cá nhân và \textbf{đổi mật khẩu}. Lọc suất chiếu theo ngày hiện tại và tương lai trực quan.
     \item \textbf{Bảo mật hệ thống:} Mã hóa mật khẩu người dùng bằng thư viện \textbf{BCrypt} ngăn chặn băm ngược, tránh rò rỉ dữ liệu khi cơ sở dữ liệu bị lộ.
     \item \textbf{Khu vực Admin:} CRUD phim, suất chiếu, dịch vụ, báo cáo doanh thu theo phim.

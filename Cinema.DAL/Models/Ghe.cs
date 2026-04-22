@@ -7,13 +7,15 @@ public partial class Ghe
 {
     public int MaGhe { get; set; }
 
-    public string? TenGhe { get; set; }
+    public int? MaPhong { get; set; }
+
+    public string? Hang { get; set; }
+
+    public int? SoGhe { get; set; }
 
     public string? LoaiGhe { get; set; }
 
-    public int? MaPhong { get; set; }
+    public virtual ICollection<ChiTietHoaDon> ChiTietHoaDons { get; set; } = new List<ChiTietHoaDon>();
 
-    public virtual Phong? MaPhongNavigation { get; set; }
-
-    public virtual ICollection<Ve> Ves { get; set; } = new List<Ve>();
+    public virtual PhongChieu? MaPhongNavigation { get; set; }
 }

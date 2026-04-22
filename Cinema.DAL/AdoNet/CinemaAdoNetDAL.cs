@@ -19,7 +19,7 @@ namespace Cinema.DAL.AdoNet
             
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
-                string query = "SELECT MaPhim, TenPhim, ThoiLuong, GioiHanTuoi, NgayKhoiChieu FROM Phim";
+                string query = "SELECT MaPhim, TenPhim, TheLoai, DaoDien, ThoiLuong, NgayKhoiChieu, Poster FROM Phim";
                 
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
@@ -49,7 +49,10 @@ namespace Cinema.DAL.AdoNet
                         {
                             string tenPhim = reader["TenPhim"].ToString() ?? "Unknown";
                             decimal doanhThu = Convert.ToDecimal(reader["TongDoanhThu"]);
-                            result.Add(tenPhim, doanhThu);
+                            if (result.ContainsKey(tenPhim))
+                                result[tenPhim] += doanhThu;
+                            else
+                                result[tenPhim] = doanhThu;
                         }
                     }
                 }
@@ -57,41 +60,33 @@ namespace Cinema.DAL.AdoNet
             return result;
         }
 
-        /// <summary>
-        /// Minh họa ADO.NET mô hình phi kết nối đầy đủ:
-        /// DataSet chứa nhiều DataTable (Phim + SuatChieu) cùng lúc
-        /// Sử dụng SqlDataAdapter để Fill dữ liệu vào bộ nhớ
-        /// </summary>
-        public DataSet LayPhimVaSuatChieu_DataSet()
+        public DataSet LayPhimVaLichChieu_DataSet()
         {
             DataSet ds = new DataSet("CinemaDataSet");
 
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
-                // DataTable 1: Danh sách Phim
-                string queryPhim = "SELECT MaPhim, TenPhim, ThoiLuong, GioiHanTuoi, NgayKhoiChieu FROM Phim";
+                string queryPhim = "SELECT MaPhim, TenPhim, TheLoai, DaoDien, ThoiLuong, NgayKhoiChieu, Poster FROM Phim";
                 using (SqlDataAdapter adapterPhim = new SqlDataAdapter(queryPhim, conn))
                 {
                     adapterPhim.Fill(ds, "Phim");
                 }
 
-                // DataTable 2: Danh sách Suất Chiếu
-                string querySuatChieu = @"SELECT sc.MaSuat, sc.MaPhim, sc.MaPhong, sc.NgayChieu, sc.GioBatDau, sc.GiaVe, p.TenPhim 
-                                          FROM SuatChieu sc 
-                                          LEFT JOIN Phim p ON sc.MaPhim = p.MaPhim
-                                          ORDER BY sc.NgayChieu DESC";
-                using (SqlDataAdapter adapterSC = new SqlDataAdapter(querySuatChieu, conn))
+                string queryLichChieu = @"SELECT lc.MaLich, lc.MaPhim, lc.MaPhong, lc.NgayChieu, lc.GioChieu, lc.GiaVe, p.TenPhim 
+                                          FROM LichChieu lc 
+                                          LEFT JOIN Phim p ON lc.MaPhim = p.MaPhim
+                                          ORDER BY lc.NgayChieu DESC";
+                using (SqlDataAdapter adapterLC = new SqlDataAdapter(queryLichChieu, conn))
                 {
-                    adapterSC.Fill(ds, "SuatChieu");
+                    adapterLC.Fill(ds, "LichChieu");
                 }
 
-                // Thiết lập DataRelation giữa 2 bảng trong DataSet (minh họa mô hình phi kết nối)
-                if (ds.Tables["Phim"]!.Columns.Contains("MaPhim") && ds.Tables["SuatChieu"]!.Columns.Contains("MaPhim"))
+                if (ds.Tables["Phim"]!.Columns.Contains("MaPhim") && ds.Tables["LichChieu"]!.Columns.Contains("MaPhim"))
                 {
                     DataRelation relation = new DataRelation(
-                        "FK_Phim_SuatChieu",
+                        "FK_Phim_LichChieu",
                         ds.Tables["Phim"]!.Columns["MaPhim"]!,
-                        ds.Tables["SuatChieu"]!.Columns["MaPhim"]!,
+                        ds.Tables["LichChieu"]!.Columns["MaPhim"]!,
                         false
                     );
                     ds.Relations.Add(relation);
@@ -102,4 +97,3 @@ namespace Cinema.DAL.AdoNet
         }
     }
 }
-

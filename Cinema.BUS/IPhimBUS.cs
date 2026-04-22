@@ -11,17 +11,17 @@ namespace Cinema.BUS
         List<PhimDTO> LayDanhSachPhimDangChieu(DateTime? selectedDate = null);
         List<PhimDTO> LayDanhSachPhimDangChieu_SP();
         PhimDTO LayChiTietPhim(int maPhim);
-        List<GheDTO> LayDanhSachGheTheoSuat(int maSuat);
+        List<GheDTO> LayDanhSachGheTheoLich(int maLich);
         int ThemPhim(PhimDTO phim);
         bool SuaPhim(PhimDTO phim);
         bool XoaPhim(int maPhim);
         List<PhimDTO> TimKiemPhim(string query);
 
-        // Hỗ trợ luồng chọn ghế (ChonGhe, LuuGheVaoSession)
-        SuatChieu? LaySuatChieu(int maSuat);
-        SuatChieu? LaySuatChieuChiTiet(int maSuat);
+        // Hỗ trợ luồng chọn ghế
+        LichChieu? LayLichChieu(int maLich);
+        LichChieu? LayLichChieuChiTiet(int maLich);
         List<Ghe> LayDanhSachGheTheoPhong(int maPhong);
-        Ghe? LayGheTheoTenVaPhong(string tenGhe, int maPhong);
-        DichVu? LayDichVu(int maDV);
+        Ghe? LayGheTheoHangSoVaPhong(string hang, int soGhe, int maPhong);
+        DoAn? LayDoAn(int maDoAn);
     }
-}
+}

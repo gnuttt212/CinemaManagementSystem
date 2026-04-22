@@ -22,54 +22,80 @@ namespace Cinema.DAL.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Cinema.DAL.Models.ChiTietDv", b =>
+            modelBuilder.Entity("Cinema.DAL.Models.ChiTietDoAn", b =>
                 {
-                    b.Property<int>("MaHd")
-                        .HasColumnType("int")
-                        .HasColumnName("MaHD");
+                    b.Property<int>("MaHD")
+                        .HasColumnType("int");
 
-                    b.Property<int>("MaDv")
-                        .HasColumnType("int")
-                        .HasColumnName("MaDV");
+                    b.Property<int>("MaDoAn")
+                        .HasColumnType("int");
 
-                    b.Property<decimal?>("DonGiaBan")
+                    b.Property<decimal?>("Gia")
                         .HasColumnType("money");
 
                     b.Property<int?>("SoLuong")
-                        .HasColumnType("int");
-
-                    b.HasKey("MaHd", "MaDv")
-                        .HasName("PK__ChiTietD__4557FE856337680E");
-
-                    b.HasIndex("MaDv");
-
-                    b.ToTable("ChiTietDV", (string)null);
-                });
-
-            modelBuilder.Entity("Cinema.DAL.Models.DichVu", b =>
-                {
-                    b.Property<int>("MaDv")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .HasColumnName("MaDV");
+                        .HasDefaultValue(1);
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaDv"));
+                    b.HasKey("MaHD", "MaDoAn")
+                        .HasName("PK_ChiTietDoAn");
 
-                    b.Property<decimal?>("DonGia")
-                        .HasColumnType("money");
+                    b.HasIndex("MaDoAn");
 
-                    b.Property<int?>("SoLuongTon")
+                    b.ToTable("ChiTietDoAn", (string)null);
+                });
+
+            modelBuilder.Entity("Cinema.DAL.Models.ChiTietHoaDon", b =>
+                {
+                    b.Property<int>("MaHD")
                         .HasColumnType("int");
 
-                    b.Property<string>("TenDv")
+                    b.Property<int>("MaGhe")
+                        .HasColumnType("int");
+
+                    b.Property<decimal?>("GiaVe")
+                        .HasColumnType("money");
+
+                    b.Property<int?>("MaLich")
+                        .HasColumnType("int");
+
+                    b.HasKey("MaHD", "MaGhe")
+                        .HasName("PK_ChiTietHoaDon");
+
+                    b.HasIndex("MaGhe");
+
+                    b.HasIndex("MaLich");
+
+                    b.ToTable("ChiTietHoaDon", (string)null);
+                });
+
+            modelBuilder.Entity("Cinema.DAL.Models.DoAn", b =>
+                {
+                    b.Property<int>("MaDoAn")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaDoAn"));
+
+                    b.Property<decimal?>("Gia")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("money")
+                        .HasDefaultValue(0m);
+
+                    b.Property<string>("Loai")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("TenDoAn")
+                        .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)")
-                        .HasColumnName("TenDV");
+                        .HasColumnType("nvarchar(100)");
 
-                    b.HasKey("MaDv")
-                        .HasName("PK__DichVu__27258657D6403FCF");
+                    b.HasKey("MaDoAn")
+                        .HasName("PK_DoAn");
 
-                    b.ToTable("DichVu", (string)null);
+                    b.ToTable("DoAn", (string)null);
                 });
 
             modelBuilder.Entity("Cinema.DAL.Models.Ghe", b =>
@@ -80,20 +106,24 @@ namespace Cinema.DAL.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaGhe"));
 
+                    b.Property<string>("Hang")
+                        .HasMaxLength(5)
+                        .HasColumnType("nvarchar(5)");
+
                     b.Property<string>("LoaiGhe")
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasColumnType("nvarchar(20)")
+                        .HasDefaultValue("Thường");
 
                     b.Property<int?>("MaPhong")
                         .HasColumnType("int");
 
-                    b.Property<string>("TenGhe")
-                        .HasMaxLength(10)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(10)");
+                    b.Property<int?>("SoGhe")
+                        .HasColumnType("int");
 
                     b.HasKey("MaGhe")
-                        .HasName("DF__Ghe__DaDat__3D5E1FD2");
+                        .HasName("PK_Ghe");
 
                     b.HasIndex("MaPhong");
 
@@ -102,18 +132,19 @@ namespace Cinema.DAL.Migrations
 
             modelBuilder.Entity("Cinema.DAL.Models.HoaDon", b =>
                 {
-                    b.Property<int>("MaHd")
+                    b.Property<int>("MaHD")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("MaHD");
+                        .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaHd"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaHD"));
 
-                    b.Property<int?>("MaNd")
-                        .HasColumnType("int")
-                        .HasColumnName("MaND");
+                    b.Property<int?>("MaKH")
+                        .HasColumnType("int");
 
-                    b.Property<DateTime?>("NgayLap")
+                    b.Property<int?>("MaNV")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("NgayDat")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime")
                         .HasDefaultValueSql("(getdate())");
@@ -123,46 +154,39 @@ namespace Cinema.DAL.Migrations
                         .HasColumnType("money")
                         .HasDefaultValue(0m);
 
-                    b.HasKey("MaHd")
-                        .HasName("PK__HoaDon__2725A6E0E68C72B0");
+                    b.Property<string>("TrangThai")
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasDefaultValue("Chờ thanh toán");
 
-                    b.HasIndex("MaNd");
+                    b.HasKey("MaHD")
+                        .HasName("PK_HoaDon");
+
+                    b.HasIndex("MaKH");
+
+                    b.HasIndex("MaNV");
 
                     b.ToTable("HoaDon", null, t =>
                         {
-                            t.HasTrigger("trg_NganXoaHoaDonCoVe");
+                            t.HasTrigger("trg_NganXoaHoaDonCoCTHD");
                         });
 
                     b.HasAnnotation("SqlServer:UseSqlOutputClause", false);
                 });
 
-            modelBuilder.Entity("Cinema.DAL.Models.LoaiPhim", b =>
+            modelBuilder.Entity("Cinema.DAL.Models.KhachHang", b =>
                 {
-                    b.Property<int>("MaLoai")
+                    b.Property<int>("MaKH")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaLoai"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaKH"));
 
-                    b.Property<string>("TenLoai")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.HasKey("MaLoai")
-                        .HasName("PK__LoaiPhim__730A57599BA3C329");
-
-                    b.ToTable("LoaiPhim", (string)null);
-                });
-
-            modelBuilder.Entity("Cinema.DAL.Models.NguoiDung", b =>
-                {
-                    b.Property<int>("MaNd")
+                    b.Property<int?>("DiemTichLuy")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .HasColumnName("MaND");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaNd"));
+                        .HasDefaultValue(0);
 
                     b.Property<string>("Email")
                         .HasMaxLength(100)
@@ -173,16 +197,19 @@ namespace Cinema.DAL.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<bool?>("IsAdmin")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
-
                     b.Property<string>("MatKhau")
                         .IsRequired()
                         .HasMaxLength(255)
                         .IsUnicode(false)
                         .HasColumnType("varchar(255)");
+
+                    b.Property<DateOnly?>("NgaySinh")
+                        .HasColumnType("date");
+
+                    b.Property<string>("SDT")
+                        .HasMaxLength(20)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(20)");
 
                     b.Property<string>("TaiKhoan")
                         .IsRequired()
@@ -190,85 +217,61 @@ namespace Cinema.DAL.Migrations
                         .IsUnicode(false)
                         .HasColumnType("varchar(50)");
 
-                    b.HasKey("MaNd")
-                        .HasName("PK__NguoiDun__2725D724C88B3203");
+                    b.HasKey("MaKH")
+                        .HasName("PK_KhachHang");
 
-                    b.HasIndex(new[] { "TaiKhoan" }, "UQ__NguoiDun__D5B8C7F0B65F44B0")
+                    b.HasIndex(new[] { "TaiKhoan" }, "UQ_KhachHang_TaiKhoan")
                         .IsUnique();
 
-                    b.ToTable("NguoiDung", (string)null);
+                    b.ToTable("KhachHang", (string)null);
                 });
 
-            modelBuilder.Entity("Cinema.DAL.Models.Phim", b =>
+            modelBuilder.Entity("Cinema.DAL.Models.KhuyenMai", b =>
                 {
-                    b.Property<int>("MaPhim")
+                    b.Property<int>("MaKM")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaPhim"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaKM"));
 
-                    b.Property<int?>("GioiHanTuoi")
-                        .HasColumnType("int");
+                    b.Property<string>("DieuKien")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
-                    b.Property<string>("Hinh")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateOnly?>("NgayBatDau")
+                        .HasColumnType("date");
 
-                    b.Property<int?>("MaLoaiPhim")
-                        .HasColumnType("int");
+                    b.Property<DateOnly?>("NgayKetThuc")
+                        .HasColumnType("date");
 
-                    b.Property<DateTime?>("NgayKhoiChieu")
-                        .HasColumnType("datetime");
+                    b.Property<decimal?>("PhanTramGiam")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("decimal(5,2)")
+                        .HasDefaultValue(0m);
 
-                    b.Property<string>("TenPhim")
+                    b.Property<string>("TenKM")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<int?>("ThoiLuong")
-                        .HasColumnType("int");
+                    b.HasKey("MaKM")
+                        .HasName("PK_KhuyenMai");
 
-                    b.HasKey("MaPhim")
-                        .HasName("PK__Phim__4AC03DE3078CB066");
-
-                    b.HasIndex("MaLoaiPhim");
-
-                    b.ToTable("Phim", (string)null);
+                    b.ToTable("KhuyenMai", (string)null);
                 });
 
-            modelBuilder.Entity("Cinema.DAL.Models.Phong", b =>
+            modelBuilder.Entity("Cinema.DAL.Models.LichChieu", b =>
                 {
-                    b.Property<int>("MaPhong")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("SoLuongGhe")
-                        .HasColumnType("int");
-
-                    b.Property<string>("TenPhong")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.HasKey("MaPhong")
-                        .HasName("PK__Phong__20BD5E5B303B82C4");
-
-                    b.ToTable("Phong", (string)null);
-                });
-
-            modelBuilder.Entity("Cinema.DAL.Models.SuatChieu", b =>
-                {
-                    b.Property<int>("MaSuat")
+                    b.Property<int>("MaLich")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaSuat"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaLich"));
 
                     b.Property<decimal?>("GiaVe")
                         .HasColumnType("money");
 
-                    b.Property<TimeOnly?>("GioBatDau")
-                        .HasColumnType("time");
-
-                    b.Property<TimeOnly?>("GioKetThuc")
+                    b.Property<TimeOnly?>("GioChieu")
                         .HasColumnType("time");
 
                     b.Property<int?>("MaPhim")
@@ -280,55 +283,159 @@ namespace Cinema.DAL.Migrations
                     b.Property<DateOnly?>("NgayChieu")
                         .HasColumnType("date");
 
-                    b.Property<string>("TrangThai")
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
-                        .HasDefaultValue("Sắp chiếu");
-
-                    b.HasKey("MaSuat")
-                        .HasName("PK__SuatChie__A69D0241CD876E94");
+                    b.HasKey("MaLich")
+                        .HasName("PK_LichChieu");
 
                     b.HasIndex("MaPhim");
 
                     b.HasIndex("MaPhong");
 
-                    b.ToTable("SuatChieu", (string)null);
+                    b.ToTable("LichChieu", (string)null);
                 });
 
-            modelBuilder.Entity("Cinema.DAL.Models.Ve", b =>
+            modelBuilder.Entity("Cinema.DAL.Models.NhanVien", b =>
                 {
-                    b.Property<int>("MaVe")
+                    b.Property<int>("MaNV")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaVe"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaNV"));
 
-                    b.Property<decimal?>("GiaVe")
-                        .HasColumnType("decimal(18, 2)");
+                    b.Property<string>("ChucVu")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
-                    b.Property<int?>("MaGhe")
+                    b.Property<string>("HoTen")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("MatKhau")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("PhanQuyen")
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)")
+                        .HasDefaultValue("NhanVien");
+
+                    b.Property<string>("TaiKhoan")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(50)");
+
+                    b.HasKey("MaNV")
+                        .HasName("PK_NhanVien");
+
+                    b.HasIndex(new[] { "TaiKhoan" }, "UQ_NhanVien_TaiKhoan")
+                        .IsUnique();
+
+                    b.ToTable("NhanVien", (string)null);
+                });
+
+            modelBuilder.Entity("Cinema.DAL.Models.NhatKyHeThong", b =>
+                {
+                    b.Property<int>("MaNhatKy")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int?>("MaHd")
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaNhatKy"));
+
+                    b.Property<string>("DiaChi_IP")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("HanhDong")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("MoTa")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("TaiKhoan")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime>("ThoiGian")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("MaNhatKy");
+
+                    b.ToTable("NhatKyHeThong");
+                });
+
+            modelBuilder.Entity("Cinema.DAL.Models.Phim", b =>
+                {
+                    b.Property<int>("MaPhim")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaPhim"));
+
+                    b.Property<string>("DaoDien")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("MoTa")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("NgayKhoiChieu")
+                        .HasColumnType("datetime");
+
+                    b.Property<string>("Poster")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TenPhim")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("TheLoai")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int?>("ThoiLuong")
+                        .HasColumnType("int");
+
+                    b.HasKey("MaPhim")
+                        .HasName("PK_Phim");
+
+                    b.ToTable("Phim", (string)null);
+                });
+
+            modelBuilder.Entity("Cinema.DAL.Models.PhongChieu", b =>
+                {
+                    b.Property<int>("MaPhong")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaPhong"));
+
+                    b.Property<string>("LoaiPhong")
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)")
+                        .HasDefaultValue("2D");
+
+                    b.Property<int?>("SucChua")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .HasColumnName("MaHD");
+                        .HasDefaultValue(0);
 
-                    b.Property<int?>("MaSuat")
-                        .HasColumnType("int");
+                    b.Property<string>("TenPhong")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
-                    b.HasKey("MaVe")
-                        .HasName("PK__Ve__2725100F68C2289C");
+                    b.HasKey("MaPhong")
+                        .HasName("PK_PhongChieu");
 
-                    b.HasIndex("MaGhe");
-
-                    b.HasIndex("MaHd");
-
-                    b.HasIndex(new[] { "MaSuat", "MaGhe" }, "UC_SuatChieu_Ghe")
-                        .IsUnique()
-                        .HasFilter("[MaSuat] IS NOT NULL AND [MaGhe] IS NOT NULL");
-
-                    b.ToTable("Ve", (string)null);
+                    b.ToTable("PhongChieu", (string)null);
                 });
 
             modelBuilder.Entity("Cinema.DAL.Models.VwDoanhThuTheoPhim", b =>
@@ -352,138 +459,137 @@ namespace Cinema.DAL.Migrations
                     b.ToView("vw_DoanhThuTheoPhim", (string)null);
                 });
 
-            modelBuilder.Entity("Cinema.DAL.Models.ChiTietDv", b =>
+            modelBuilder.Entity("Cinema.DAL.Models.ChiTietDoAn", b =>
                 {
-                    b.HasOne("Cinema.DAL.Models.DichVu", "MaDvNavigation")
-                        .WithMany("ChiTietDvs")
-                        .HasForeignKey("MaDv")
+                    b.HasOne("Cinema.DAL.Models.DoAn", "MaDoAnNavigation")
+                        .WithMany("ChiTietDoAns")
+                        .HasForeignKey("MaDoAn")
                         .IsRequired()
-                        .HasConstraintName("FK__ChiTietDV__MaDV__46E78A0C");
+                        .HasConstraintName("FK_CTDoAn_DoAn");
 
-                    b.HasOne("Cinema.DAL.Models.HoaDon", "MaHdNavigation")
-                        .WithMany("ChiTietDvs")
-                        .HasForeignKey("MaHd")
+                    b.HasOne("Cinema.DAL.Models.HoaDon", "MaHDNavigation")
+                        .WithMany("ChiTietDoAns")
+                        .HasForeignKey("MaHD")
                         .IsRequired()
-                        .HasConstraintName("FK__ChiTietDV__MaHD__45F365D3");
+                        .HasConstraintName("FK_CTDoAn_HoaDon");
 
-                    b.Navigation("MaDvNavigation");
+                    b.Navigation("MaDoAnNavigation");
 
-                    b.Navigation("MaHdNavigation");
+                    b.Navigation("MaHDNavigation");
+                });
+
+            modelBuilder.Entity("Cinema.DAL.Models.ChiTietHoaDon", b =>
+                {
+                    b.HasOne("Cinema.DAL.Models.Ghe", "MaGheNavigation")
+                        .WithMany("ChiTietHoaDons")
+                        .HasForeignKey("MaGhe")
+                        .IsRequired()
+                        .HasConstraintName("FK_CTHD_Ghe");
+
+                    b.HasOne("Cinema.DAL.Models.HoaDon", "MaHDNavigation")
+                        .WithMany("ChiTietHoaDons")
+                        .HasForeignKey("MaHD")
+                        .IsRequired()
+                        .HasConstraintName("FK_CTHD_HoaDon");
+
+                    b.HasOne("Cinema.DAL.Models.LichChieu", "MaLichNavigation")
+                        .WithMany("ChiTietHoaDons")
+                        .HasForeignKey("MaLich")
+                        .HasConstraintName("FK_CTHD_LichChieu");
+
+                    b.Navigation("MaGheNavigation");
+
+                    b.Navigation("MaHDNavigation");
+
+                    b.Navigation("MaLichNavigation");
                 });
 
             modelBuilder.Entity("Cinema.DAL.Models.Ghe", b =>
                 {
-                    b.HasOne("Cinema.DAL.Models.Phong", "MaPhongNavigation")
+                    b.HasOne("Cinema.DAL.Models.PhongChieu", "MaPhongNavigation")
                         .WithMany("Ghes")
                         .HasForeignKey("MaPhong")
-                        .HasConstraintName("FK_Ghe_Phong");
+                        .HasConstraintName("FK_Ghe_PhongChieu");
 
                     b.Navigation("MaPhongNavigation");
                 });
 
             modelBuilder.Entity("Cinema.DAL.Models.HoaDon", b =>
                 {
-                    b.HasOne("Cinema.DAL.Models.NguoiDung", "MaNdNavigation")
+                    b.HasOne("Cinema.DAL.Models.KhachHang", "MaKHNavigation")
                         .WithMany("HoaDons")
-                        .HasForeignKey("MaNd")
-                        .HasConstraintName("FK_HoaDon_NguoiDung");
+                        .HasForeignKey("MaKH")
+                        .HasConstraintName("FK_HoaDon_KhachHang");
 
-                    b.Navigation("MaNdNavigation");
+                    b.HasOne("Cinema.DAL.Models.NhanVien", "MaNVNavigation")
+                        .WithMany("HoaDons")
+                        .HasForeignKey("MaNV")
+                        .HasConstraintName("FK_HoaDon_NhanVien");
+
+                    b.Navigation("MaKHNavigation");
+
+                    b.Navigation("MaNVNavigation");
                 });
 
-            modelBuilder.Entity("Cinema.DAL.Models.Phim", b =>
-                {
-                    b.HasOne("Cinema.DAL.Models.LoaiPhim", "MaLoaiPhimNavigation")
-                        .WithMany("Phims")
-                        .HasForeignKey("MaLoaiPhim")
-                        .HasConstraintName("FK_Phim_LoaiPhim");
-
-                    b.Navigation("MaLoaiPhimNavigation");
-                });
-
-            modelBuilder.Entity("Cinema.DAL.Models.SuatChieu", b =>
+            modelBuilder.Entity("Cinema.DAL.Models.LichChieu", b =>
                 {
                     b.HasOne("Cinema.DAL.Models.Phim", "MaPhimNavigation")
-                        .WithMany("SuatChieus")
+                        .WithMany("LichChieus")
                         .HasForeignKey("MaPhim")
-                        .HasConstraintName("FK__SuatChieu__MaPhi__398D8EEE");
+                        .HasConstraintName("FK_LichChieu_Phim");
 
-                    b.HasOne("Cinema.DAL.Models.Phong", "MaPhongNavigation")
-                        .WithMany("SuatChieus")
+                    b.HasOne("Cinema.DAL.Models.PhongChieu", "MaPhongNavigation")
+                        .WithMany("LichChieus")
                         .HasForeignKey("MaPhong")
-                        .HasConstraintName("FK_SuatChieu_Phong");
+                        .HasConstraintName("FK_LichChieu_PhongChieu");
 
                     b.Navigation("MaPhimNavigation");
 
                     b.Navigation("MaPhongNavigation");
                 });
 
-            modelBuilder.Entity("Cinema.DAL.Models.Ve", b =>
+            modelBuilder.Entity("Cinema.DAL.Models.DoAn", b =>
                 {
-                    b.HasOne("Cinema.DAL.Models.Ghe", "MaGheNavigation")
-                        .WithMany("Ves")
-                        .HasForeignKey("MaGhe")
-                        .HasConstraintName("FK_Ve_Ghe");
-
-                    b.HasOne("Cinema.DAL.Models.HoaDon", "MaHdNavigation")
-                        .WithMany("Ves")
-                        .HasForeignKey("MaHd")
-                        .HasConstraintName("FK__Ve__MaHD__4F7CD00D");
-
-                    b.HasOne("Cinema.DAL.Models.SuatChieu", "MaSuatNavigation")
-                        .WithMany("Ves")
-                        .HasForeignKey("MaSuat")
-                        .HasConstraintName("FK__Ve__MaSuat__4D94879B");
-
-                    b.Navigation("MaGheNavigation");
-
-                    b.Navigation("MaHdNavigation");
-
-                    b.Navigation("MaSuatNavigation");
-                });
-
-            modelBuilder.Entity("Cinema.DAL.Models.DichVu", b =>
-                {
-                    b.Navigation("ChiTietDvs");
+                    b.Navigation("ChiTietDoAns");
                 });
 
             modelBuilder.Entity("Cinema.DAL.Models.Ghe", b =>
                 {
-                    b.Navigation("Ves");
+                    b.Navigation("ChiTietHoaDons");
                 });
 
             modelBuilder.Entity("Cinema.DAL.Models.HoaDon", b =>
                 {
-                    b.Navigation("ChiTietDvs");
+                    b.Navigation("ChiTietDoAns");
 
-                    b.Navigation("Ves");
+                    b.Navigation("ChiTietHoaDons");
                 });
 
-            modelBuilder.Entity("Cinema.DAL.Models.LoaiPhim", b =>
+            modelBuilder.Entity("Cinema.DAL.Models.KhachHang", b =>
                 {
-                    b.Navigation("Phims");
+                    b.Navigation("HoaDons");
                 });
 
-            modelBuilder.Entity("Cinema.DAL.Models.NguoiDung", b =>
+            modelBuilder.Entity("Cinema.DAL.Models.LichChieu", b =>
+                {
+                    b.Navigation("ChiTietHoaDons");
+                });
+
+            modelBuilder.Entity("Cinema.DAL.Models.NhanVien", b =>
                 {
                     b.Navigation("HoaDons");
                 });
 
             modelBuilder.Entity("Cinema.DAL.Models.Phim", b =>
                 {
-                    b.Navigation("SuatChieus");
+                    b.Navigation("LichChieus");
                 });
 
-            modelBuilder.Entity("Cinema.DAL.Models.Phong", b =>
+            modelBuilder.Entity("Cinema.DAL.Models.PhongChieu", b =>
                 {
                     b.Navigation("Ghes");
 
-                    b.Navigation("SuatChieus");
-                });
-
-            modelBuilder.Entity("Cinema.DAL.Models.SuatChieu", b =>
-                {
-                    b.Navigation("Ves");
+                    b.Navigation("LichChieus");
                 });
 #pragma warning restore 612, 618
         }

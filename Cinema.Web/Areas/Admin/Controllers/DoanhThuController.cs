@@ -22,16 +22,16 @@ namespace Cinema.Web.Areas.Admin.Controllers
             {
                 TongDoanhThu = _db.HoaDons.Sum(h => h.TongTien ?? 0),
                 TongHoaDon = _db.HoaDons.Count(),
-                TongVeDaBan = _db.Ves.Count(),
-                ThongKePhim = _db.Ves
-                    .Include(v => v.MaSuatNavigation)
-                    .ThenInclude(s => s!.MaPhimNavigation)
-                    .Where(v => v.MaSuatNavigation != null && v.MaSuatNavigation.MaPhimNavigation != null)
-                    .GroupBy(v => v.MaSuatNavigation!.MaPhimNavigation!.TenPhim)
+                TongVeDaBan = _db.ChiTietHoaDons.Count(),
+                ThongKePhim = _db.ChiTietHoaDons
+                    .Include(ct => ct.MaLichNavigation)
+                    .ThenInclude(lc => lc!.MaPhimNavigation)
+                    .Where(ct => ct.MaLichNavigation != null && ct.MaLichNavigation.MaPhimNavigation != null)
+                    .GroupBy(ct => ct.MaLichNavigation!.MaPhimNavigation!.TenPhim)
                     .Select(g => new DoanhThuTheoPhim
                     {
                         TenPhim = g.Key ?? "N/A",
-                        DoanhThu = g.Sum(v => v.MaSuatNavigation!.GiaVe ?? 0)
+                        DoanhThu = g.Sum(ct => ct.GiaVe ?? 0)
                     }).ToList()
             };
 

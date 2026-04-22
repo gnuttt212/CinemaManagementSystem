@@ -26,14 +26,6 @@ namespace Cinema.Web.ApiControllers
             _db = db;
         }
 
-        // ========================================================
-        // PHẦN 1: RESTful CRUD API (EF Core + LINQ)
-        // ========================================================
-
-        /// <summary>
-        /// GET: api/phimapi
-        /// Lấy toàn bộ danh sách phim (EF Core + LINQ)
-        /// </summary>
         [HttpGet]
         public ActionResult<IEnumerable<PhimDTO>> GetPhims()
         {
@@ -48,10 +40,6 @@ namespace Cinema.Web.ApiControllers
             }
         }
 
-        /// <summary>
-        /// GET: api/phimapi/5
-        /// Lấy chi tiết 1 phim theo ID
-        /// </summary>
         [HttpGet("{id}")]
         public ActionResult<PhimDTO> GetPhim(int id)
         {
@@ -63,10 +51,6 @@ namespace Cinema.Web.ApiControllers
             return Ok(phim);
         }
 
-        /// <summary>
-        /// POST: api/phimapi
-        /// Thêm phim mới (RESTful Create)
-        /// </summary>
         [HttpPost]
         public ActionResult<PhimDTO> CreatePhim([FromBody] PhimDTO dto)
         {
@@ -84,10 +68,6 @@ namespace Cinema.Web.ApiControllers
             return StatusCode(500, new { message = "Không thể thêm phim" });
         }
 
-        /// <summary>
-        /// PUT: api/phimapi/5
-        /// Cập nhật phim (RESTful Update)
-        /// </summary>
         [HttpPut("{id}")]
         public IActionResult UpdatePhim(int id, [FromBody] PhimDTO dto)
         {
@@ -102,10 +82,6 @@ namespace Cinema.Web.ApiControllers
             return NotFound(new { message = $"Không tìm thấy phim với mã {id}" });
         }
 
-        /// <summary>
-        /// DELETE: api/phimapi/5
-        /// Xóa phim (RESTful Delete)
-        /// </summary>
         [HttpDelete("{id}")]
         public IActionResult DeletePhim(int id)
         {
@@ -117,14 +93,7 @@ namespace Cinema.Web.ApiControllers
             return NotFound(new { message = $"Không tìm thấy phim với mã {id} hoặc không thể xóa do có dữ liệu liên quan" });
         }
 
-        // ========================================================
-        // PHẦN 2: ADO.NET (DataAdapter + DataTable)
-        // ========================================================
 
-        /// <summary>
-        /// GET: api/phimapi/adonet
-        /// Lấy danh sách phim bằng ADO.NET thuần (SqlDataAdapter + DataTable)
-        /// </summary>
         [HttpGet("adonet")]
         public IActionResult GetPhimsAdoNet()
         {
@@ -157,7 +126,7 @@ namespace Cinema.Web.ApiControllers
         {
             try
             {
-                DataSet ds = _adoNetDal.LayPhimVaSuatChieu_DataSet();
+                DataSet ds = _adoNetDal.LayPhimVaLichChieu_DataSet();
 
                 var result = new Dictionary<string, object>();
                 foreach (DataTable table in ds.Tables)
@@ -183,23 +152,13 @@ namespace Cinema.Web.ApiControllers
             }
         }
 
-        // ========================================================
-        // PHẦN 3: LINQ to XML (Export / Import)
-        // ========================================================
-
-        /// <summary>
-        /// GET: api/phimapi/export-xml
-        /// Xuất danh sách phim ra định dạng XML sử dụng LINQ to XML (XDocument + XElement)
-        /// </summary>
         [HttpGet("export-xml")]
         public IActionResult ExportXml()
         {
             try
             {
-                // Sử dụng LINQ to Objects lấy dữ liệu
                 var phims = _db.Phims.ToList();
 
-                // Sử dụng LINQ to XML để xây dựng tài liệu XML
                 XDocument xmlDoc = new XDocument(
                     new XDeclaration("1.0", "utf-8", "yes"),
                     new XElement("DanhSachPhim",
@@ -209,16 +168,16 @@ namespace Cinema.Web.ApiControllers
                         select new XElement("Phim",
                             new XAttribute("MaPhim", p.MaPhim),
                             new XElement("TenPhim", p.TenPhim),
+                            new XElement("TheLoai", p.TheLoai ?? ""),
+                            new XElement("DaoDien", p.DaoDien ?? ""),
                             new XElement("ThoiLuong", p.ThoiLuong ?? 0),
-                            new XElement("GioiHanTuoi", p.GioiHanTuoi ?? 0),
                             new XElement("NgayKhoiChieu", p.NgayKhoiChieu?.ToString("yyyy-MM-dd") ?? ""),
-                            new XElement("Hinh", p.Hinh ?? ""),
-                            new XElement("MaLoaiPhim", p.MaLoaiPhim ?? 0)
+                            new XElement("MoTa", p.MoTa ?? ""),
+                            new XElement("Poster", p.Poster ?? "")
                         )
                     )
                 );
 
-                // Trả về dạng XML
                 return Content(xmlDoc.ToString(), "application/xml");
             }
             catch (Exception ex)
@@ -227,29 +186,23 @@ namespace Cinema.Web.ApiControllers
             }
         }
 
-        /// <summary>
-        /// POST: api/phimapi/import-xml
-        /// Nhập danh sách phim từ XML sử dụng LINQ to XML
-        /// Body: raw XML content
-        /// </summary>
         [HttpPost("import-xml")]
         public IActionResult ImportXml([FromBody] string xmlContent)
         {
             try
             {
-                // Parse XML bằng LINQ to XML
                 XDocument xmlDoc = XDocument.Parse(xmlContent);
 
-                // Dùng LINQ to XML để trích xuất dữ liệu từ các XElement
                 var phimElements = xmlDoc.Descendants("Phim");
 
                 var importedPhims = (from elem in phimElements
                                     select new PhimDTO
                                     {
                                         TenPhim = (string?)elem.Element("TenPhim") ?? "Không tên",
+                                        TheLoai = (string?)elem.Element("TheLoai"),
+                                        DaoDien = (string?)elem.Element("DaoDien"),
                                         ThoiLuong = (int?)elem.Element("ThoiLuong") ?? 0,
-                                        GioiHanTuoi = (int?)elem.Element("GioiHanTuoi") ?? 0,
-                                        Hinh = (string?)elem.Element("Hinh") ?? ""
+                                        Poster = (string?)elem.Element("Poster") ?? ""
                                     }).ToList();
 
                 int count = 0;
@@ -258,10 +211,10 @@ namespace Cinema.Web.ApiControllers
                     var phim = new Phim
                     {
                         TenPhim = dto.TenPhim,
+                        TheLoai = dto.TheLoai,
+                        DaoDien = dto.DaoDien,
                         ThoiLuong = dto.ThoiLuong,
-                        GioiHanTuoi = dto.GioiHanTuoi,
-                        Hinh = dto.Hinh,
-                        MaLoaiPhim = 1
+                        Poster = dto.Poster
                     };
                     _db.Phims.Add(phim);
                     count++;

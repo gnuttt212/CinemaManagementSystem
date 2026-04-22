@@ -17,11 +17,11 @@ namespace Cinema.Web.Areas.Admin.Controllers
         }
         public IActionResult Index()
         {
-            var ds = _db.SuatChieus
-                .Include(s => s.MaPhimNavigation)
-                .Include(s => s.MaPhongNavigation)
-                .OrderByDescending(s => s.NgayChieu)
-                .ThenByDescending(s => s.GioBatDau)
+            var ds = _db.LichChieus
+                .Include(lc => lc.MaPhimNavigation)
+                .Include(lc => lc.MaPhongNavigation)
+                .OrderByDescending(lc => lc.NgayChieu)
+                .ThenByDescending(lc => lc.GioChieu)
                 .ToList();
             return View(ds);
         }
@@ -29,80 +29,74 @@ namespace Cinema.Web.Areas.Admin.Controllers
         public IActionResult Create()
         {
             ViewBag.MaPhim = _db.Phims.ToList();
-            ViewBag.MaPhong = _db.Phongs.ToList();
+            ViewBag.MaPhong = _db.PhongChieus.ToList();
             return View();
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(SuatChieu sc)
+        public IActionResult Create(LichChieu lc)
         {
+            ModelState.Remove("MaPhimNavigation");
+            ModelState.Remove("MaPhongNavigation");
+            ModelState.Remove("ChiTietHoaDons");
+
             if (ModelState.IsValid)
             {
-                var phim = _db.Phims.Find(sc.MaPhim);
-                if (phim != null && phim.ThoiLuong.HasValue && sc.GioBatDau.HasValue)
-                {
-                    sc.GioKetThuc = sc.GioBatDau.Value.AddMinutes(phim.ThoiLuong.Value);
-                }
-                if (string.IsNullOrEmpty(sc.TrangThai)) sc.TrangThai = "Sắp chiếu";
-
-                _db.SuatChieus.Add(sc);
+                _db.LichChieus.Add(lc);
                 _db.SaveChanges();
                 return RedirectToAction(nameof(Index));
             }
             ViewBag.MaPhim = _db.Phims.ToList();
-            ViewBag.MaPhong = _db.Phongs.ToList();
-            return View(sc);
+            ViewBag.MaPhong = _db.PhongChieus.ToList();
+            return View(lc);
         }
         public IActionResult Edit(int id)
         {
-            var suatChieu = _db.SuatChieus.Find(id);
-            if (suatChieu == null) return NotFound();
+            var lichChieu = _db.LichChieus.Find(id);
+            if (lichChieu == null) return NotFound();
 
             ViewBag.MaPhim = _db.Phims.ToList();
-            ViewBag.MaPhong = _db.Phongs.ToList();
-            return View(suatChieu);
+            ViewBag.MaPhong = _db.PhongChieus.ToList();
+            return View(lichChieu);
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(SuatChieu sc)
+        public IActionResult Edit(LichChieu lc)
         {
+            ModelState.Remove("MaPhimNavigation");
+            ModelState.Remove("MaPhongNavigation");
+            ModelState.Remove("ChiTietHoaDons");
+
             if (ModelState.IsValid)
             {
                 try
                 {
-                    var phim = _db.Phims.Find(sc.MaPhim);
-                    if (phim != null && phim.ThoiLuong.HasValue && sc.GioBatDau.HasValue)
-                    {
-                        sc.GioKetThuc = sc.GioBatDau.Value.AddMinutes(phim.ThoiLuong.Value);
-                    }
-                    if (string.IsNullOrEmpty(sc.TrangThai)) sc.TrangThai = "Sắp chiếu";
-
-                    _db.Update(sc);
+                    _db.Update(lc);
                     _db.SaveChanges();
                     return RedirectToAction(nameof(Index));
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!_db.SuatChieus.Any(e => e.MaSuat == sc.MaSuat)) return NotFound();
+                    if (!_db.LichChieus.Any(e => e.MaLich == lc.MaLich)) return NotFound();
                     else throw;
                 }
             }
             ViewBag.MaPhim = _db.Phims.ToList();
-            ViewBag.MaPhong = _db.Phongs.ToList();
-            return View(sc);
+            ViewBag.MaPhong = _db.PhongChieus.ToList();
+            return View(lc);
         }
         [HttpPost]
         public IActionResult Delete(int id)
         {
-            var suatChieu = _db.SuatChieus.Find(id);
-            if (suatChieu == null)
+            var lichChieu = _db.LichChieus.Find(id);
+            if (lichChieu == null)
             {
-                return Json(new { success = false, message = "Không tìm thấy suất chiếu!" });
+                return Json(new { success = false, message = "Không tìm thấy lịch chiếu!" });
             }
 
             try
             {
-                _db.SuatChieus.Remove(suatChieu);
+                _db.LichChieus.Remove(lichChieu);
                 _db.SaveChanges();
                 return Json(new { success = true });
             }
