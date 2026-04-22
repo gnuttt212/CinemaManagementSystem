@@ -11,6 +11,7 @@ namespace Cinema.DTO
         public string? ChucVu { get; set; }
         public string TaiKhoan { get; set; } = string.Empty;
         public string? PhanQuyen { get; set; }
+        public string? MatKhau { get; set; }
     }
 
     public class NhanVienLoginRequest

@@ -1,0 +1,56 @@
+@model Cinema.DTO.KhachHangDTO
+@{
+    ViewData["Title"] = "Chỉnh Sửa Khách Hàng";
+    Layout = "_Layout";
+}
+
+<div class="container-fluid">
+    <div class="card shadow border-0 rounded-4 w-50 mx-auto">
+        <div class="card-header bg-white py-3">
+            <h5 class="mb-0 fw-bold text-warning"><i class="bi bi-pencil-square me-2"></i>CẬP NHẬT KHÁCH HÀNG</h5>
+        </div>
+        <div class="card-body p-4">
+            <form asp-action="Edit" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                <input type="hidden" asp-for="MaKH" />
+                
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Tài khoản</label>
+                    <input asp-for="TaiKhoan" class="form-control" required readonly />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Họ và Tên</label>
+                    <input asp-for="HoTen" class="form-control" required />
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Email</label>
+                        <input asp-for="Email" type="email" class="form-control" required />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Số điện thoại</label>
+                        <input asp-for="SDT" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Ngày sinh</label>
+                        <input asp-for="NgaySinh" type="date" class="form-control" value="@(Model.NgaySinh?.ToString("yyyy-MM-dd"))" />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Điểm tích lũy</label>
+                        <input asp-for="DiemTichLuy" type="number" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2 mt-4">
+                    <button type="submit" class="btn btn-warning btn-lg rounded-pill shadow">Lưu thay đổi</button>
+                    <a asp-action="Index" class="btn btn-outline-secondary rounded-pill">Hủy bỏ</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

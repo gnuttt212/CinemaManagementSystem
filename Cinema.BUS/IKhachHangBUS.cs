@@ -11,5 +11,10 @@ namespace Cinema.BUS
         KhachHangDTO LayThongTinProfile(string taiKhoan);
         bool CapNhatProfile(KhachHangDTO model);
         bool DoiMatKhau(string taiKhoan, string matKhauCu, string matKhauMoi);
+        
+        List<KhachHangDTO> LayDanhSach();
+        KhachHangDTO? LayTheoMa(int maKh);
+        bool Sua(KhachHangDTO model);
+        bool Xoa(int maKh);
     }
 }
