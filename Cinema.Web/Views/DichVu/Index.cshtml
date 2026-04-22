@@ -1,51 +1,38 @@
-@model List<Cinema.DTO.DichVuDTO>
+@model List<Cinema.DTO.DoAnDTO>
+
+@{
+    ViewData["Title"] = "Dịch vụ bắp nước";
+}
 
 <div class="container mt-5">
     <h2 class="text-center fw-bold text-success mb-4">🍿 DỊCH VỤ BẮP NƯỚC</h2>
     <div class="row">
-        @foreach (var dv in Model)
+        @if (Model != null && Model.Any())
         {
-            <div class="col-md-3 mb-4">
-                <div class="card h-100 text-center shadow-sm border-0 rounded-4 overflow-hidden feature-card">
-                    <img src="~/images/@(string.IsNullOrEmpty(dv.HinhAnh) ? "popcorn-default.png" : dv.HinhAnh)"
-                         class="card-img-top p-3" alt="@dv.TenDV" style="height: 180px; object-fit: contain;" onerror="this.onerror=null; this.src='https://via.placeholder.com/200x200?text=Service';">
-
-                    <div class="card-body">
-                        <h5 class="card-title fw-bold">@dv.TenDV</h5>
-
-                        <p class="text-danger fs-5 fw-bold">
-                            @dv.DonGia.ToString("N0") đ
-                        </p>
-                        <p class="small @(dv.SoLuongTon > 0 ? "text-muted" : "text-danger fw-bold")">
-                            @(dv.SoLuongTon > 0 ? $"Còn lại: {dv.SoLuongTon}" : "Hết hàng")
-                        </p>
-
-                        @if (dv.SoLuongTon > 0)
-                        {
-                            <button class="btn btn-success w-100 rounded-pill shadow-sm"
-                                    onclick="addToCart(@dv.MaDV, '@dv.TenDV')">
-                                <i class="bi bi-cart-plus"></i> Thêm vào giỏ
-                            </button>
-                        }
-                        else
-                        {
-                            <button class="btn btn-secondary w-100 rounded-pill disabled">Tạm hết</button>
-                        }
+            @foreach (var dv in Model)
+            {
+                <div class="col-md-3 mb-4">
+                    <div class="card h-100 text-center shadow-sm border-0 rounded-4 overflow-hidden">
+                        <div class="card-body d-flex flex-column justify-content-center">
+                            <div class="mb-3">
+                                <i class="bi bi-cup-straw display-3 text-success"></i>
+                            </div>
+                            <h5 class="card-title fw-bold">@dv.TenDoAn</h5>
+                            <p class="text-muted small mb-2">@(dv.Loai ?? "Chưa phân loại")</p>
+                            <p class="text-danger fs-5 fw-bold mb-0">
+                                @dv.Gia.ToString("N0") đ
+                            </p>
+                        </div>
                     </div>
                 </div>
+            }
+        }
+        else
+        {
+            <div class="col-12 text-center py-5">
+                <i class="bi bi-emoji-frown display-1 text-muted"></i>
+                <p class="mt-3 text-muted fs-5">Chưa có dịch vụ nào.</p>
             </div>
         }
     </div>
 </div>
-
-<script>
-    function addToCart(maDv, tenDv) {
-        fetch(`/DichVu/AddToCart?id=${maDv}`, { method: 'POST' })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    alert(`Đã thêm ${tenDv} vào giỏ hàng!`);
-                }
-            });
-    }
-</script>

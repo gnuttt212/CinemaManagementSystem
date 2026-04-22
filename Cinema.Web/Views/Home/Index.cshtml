@@ -1,4 +1,4 @@
-﻿@model List<Cinema.DTO.PhimDTO>
+@model List<Cinema.DTO.PhimDTO>
 @{
     ViewData["Title"] = "Trang Chủ - Cinema.Web";
 }
@@ -80,7 +80,12 @@
             <div class="col-lg-3 col-md-4 col-sm-6">
                 <div class="card h-100 border-0 shadow-sm movie-card overflow-hidden rounded-4">
                     <div class="position-relative overflow-hidden">
-                        <img src="~/images/@phim.Hinh" class="card-img-top" alt="@phim.TenPhim" style="height: 380px; object-fit: cover; transition: 0.5s;">
+                        @{
+                            var posterUrl = string.IsNullOrEmpty(phim.Poster)
+                                ? "https://via.placeholder.com/300x400?text=No+Image"
+                                : phim.Poster.StartsWith("http") ? phim.Poster : "/images/phim/" + phim.Poster;
+                        }
+                        <img src="@posterUrl" class="card-img-top" alt="@phim.TenPhim" style="height: 380px; object-fit: cover; transition: 0.5s;" onerror="this.onerror=null; this.src='https://via.placeholder.com/300x400?text=No+Image';">
                         <div class="movie-overlay d-flex align-items-center justify-content-center">
                             <a asp-controller="Phim" asp-action="Details" asp-route-id="@phim.MaPhim" class="btn btn-warning fw-bold rounded-pill px-4">XEM CHI TIẾT</a>
                         </div>

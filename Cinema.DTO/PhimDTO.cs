@@ -7,30 +7,28 @@ namespace Cinema.DTO
     {
         public int MaPhim { get; set; }
         public string TenPhim { get; set; } = string.Empty;
+        public string? TheLoai { get; set; }
+        public string? DaoDien { get; set; }
         public int? ThoiLuong { get; set; }
         public DateTime? NgayKhoiChieu { get; set; }
-        public int? GioiHanTuoi { get; set; }
         public string? MoTa { get; set; }
-        public string Hinh { get; set; } = string.Empty;
-        public string TheLoai { get; set; } = string.Empty;
-        public int? MaLoaiPhim { get; set; }
-        public string? LoaiGhe { get; set; }
-        public List<SuatChieuDTO> SuatChieus { get; set; } = new List<SuatChieuDTO>();
-        public List<SuatChieuHienThiDTO> DanhSachSuatChieu { get; set; } = new List<SuatChieuHienThiDTO>();
+        public string? Poster { get; set; }
+        public List<LichChieuDTO> LichChieus { get; set; } = new List<LichChieuDTO>();
+        public List<LichChieuHienThiDTO> DanhSachLichChieu { get; set; } = new List<LichChieuHienThiDTO>();
 
         public string ThongTinHienThi => $"{TenPhim} ({ThoiLuong} phút)";
     }
 
-    public class SuatChieuHienThiDTO
+    public class LichChieuHienThiDTO
     {
-        public int MaSuat { get; set; }
-        public string? GioBatDau { get; set; } 
+        public int MaLich { get; set; }
+        public string? GioChieu { get; set; } 
     }
 
-    public class SuatChieuDTO
+    public class LichChieuDTO
     {
-        public int MaSuat { get; set; }
-        public TimeSpan? GioBatDau { get; set; } 
+        public int MaLich { get; set; }
+        public TimeSpan? GioChieu { get; set; } 
         public decimal? GiaVe { get; set; }
     }
 }

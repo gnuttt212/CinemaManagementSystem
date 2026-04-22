@@ -16,7 +16,7 @@ namespace Cinema.Web.Areas.Admin.Controllers
         }
         public IActionResult Index()
         {
-            var ds = _db.DichVus.OrderByDescending(d => d.MaDv).ToList();
+            var ds = _db.DoAns.OrderByDescending(d => d.MaDoAn).ToList();
             return View(ds);
         }
         public IActionResult Create()
@@ -25,11 +25,11 @@ namespace Cinema.Web.Areas.Admin.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(DichVu model)
+        public IActionResult Create(DoAn model)
         {
             if (ModelState.IsValid)
             {
-                _db.DichVus.Add(model);
+                _db.DoAns.Add(model);
                 _db.SaveChanges();
                 return RedirectToAction(nameof(Index));
             }
@@ -37,13 +37,13 @@ namespace Cinema.Web.Areas.Admin.Controllers
         }
         public IActionResult Edit(int id)
         {
-            var dichVu = _db.DichVus.Find(id);
-            if (dichVu == null) return NotFound();
-            return View(dichVu);
+            var doAn = _db.DoAns.Find(id);
+            if (doAn == null) return NotFound();
+            return View(doAn);
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(DichVu model)
+        public IActionResult Edit(DoAn model)
         {
             if (ModelState.IsValid)
             {
@@ -57,21 +57,21 @@ namespace Cinema.Web.Areas.Admin.Controllers
         [HttpPost]
         public IActionResult Delete(int id)
         {
-            var dichVu = _db.DichVus.Find(id);
-            if (dichVu == null)
+            var doAn = _db.DoAns.Find(id);
+            if (doAn == null)
             {
-                return Json(new { success = false, message = "Không tìm thấy dịch vụ!" });
+                return Json(new { success = false, message = "Không tìm thấy đồ ăn!" });
             }
 
             try
             {
-                var existHD = _db.ChiTietDvs.Any(c => c.MaDv == id);
+                var existHD = _db.ChiTietDoAns.Any(c => c.MaDoAn == id);
                 if (existHD)
                 {
-                    return Json(new { success = false, message = "Dịch vụ đã được bán trong hóa đơn, không thể xóa!" });
+                    return Json(new { success = false, message = "Đồ ăn đã được bán trong hóa đơn, không thể xóa!" });
                 }
 
-                _db.DichVus.Remove(dichVu);
+                _db.DoAns.Remove(doAn);
                 _db.SaveChanges();
                 return Json(new { success = true });
             }

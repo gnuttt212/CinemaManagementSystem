@@ -9,17 +9,17 @@ public partial class Phim
 
     public string TenPhim { get; set; } = null!;
 
+    public string? TheLoai { get; set; }
+
+    public string? DaoDien { get; set; }
+
     public int? ThoiLuong { get; set; }
-
-    public int? GioiHanTuoi { get; set; }
-
-    public int? MaLoaiPhim { get; set; }
-
-    public string? Hinh { get; set; }
 
     public DateTime? NgayKhoiChieu { get; set; }
 
-    public virtual LoaiPhim? MaLoaiPhimNavigation { get; set; }
+    public string? MoTa { get; set; }
 
-    public virtual ICollection<SuatChieu> SuatChieus { get; set; } = new List<SuatChieu>();
+    public string? Poster { get; set; }
+
+    public virtual ICollection<LichChieu> LichChieus { get; set; } = new List<LichChieu>();
 }

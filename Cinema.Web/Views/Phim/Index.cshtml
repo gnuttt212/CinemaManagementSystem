@@ -50,9 +50,9 @@
                 <div class="card h-100 shadow-sm border-0 transition-hover" style="border-radius: 15px; overflow: hidden;">
                     <div style="position: relative;">
                         @{
-                            var imgUrl = string.IsNullOrEmpty(item.Hinh)
+                            var imgUrl = string.IsNullOrEmpty(item.Poster)
                             ? "https://via.placeholder.com/300x400?text=No+Image"
-                            : item.Hinh.StartsWith("http") ? item.Hinh : "/images/phim/" + item.Hinh;
+                            : item.Poster.StartsWith("http") ? item.Poster : "/images/phim/" + item.Poster;
                         }
                         <img src="@imgUrl" class="card-img-top" alt="@item.TenPhim" style="height: 400px; object-fit: cover;" onerror="this.onerror=null; this.src='https://via.placeholder.com/300x400?text=No+Image';">
                     </div>
@@ -61,15 +61,15 @@
                         <h5 class="card-title fw-bold text-truncate text-primary">@item.TenPhim</h5>
                         <p class="text-secondary small mb-2"><i class="bi bi-tags-fill text-warning me-1"></i> @item.TheLoai</p>
                         <div class="mt-3">
-                            @if (item.DanhSachSuatChieu != null && item.DanhSachSuatChieu.Any())
+                            @if (item.DanhSachLichChieu != null && item.DanhSachLichChieu.Any())
                             {
                                 <p class="small text-muted mb-2"><i class="bi bi-calendar3"></i> Lịch chiếu:</p>
                                 <div class="d-flex flex-wrap gap-2">
-                                    @foreach (var suat in item.DanhSachSuatChieu)
+                                    @foreach (var suat in item.DanhSachLichChieu)
                                     {
-                                        <a asp-controller="Phim" asp-action="ChonGhe" asp-route-maSuat="@suat.MaSuat"
+                                        <a asp-controller="Phim" asp-action="ChonGhe" asp-route-maLich="@suat.MaLich"
                                            class="btn btn-outline-primary btn-sm fw-bold px-3 py-1 shadow-sm">
-                                            @suat.GioBatDau
+                                            @suat.GioChieu
                                         </a>
                                     }
                                 </div>

@@ -1,18 +1,17 @@
-﻿using Cinema.BUS;
+using Cinema.BUS;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Cinema.Web.Controllers
 {
     public class DichVuController : Controller
     {
-        private readonly IDichVuBUS _dichVuBus;
-        public DichVuController(IDichVuBUS dichVuBus) { _dichVuBus = dichVuBus; }
+        private readonly IDoAnBUS _doAnBus;
+        public DichVuController(IDoAnBUS doAnBus) { _doAnBus = doAnBus; }
 
-       
         public IActionResult Index()
         {
-            var data = _dichVuBus.LayDanhSachDichVu();
-            return View(data); 
+            var data = _doAnBus.LayDanhSachDoAn();
+            return View(data);
         }
     }
 }
