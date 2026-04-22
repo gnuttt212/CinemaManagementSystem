@@ -18,10 +18,7 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
-// DAL
 builder.Services.AddScoped<ICinemaAdoNetDAL, CinemaAdoNetDAL>();
-
-// BUS
 builder.Services.AddScoped<IPhimBUS, PhimBUS>();
 builder.Services.AddScoped<IHoaDonBUS, HoaDonBUS>();
 builder.Services.AddScoped<IKhachHangBUS, KhachHangBUS>();
