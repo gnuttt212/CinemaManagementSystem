@@ -19,43 +19,44 @@ namespace Cinema.BUS
         public List<PhimDTO> LayDanhSachPhim() 
         {
             return _db.Phims
-                .Include(p => p.MaLoaiPhimNavigation)
                 .Select(p => new PhimDTO
                 {
                     MaPhim = p.MaPhim,
                     TenPhim = p.TenPhim,
+                    TheLoai = p.TheLoai,
+                    DaoDien = p.DaoDien,
                     ThoiLuong = p.ThoiLuong,
-                    GioiHanTuoi = p.GioiHanTuoi,
                     NgayKhoiChieu = p.NgayKhoiChieu,
-                    Hinh = p.Hinh,
-                    TheLoai = p.MaLoaiPhimNavigation != null ? p.MaLoaiPhimNavigation.TenLoai : "Chưa phân loại"
+                    MoTa = p.MoTa,
+                    Poster = p.Poster
                 })
                 .ToList();
         }
 
-        public List<PhimDTO> LayDanhSachPhimDangChieu()
+        public List<PhimDTO> LayDanhSachPhimDangChieu(DateTime? selectedDate = null)
         {
-            var today = DateTime.Today; 
+            var targetDate = selectedDate.HasValue ? DateOnly.FromDateTime(selectedDate.Value) : DateOnly.FromDateTime(DateTime.Today);
 
             return _db.Phims
-                .Include(p => p.SuatChieus) 
-                .Where(p => p.ThoiLuong > 0)
+                .Include(p => p.LichChieus)
+                .Where(p => p.ThoiLuong > 0 && p.LichChieus.Any(lc => lc.NgayChieu == targetDate))
                 .Select(p => new PhimDTO
                 {
                     MaPhim = p.MaPhim,
                     TenPhim = p.TenPhim,
+                    TheLoai = p.TheLoai,
+                    DaoDien = p.DaoDien,
                     ThoiLuong = p.ThoiLuong,
-                    GioiHanTuoi = p.GioiHanTuoi,
                     NgayKhoiChieu = p.NgayKhoiChieu,
-                    Hinh = p.Hinh,
-                    TheLoai = "Phim Đang Chiếu",
-                    DanhSachSuatChieu = p.SuatChieus
-                        .Where(s => s.NgayChieu >= DateOnly.FromDateTime(DateTime.Today))
-                        .OrderBy(s => s.GioBatDau)
-                        .Select(s => new SuatChieuHienThiDTO
+                    MoTa = p.MoTa,
+                    Poster = p.Poster,
+                    DanhSachLichChieu = p.LichChieus
+                        .Where(lc => lc.NgayChieu == targetDate)
+                        .OrderBy(lc => lc.GioChieu)
+                        .Select(lc => new LichChieuHienThiDTO
                         {
-                            MaSuat = s.MaSuat,
-                            GioBatDau = s.GioBatDau.HasValue ? s.GioBatDau.Value.ToString(@"hh\:mm") : "00:00"
+                            MaLich = lc.MaLich,
+                            GioChieu = lc.GioChieu.HasValue ? lc.GioChieu.Value.ToString(@"hh\:mm") : "00:00"
                         }).ToList()
                 })
                 .ToList();
@@ -67,55 +68,57 @@ namespace Cinema.BUS
             var maPhims = phims.Select(p => p.MaPhim).ToList();
 
             var today = DateOnly.FromDateTime(DateTime.Today);
-            var suatChieusToday = _db.SuatChieus
-                .Where(s => s.MaPhim.HasValue && maPhims.Contains(s.MaPhim.Value) && s.NgayChieu == today)
+            var lichChieusToday = _db.LichChieus
+                .Where(lc => lc.MaPhim.HasValue && maPhims.Contains(lc.MaPhim.Value) && lc.NgayChieu == today)
                 .ToList();
             
             return phims.Select(p => new PhimDTO
             {
                 MaPhim = p.MaPhim,
                 TenPhim = p.TenPhim,
+                TheLoai = p.TheLoai,
+                DaoDien = p.DaoDien,
                 ThoiLuong = p.ThoiLuong,
-                GioiHanTuoi = p.GioiHanTuoi,
                 NgayKhoiChieu = p.NgayKhoiChieu,
-                Hinh = p.Hinh,
-                TheLoai = "Phim Đang Chiếu (SP)",
-                DanhSachSuatChieu = suatChieusToday
-                    .Where(s => s.MaPhim == p.MaPhim)
-                    .OrderBy(s => s.GioBatDau)
-                    .Select(s => new SuatChieuHienThiDTO
+                MoTa = p.MoTa,
+                Poster = p.Poster,
+                DanhSachLichChieu = lichChieusToday
+                    .Where(lc => lc.MaPhim == p.MaPhim)
+                    .OrderBy(lc => lc.GioChieu)
+                    .Select(lc => new LichChieuHienThiDTO
                     {
-                        MaSuat = s.MaSuat,
-                        GioBatDau = s.GioBatDau.HasValue ? s.GioBatDau.Value.ToString(@"hh\:mm") : "00:00"
+                        MaLich = lc.MaLich,
+                        GioChieu = lc.GioChieu.HasValue ? lc.GioChieu.Value.ToString(@"hh\:mm") : "00:00"
                     }).ToList()
             }).ToList();
         }
+
         public List<PhimDTO> TimKiemPhim(string query)
         {
             if (string.IsNullOrEmpty(query)) return LayDanhSachPhimDangChieu();
 
-            var today = DateTime.Today;
             var q = query.ToLower();
 
             return _db.Phims
-                .Include(p => p.SuatChieus)
+                .Include(p => p.LichChieus)
                 .Where(p => p.TenPhim.ToLower().Contains(q))
                 .Select(p => new PhimDTO
                 {
                     MaPhim = p.MaPhim,
                     TenPhim = p.TenPhim,
+                    TheLoai = p.TheLoai,
+                    DaoDien = p.DaoDien,
                     ThoiLuong = p.ThoiLuong,
-                    GioiHanTuoi = p.GioiHanTuoi,
                     NgayKhoiChieu = p.NgayKhoiChieu,
-                    Hinh = p.Hinh,
-                    TheLoai = "Kết quả tìm kiếm",
-                    DanhSachSuatChieu = p.SuatChieus
-                        .Where(s => s.NgayChieu >= DateOnly.FromDateTime(DateTime.Today))
-                        .OrderBy(s => s.GioBatDau)
-                        .Select(s => new SuatChieuHienThiDTO
+                    MoTa = p.MoTa,
+                    Poster = p.Poster,
+                    DanhSachLichChieu = p.LichChieus
+                        .Where(lc => lc.NgayChieu >= DateOnly.FromDateTime(DateTime.Today))
+                        .OrderBy(lc => lc.GioChieu)
+                        .Select(lc => new LichChieuHienThiDTO
                         {
-                            MaSuat = s.MaSuat,
-                            GioBatDau = s.GioBatDau.HasValue ? s.GioBatDau.Value.ToString(@"hh\:mm") : "00:00"
+                            MaLich = lc.MaLich,
+                            GioChieu = lc.GioChieu.HasValue ? lc.GioChieu.Value.ToString(@"hh\:mm") : "00:00"
                         }).ToList()
                 })
                 .ToList();
@@ -130,36 +133,41 @@ namespace Cinema.BUS
             {
                 MaPhim = phim.MaPhim,
                 TenPhim = phim.TenPhim,
+                TheLoai = phim.TheLoai,
+                DaoDien = phim.DaoDien,
                 ThoiLuong = phim.ThoiLuong,
                 NgayKhoiChieu = phim.NgayKhoiChieu,
-                GioiHanTuoi = phim.GioiHanTuoi ?? 0,
-                Hinh = phim.Hinh,
-                SuatChieus = _db.SuatChieus.Where(s => s.MaPhim == maPhim)
-                    .Select(s => new SuatChieuDTO
+                MoTa = phim.MoTa,
+                Poster = phim.Poster,
+                LichChieus = _db.LichChieus.Where(lc => lc.MaPhim == maPhim)
+                    .Select(lc => new LichChieuDTO
                     {
-                        MaSuat = s.MaSuat,
-                        GioBatDau = s.GioBatDau.HasValue ? TimeSpan.FromTicks(s.GioBatDau.Value.Ticks) : null
+                        MaLich = lc.MaLich,
+                        GioChieu = lc.GioChieu.HasValue ? TimeSpan.FromTicks(lc.GioChieu.Value.Ticks) : null,
+                        GiaVe = lc.GiaVe
                     }).ToList()
             };
         }
 
-        public bool ThemPhim(PhimDTO dto)
+        public int ThemPhim(PhimDTO dto)
         {
             try
             {
                 var phim = new Phim
                 {
                     TenPhim = dto.TenPhim,
+                    TheLoai = dto.TheLoai,
+                    DaoDien = dto.DaoDien,
                     ThoiLuong = dto.ThoiLuong,
-                    GioiHanTuoi = dto.GioiHanTuoi,
                     NgayKhoiChieu = dto.NgayKhoiChieu,
-                    Hinh = dto.Hinh,
-                    MaLoaiPhim = 1
+                    MoTa = dto.MoTa,
+                    Poster = dto.Poster
                 };
                 _db.Phims.Add(phim);
-                return _db.SaveChanges() > 0;
+                _db.SaveChanges();
+                return phim.MaPhim;
             }
-            catch { return false; }
+            catch { return 0; }
         }
 
         public bool SuaPhim(PhimDTO dto)
@@ -170,10 +178,12 @@ namespace Cinema.BUS
                 if (phim == null) return false;
 
                 phim.TenPhim = dto.TenPhim;
+                phim.TheLoai = dto.TheLoai;
+                phim.DaoDien = dto.DaoDien;
                 phim.ThoiLuong = dto.ThoiLuong;
-                phim.GioiHanTuoi = dto.GioiHanTuoi;
                 phim.NgayKhoiChieu = dto.NgayKhoiChieu;
-                phim.Hinh = dto.Hinh;
+                phim.MoTa = dto.MoTa;
+                phim.Poster = dto.Poster;
 
                 return _db.SaveChanges() > 0;
             }
@@ -192,20 +202,53 @@ namespace Cinema.BUS
             catch { return false; }
         }
 
-        public List<GheDTO> LayDanhSachGheTheoSuat(int maSuat)
+        public List<GheDTO> LayDanhSachGheTheoLich(int maLich)
         {
-            var suatChieu = _db.SuatChieus.Find(maSuat);
-            if (suatChieu == null) return new List<GheDTO>();
+            var lichChieu = _db.LichChieus.Find(maLich);
+            if (lichChieu == null) return new List<GheDTO>();
 
             return _db.Ghes
-                .Where(g => g.MaPhong == suatChieu.MaPhong)
+                .Where(g => g.MaPhong == lichChieu.MaPhong)
                 .Select(g => new GheDTO
                 {
                     MaGhe = g.MaGhe,
-                    TenGhe = g.TenGhe,
+                    Hang = g.Hang,
+                    SoGhe = g.SoGhe,
                     LoaiGhe = g.LoaiGhe,
-                    DaDat = _db.Ves.Any(v => v.MaGhe == g.MaGhe && v.MaSuat == maSuat)
+                    DaDat = _db.ChiTietHoaDons.Any(ct => ct.MaGhe == g.MaGhe && ct.MaLich == maLich)
                 }).ToList();
+        }
+
+        // === Các method hỗ trợ luồng chọn ghế ===
+
+        public LichChieu? LayLichChieu(int maLich)
+        {
+            return _db.LichChieus.Find(maLich);
+        }
+
+        public LichChieu? LayLichChieuChiTiet(int maLich)
+        {
+            return _db.LichChieus
+                .Include(lc => lc.MaPhimNavigation)
+                .FirstOrDefault(lc => lc.MaLich == maLich);
+        }
+
+        public List<Ghe> LayDanhSachGheTheoPhong(int maPhong)
+        {
+            return _db.Ghes
+                .Where(g => g.MaPhong == maPhong)
+                .OrderBy(g => g.Hang).ThenBy(g => g.SoGhe)
+                .ToList();
+        }
+
+        public Ghe? LayGheTheoHangSoVaPhong(string hang, int soGhe, int maPhong)
+        {
+            return _db.Ghes.FirstOrDefault(g => g.Hang == hang && g.SoGhe == soGhe && g.MaPhong == maPhong);
+        }
+
+        public DoAn? LayDoAn(int maDoAn)
+        {
+            return _db.DoAns.Find(maDoAn);
         }
     }
 }

@@ -1,9 +1,7 @@
 using Cinema.BUS;
-using Cinema.DAL.Models;
 using Cinema.DTO;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,21 +11,26 @@ namespace Cinema.Web.Controllers
     public class PhimController : Controller
     {
         private readonly IPhimBUS _phimBus;
-        private readonly IDichVuBUS _dichVuBus;
-        private readonly IHoaDonBUS _hoaDonBus; 
-        private readonly QuanLyRapPhimContext _db;
+        private readonly IDoAnBUS _doAnBus;
+        private readonly IHoaDonBUS _hoaDonBus;
 
-        public PhimController(IPhimBUS phimBus, IDichVuBUS dichVuBus, IHoaDonBUS hoaDonBus, QuanLyRapPhimContext db)
+        public PhimController(IPhimBUS phimBus, IDoAnBUS doAnBus, IHoaDonBUS hoaDonBus)
         {
             _phimBus = phimBus;
-            _dichVuBus = dichVuBus;
-            _hoaDonBus = hoaDonBus; 
-            _db = db;
+            _doAnBus = doAnBus;
+            _hoaDonBus = hoaDonBus;
         }
 
-        public IActionResult Index()
+        public IActionResult Index(string date)
         {
-            var dsPhim = _phimBus.LayDanhSachPhimDangChieu();
+            DateTime? selectedDate = null;
+            if (!string.IsNullOrEmpty(date) && DateTime.TryParseExact(date, "yyyy-MM-dd", null, System.Globalization.DateTimeStyles.None, out var parsedDate))
+            {
+                selectedDate = parsedDate;
+            }
+            
+            var dsPhim = _phimBus.LayDanhSachPhimDangChieu(selectedDate);
+            ViewBag.SelectedDate = selectedDate;
             return View(dsPhim);
         }
 
@@ -48,80 +51,79 @@ namespace Cinema.Web.Controllers
             if (phim == null) return NotFound();
             return View(phim);
         }
-        public IActionResult ChonGhe(int maSuat)
+
+        public IActionResult ChonGhe(int maLich)
         {
-            var suatChieu = _db.SuatChieus.FirstOrDefault(s => s.MaSuat == maSuat);
-            if (suatChieu == null) return NotFound();
+            var lichChieu = _phimBus.LayLichChieu(maLich);
+            if (lichChieu == null) return NotFound();
 
-            var danhSachGhe = _db.Ghes
-                .Where(g => g.MaPhong == suatChieu.MaPhong)
-                .OrderBy(g => g.TenGhe)
-                .ToList();
-            var gheDaDat = _hoaDonBus.LayDanhSachMaGheDaDat(maSuat);
+            var danhSachGhe = _phimBus.LayDanhSachGheTheoPhong(lichChieu.MaPhong ?? 0);
+            var gheDaDat = _hoaDonBus.LayDanhSachMaGheDaDat(maLich);
 
-            ViewBag.DichVus = _dichVuBus.LayDanhSachDichVu();
-            ViewBag.MaSuat = maSuat;
-            ViewBag.GiaVeGoc = suatChieu.GiaVe ?? 0;
-            ViewBag.GheDaDat = gheDaDat; 
+            ViewBag.DoAns = _doAnBus.LayDanhSachDoAn();
+            ViewBag.MaLich = maLich;
+            ViewBag.GiaVeGoc = lichChieu.GiaVe ?? 0;
+            ViewBag.GheDaDat = gheDaDat;
 
             return View(danhSachGhe);
         }
+
         [HttpPost]
-        public IActionResult LuuGheVaoSession(List<string> ghes, int maSuat, List<DichVuChonDTO> dichVus)
+        public IActionResult LuuGheVaoSession(List<string> ghes, int maLich, List<DoAnChonDTO> doAns)
         {
             try
             {
-                var suatChieu = _db.SuatChieus
-                    .Include(s => s.MaPhimNavigation)
-                    .FirstOrDefault(s => s.MaSuat == maSuat);
+                var lichChieu = _phimBus.LayLichChieuChiTiet(maLich);
 
-                if (suatChieu == null)
+                if (lichChieu == null)
                 {
-                    return Json(new { success = false, message = "Không tìm thấy suất chiếu hợp lệ!" });
+                    return Json(new { success = false, message = "Không tìm thấy lịch chiếu hợp lệ!" });
                 }
 
                 foreach (var tenGhe in ghes)
                 {
-                    var gheInfo = _db.Ghes.FirstOrDefault(g => g.TenGhe == tenGhe &&
-                                  g.MaPhong == suatChieu.MaPhong);
-
-                    if (gheInfo != null)
+                    if (tenGhe.Length >= 2)
                     {
-                        if (_hoaDonBus.KiemTraGheDaDat(maSuat, gheInfo.MaGhe))
+                        string hang = tenGhe.Substring(0, 1);
+                        if (int.TryParse(tenGhe.Substring(1), out int soGhe))
                         {
-                            return Json(new { success = false, message = $"Ghế {tenGhe} vừa có người khác đặt. Vui lòng chọn ghế khác!" });
+                            var gheInfo = _phimBus.LayGheTheoHangSoVaPhong(hang, soGhe, lichChieu.MaPhong ?? 0);
+                            if (gheInfo != null)
+                            {
+                                if (_hoaDonBus.KiemTraGheDaDat(maLich, gheInfo.MaGhe))
+                                {
+                                    return Json(new { success = false, message = $"Ghế {tenGhe} vừa có người khác đặt. Vui lòng chọn ghế khác!" });
+                                }
+                            }
                         }
                     }
                 }
 
-                if (suatChieu == null)
-                    return Json(new { success = false, message = "Suất chiếu không tồn tại!" });
-
                 var cart = HttpContext.Session.Get<CartItemDTO>("GioHang") ?? new CartItemDTO();
 
-                cart.MaPhim = suatChieu.MaPhim ?? 0;
-                cart.TenPhim = suatChieu.MaPhimNavigation?.TenPhim ?? "Phim không xác định";
-                cart.HinhAnh = suatChieu.MaPhimNavigation?.Hinh;
-                cart.MaSuat = maSuat;
+                cart.MaPhim = lichChieu.MaPhim ?? 0;
+                cart.TenPhim = lichChieu.MaPhimNavigation?.TenPhim ?? "Phim không xác định";
+                cart.Poster = lichChieu.MaPhimNavigation?.Poster;
+                cart.MaLich = maLich;
                 cart.DanhSachGhe = ghes;
-                cart.TongTienPhim = ghes.Count * (suatChieu.GiaVe ?? 0);
+                cart.TongTienPhim = ghes.Count * (lichChieu.GiaVe ?? 0);
 
-                if (dichVus != null && dichVus.Any())
+                if (doAns != null && doAns.Any())
                 {
-                    cart.DichVus = dichVus.Select(d => {
-                        var dvInfo = _db.DichVus.Find(d.MaDV);
-                        return new DichVuDTO
+                    cart.DoAns = doAns.Select(d => {
+                        var doAnInfo = _phimBus.LayDoAn(d.MaDoAn);
+                        return new DoAnDTO
                         {
-                            MaDV = d.MaDV,
-                            TenDV = dvInfo?.TenDv ?? "Dịch vụ",
-                            DonGia = dvInfo?.DonGia ?? 0,
+                            MaDoAn = d.MaDoAn,
+                            TenDoAn = doAnInfo?.TenDoAn ?? "Đồ ăn",
+                            Gia = doAnInfo?.Gia ?? 0,
                             SoLuong = d.SoLuong
                         };
                     }).ToList();
                 }
                 else
                 {
-                    cart.DichVus = new List<DichVuDTO>();
+                    cart.DoAns = new List<DoAnDTO>();
                 }
 
                 HttpContext.Session.Set("GioHang", cart);
@@ -133,5 +135,14 @@ namespace Cinema.Web.Controllers
                 return Json(new { success = false, message = "Lỗi hệ thống: " + ex.Message });
             }
         }
+    }
+
+    /// <summary>
+    /// DTO đơn giản cho việc chọn đồ ăn từ form
+    /// </summary>
+    public class DoAnChonDTO
+    {
+        public int MaDoAn { get; set; }
+        public int SoLuong { get; set; }
     }
 }

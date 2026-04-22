@@ -5,9 +5,43 @@
 }
 
 <div class="container mt-4">
-    <h1 class="text-center mb-5 text-uppercase fw-bold text-primary">
-        <i class="bi bi-film"></i> Phim Đang Chiếu
+    <h1 class="text-center mb-4 text-uppercase fw-bold text-primary">
+        <i class="bi bi-film"></i> Lịch Chiếu Phim
     </h1>
+
+    <div class="d-flex justify-content-center flex-wrap mb-5 gap-2">
+        @for (int i = 0; i < 7; i++)
+        {
+            var d = DateTime.Today.AddDays(i);
+            bool isActive = false;
+            
+            if (ViewBag.SelectedDate != null)
+            {
+                isActive = ((DateTime)ViewBag.SelectedDate).Date == d.Date;
+            }
+            else
+            {
+                isActive = i == 0;
+            }
+
+            var activeClass = isActive ? "btn-primary shadow-sm" : "btn-outline-primary border-2 opacity-75";
+            
+            <a asp-action="Index" asp-route-date="@d.ToString("yyyy-MM-dd")" class="btn @activeClass fw-bold rounded-4 px-4 py-2 text-center" style="min-width: 100px;">
+                <div class="fs-5">@d.ToString("dd/MM")</div>
+                <small class="fw-normal d-block mt-1">
+                    @(i == 0 ? "Hôm nay" : d.ToString("dddd", new System.Globalization.CultureInfo("vi-VN")))
+                </small>
+            </a>
+        }
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="text-center py-5">
+            <h4 class="text-muted"><i class="bi bi-calendar-x"></i> Không có suất chiếu nào trong ngày hôm nay.</h4>
+            <p>Vui lòng chọn ngày khác để xem lịch chiếu.</p>
+        </div>
+    }
 
     <div class="row">
         @foreach (var item in Model)
@@ -16,25 +50,26 @@
                 <div class="card h-100 shadow-sm border-0 transition-hover" style="border-radius: 15px; overflow: hidden;">
                     <div style="position: relative;">
                         @{
-                            var imgUrl = string.IsNullOrEmpty(item.Hinh)
+                            var imgUrl = string.IsNullOrEmpty(item.Poster)
                             ? "https://via.placeholder.com/300x400?text=No+Image"
-                            : item.Hinh.StartsWith("http") ? item.Hinh : "/images/phim/" + item.Hinh;
+                            : item.Poster.StartsWith("http") ? item.Poster : "/images/phim/" + item.Poster;
                         }
                         <img src="@imgUrl" class="card-img-top" alt="@item.TenPhim" style="height: 400px; object-fit: cover;" onerror="this.onerror=null; this.src='https://via.placeholder.com/300x400?text=No+Image';">
                     </div>
 
                     <div class="card-body">
                         <h5 class="card-title fw-bold text-truncate text-primary">@item.TenPhim</h5>
+                        <p class="text-secondary small mb-2"><i class="bi bi-tags-fill text-warning me-1"></i> @item.TheLoai</p>
                         <div class="mt-3">
-                            @if (item.DanhSachSuatChieu != null && item.DanhSachSuatChieu.Any())
+                            @if (item.DanhSachLichChieu != null && item.DanhSachLichChieu.Any())
                             {
                                 <p class="small text-muted mb-2"><i class="bi bi-calendar3"></i> Lịch chiếu:</p>
                                 <div class="d-flex flex-wrap gap-2">
-                                    @foreach (var suat in item.DanhSachSuatChieu)
+                                    @foreach (var suat in item.DanhSachLichChieu)
                                     {
-                                        <a asp-controller="Phim" asp-action="ChonGhe" asp-route-maSuat="@suat.MaSuat"
+                                        <a asp-controller="Phim" asp-action="ChonGhe" asp-route-maLich="@suat.MaLich"
                                            class="btn btn-outline-primary btn-sm fw-bold px-3 py-1 shadow-sm">
-                                            @suat.GioBatDau
+                                            @suat.GioChieu
                                         </a>
                                     }
                                 </div>

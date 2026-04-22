@@ -1,4 +1,4 @@
-@model Cinema.DTO.NguoiDungDTO
+@model Cinema.DTO.KhachHangDTO
 
 @{
     ViewData["Title"] = "Chỉnh sửa thông tin";
@@ -10,7 +10,7 @@
             <h3 class="fw-bold mb-4 text-center">CẬP NHẬT HỒ SƠ</h3>
             
             <form asp-action="EditProfile" method="post">
-                <input type="hidden" name="MaNd" value="@Model.MaND" />
+                <input type="hidden" name="MaKH" value="@Model.MaKH" />
                 <input type="hidden" name="TaiKhoan" value="@Model.TaiKhoan" />
 
                 <div class="mb-3">
@@ -24,9 +24,14 @@
                     <input type="text" class="form-control" name="HoTen" value="@Model.HoTen" required />
                 </div>
 
-                <div class="mb-4">
+                <div class="mb-3">
                     <label class="form-label fw-bold">Thư điện tử (Email)</label>
                     <input type="email" class="form-control" name="Email" value="@Model.Email" />
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-bold">Số điện thoại</label>
+                    <input type="tel" class="form-control" name="SDT" value="@Model.SDT" />
                 </div>
 
                 @if (!ViewData.ModelState.IsValid)

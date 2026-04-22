@@ -1,4 +1,4 @@
-﻿@model Cinema.DTO.PhimDTO
+@model Cinema.DTO.PhimDTO
 @{
     ViewData["Title"] = "Thêm Phim Mới";
     Layout = "_Layout";
@@ -28,12 +28,7 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label fw-bold">Thể loại</label>
-                                <select asp-for="TheLoai" class="form-select">
-                                    @foreach (var loai in ViewBag.MaLoaiPhim)
-                                    {
-                                        <option value="@loai.TenLoai">@loai.TenLoai</option>
-                                    }
-                                </select>
+                                <input asp-for="TheLoai" class="form-control" placeholder="Hành động, Hài hước..." />
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label fw-bold">Thời lượng (Phút)</label>
@@ -47,8 +42,8 @@
                                 <input asp-for="NgayKhoiChieu" type="date" class="form-control" required />
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold">Giới hạn tuổi</label>
-                                <input asp-for="GioiHanTuoi" type="number" class="form-control" placeholder="13, 16, 18..." />
+                                <label class="form-label fw-bold">Đạo diễn</label>
+                                <input asp-for="DaoDien" type="text" class="form-control" placeholder="Tên đạo diễn" />
                             </div>
                         </div>
 

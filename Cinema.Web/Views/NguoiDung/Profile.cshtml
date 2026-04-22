@@ -1,4 +1,4 @@
-@model Cinema.DTO.NguoiDungDTO
+@model Cinema.DTO.KhachHangDTO
 
 @{
     ViewData["Title"] = "Thông tin cá nhân";
@@ -20,6 +20,16 @@
                             <i class="bi bi-envelope-at-fill text-primary me-2"></i>
                             <strong>Email:</strong> <br />
                             <span class="text-break">@Model.Email</span>
+                        </p>
+                        <p class="mb-2 border-bottom pb-2">
+                            <i class="bi bi-telephone-fill text-success me-2"></i>
+                            <strong>SĐT:</strong> <br />
+                            <span>@(Model.SDT ?? "Chưa cập nhật")</span>
+                        </p>
+                        <p class="mb-0">
+                            <i class="bi bi-star-fill text-warning me-2"></i>
+                            <strong>Điểm tích lũy:</strong> <br />
+                            <span class="fw-bold text-primary">@Model.DiemTichLuy điểm</span>
                         </p>
                     </div>
 
@@ -63,19 +73,24 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach (var hd in Model.LichSuHoaDon.OrderByDescending(x => x.NgayLap))
+                                    @foreach (var hd in Model.LichSuHoaDon.OrderByDescending(x => x.NgayDat))
                                     {
                                         <tr>
                                             <td class="fw-bold">#@hd.MaHD</td>
                                             <td>
-                                                <div class="fw-bold">@hd.NgayLap?.ToString("dd/MM/yyyy")</div>
-                                                <div class="small text-muted">@hd.NgayLap?.ToString("HH:mm")</div>
+                                                <div class="fw-bold">@hd.NgayDat?.ToString("dd/MM/yyyy")</div>
+                                                <div class="small text-muted">@hd.NgayDat?.ToString("HH:mm")</div>
                                             </td>
                                             <td class="text-end text-danger fw-bold">
                                                 @hd.TongTien?.ToString("N0") đ
                                             </td>
                                             <td class="text-center">
-                                                <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3">Thành công</span>
+                                                @{
+                                                    var badgeClass = hd.TrangThai == "Đã thanh toán" 
+                                                        ? "bg-success-subtle text-success border-success-subtle" 
+                                                        : "bg-warning-subtle text-warning border-warning-subtle";
+                                                }
+                                                <span class="badge @badgeClass border rounded-pill px-3">@(hd.TrangThai ?? "N/A")</span>
                                             </td>
                                             <td class="text-center">
                                                 <a asp-controller="HoaDon" asp-action="ThanhToanThanhCong" asp-route-id="@hd.MaHD"

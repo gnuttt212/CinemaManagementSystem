@@ -19,10 +19,12 @@ builder.Services.AddSession(options =>
 });
 
 builder.Services.AddScoped<ICinemaAdoNetDAL, CinemaAdoNetDAL>();
-builder.Services.AddScoped<IDichVuBUS, DichVuBUS>();
 builder.Services.AddScoped<IPhimBUS, PhimBUS>();
 builder.Services.AddScoped<IHoaDonBUS, HoaDonBUS>();
-builder.Services.AddScoped<INguoiDungBUS, NguoiDungBUS>();
+builder.Services.AddScoped<IKhachHangBUS, KhachHangBUS>();
+builder.Services.AddScoped<INhanVienBUS, NhanVienBUS>();
+builder.Services.AddScoped<IDoAnBUS, DoAnBUS>();
+builder.Services.AddScoped<IKhuyenMaiBUS, KhuyenMaiBUS>();
 
 var app = builder.Build();
 

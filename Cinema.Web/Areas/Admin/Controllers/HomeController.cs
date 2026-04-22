@@ -7,6 +7,7 @@ using System.Text.Json;
 namespace Cinema.Web.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [AdminAuthorize]
     public class HomeController : Controller
     {
         private readonly QuanLyRapPhimContext _context;
@@ -21,7 +22,7 @@ namespace Cinema.Web.Areas.Admin.Controllers
         public IActionResult Index()
         {
             ViewBag.TongSoPhim = _context.Phims.Count();
-            ViewBag.VeDaBan = _context.Ves.Count();
+            ViewBag.VeDaBan = _context.ChiTietHoaDons.Count();
             
             decimal doanhThu = _context.HoaDons.Sum(h => h.TongTien) ?? 0;
             if (doanhThu >= 1000000)
@@ -33,7 +34,7 @@ namespace Cinema.Web.Areas.Admin.Controllers
                 ViewBag.DoanhThu = doanhThu.ToString("N0") + "đ";
             }
 
-            ViewBag.KhachHang = _context.NguoiDungs.Count();
+            ViewBag.KhachHang = _context.KhachHangs.Count();
 
             var chartData = _adoNetDal.GetDoanhThuTheoPhimChart();
             ViewBag.ChartLabels = JsonSerializer.Serialize(chartData.Keys.ToList());

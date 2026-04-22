@@ -1,0 +1,69 @@
+@model Cinema.DTO.PhimDTO
+@{
+    ViewData["Title"] = "Sửa Phim";
+    Layout = "_Layout";
+}
+
+<div class="container-fluid">
+    <div class="card shadow border-0 rounded-4">
+        <div class="card-header bg-white py-3">
+            <h5 class="mb-0 fw-bold text-warning"><i class="bi bi-pencil-square me-2"></i>CHỈNH SỬA PHIM</h5>
+        </div>
+        <div class="card-body p-4">
+            <form asp-action="Edit" method="post" enctype="multipart/form-data">
+                <input type="hidden" asp-for="MaPhim" />
+                <input type="hidden" asp-for="Poster" /> 
+
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Tên phim</label>
+                            <input asp-for="TenPhim" class="form-control" required />
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Thời lượng (Phút)</label>
+                                <input asp-for="ThoiLuong" type="number" class="form-control" />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Ngày khởi chiếu</label>
+                                <input asp-for="NgayKhoiChieu" type="date" class="form-control"
+                                       value="@(Model.NgayKhoiChieu?.ToString("yyyy-MM-dd"))" />
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Mô tả</label>
+                            <textarea asp-for="MoTa" class="form-control" rows="5"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 text-center border-start">
+                        <label class="form-label fw-bold d-block mb-3">Poster Hiện Tại</label>
+                        <div class="mb-3">
+                            <img id="previewImg" src="/images/phim/@Model.Poster"
+                                 class="img-thumbnail shadow-sm mb-3"
+                                 style="height: 300px; width: 200px; object-fit: cover;"
+                                 onerror="this.src='/images/no-image.jpg';" />
+                        </div>
+                        <input type="file" name="ImageFile" id="imageInput" class="form-control" accept="image/*" />
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-warning btn-lg rounded-pill shadow">Lưu thay đổi</button>
+                            <a asp-action="Index" class="btn btn-outline-secondary rounded-pill">Hủy bỏ</a>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById('imageInput').onchange = function (evt) {
+            const [file] = this.files;
+            if (file) {
+                document.getElementById('previewImg').src = URL.createObjectURL(file);
+            }
+        };
+    </script>
+}
