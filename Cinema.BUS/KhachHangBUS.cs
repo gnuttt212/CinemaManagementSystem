@@ -114,5 +114,64 @@ namespace Cinema.BUS
             }
             catch { return false; }
         }
+
+        public List<KhachHangDTO> LayDanhSach()
+        {
+            return _db.KhachHangs.Select(k => new KhachHangDTO
+            {
+                MaKH = k.MaKh,
+                TaiKhoan = k.TaiKhoan,
+                HoTen = k.HoTen ?? "",
+                Email = k.Email ?? "",
+                SDT = k.Sdt,
+                NgaySinh = k.NgaySinh,
+                DiemTichLuy = k.DiemTichLuy ?? 0
+            }).ToList();
+        }
+
+        public KhachHangDTO? LayTheoMa(int maKh)
+        {
+            var k = _db.KhachHangs.Find(maKh);
+            if (k == null) return null;
+            return new KhachHangDTO
+            {
+                MaKH = k.MaKh,
+                TaiKhoan = k.TaiKhoan,
+                HoTen = k.HoTen ?? "",
+                Email = k.Email ?? "",
+                SDT = k.Sdt,
+                NgaySinh = k.NgaySinh,
+                DiemTichLuy = k.DiemTichLuy ?? 0
+            };
+        }
+
+        public bool Sua(KhachHangDTO model)
+        {
+            try
+            {
+                var kh = _db.KhachHangs.Find(model.MaKH);
+                if (kh == null) return false;
+                kh.HoTen = model.HoTen;
+                kh.Email = model.Email;
+                kh.Sdt = model.SDT;
+                kh.NgaySinh = model.NgaySinh;
+                kh.DiemTichLuy = model.DiemTichLuy;
+
+                return _db.SaveChanges() > 0;
+            }
+            catch { return false; }
+        }
+
+        public bool Xoa(int maKh)
+        {
+            try
+            {
+                var kh = _db.KhachHangs.Find(maKh);
+                if (kh == null) return false;
+                _db.KhachHangs.Remove(kh);
+                return _db.SaveChanges() > 0;
+            }
+            catch { return false; }
+        }
     }
 }

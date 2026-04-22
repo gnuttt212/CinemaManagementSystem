@@ -1,0 +1,52 @@
+@model Cinema.DTO.NhanVienDTO
+@{
+    ViewData["Title"] = "Thêm Nhân Viên";
+    Layout = "_Layout";
+}
+
+<div class="container-fluid">
+    <div class="card shadow border-0 rounded-4 w-50 mx-auto">
+        <div class="card-header bg-white py-3">
+            <h5 class="mb-0 fw-bold text-primary"><i class="bi bi-person-plus me-2"></i>THÊM NHÂN VIÊN MỚI</h5>
+        </div>
+        <div class="card-body p-4">
+            <form asp-action="Create" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Tài khoản</label>
+                    <input asp-for="TaiKhoan" class="form-control" required />
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Mật khẩu</label>
+                    <input asp-for="MatKhau" type="password" class="form-control" required />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Họ và Tên</label>
+                    <input asp-for="HoTen" class="form-control" required />
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Chức vụ</label>
+                        <input asp-for="ChucVu" class="form-control" placeholder="Ví dụ: Bán vé" />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Phân quyền</label>
+                        <select asp-for="PhanQuyen" class="form-select">
+                            <option value="NhanVien">Nhân viên</option>
+                            <option value="Admin">Quản trị viên (Admin)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2 mt-4">
+                    <button type="submit" class="btn btn-primary btn-lg rounded-pill shadow">Lưu nhân viên</button>
+                    <a asp-action="Index" class="btn btn-outline-secondary rounded-pill">Hủy bỏ</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
