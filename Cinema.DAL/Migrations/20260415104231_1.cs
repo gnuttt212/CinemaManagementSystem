@@ -1,14 +1,11 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-#nullable disable
 
 namespace Cinema.DAL.Migrations
 {
-    /// <inheritdoc />
     public partial class _1 : Migration
     {
-        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
@@ -270,7 +267,6 @@ namespace Cinema.DAL.Migrations
                 filter: "[MaSuat] IS NOT NULL AND [MaGhe] IS NOT NULL");
         }
 
-        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(

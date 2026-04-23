@@ -219,8 +219,6 @@ namespace Cinema.BUS
                 }).ToList();
         }
 
-        // === Các method hỗ trợ luồng chọn ghế ===
-
         public LichChieu? LayLichChieu(int maLich)
         {
             return _db.LichChieus.Find(maLich);

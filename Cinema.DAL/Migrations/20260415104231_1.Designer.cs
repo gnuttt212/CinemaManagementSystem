@@ -15,7 +15,6 @@ namespace Cinema.DAL.Migrations
     [Migration("20260415104231_1")]
     partial class _1
     {
-        /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618

@@ -16,8 +16,6 @@ namespace Cinema.BUS
         bool SuaPhim(PhimDTO phim);
         bool XoaPhim(int maPhim);
         List<PhimDTO> TimKiemPhim(string query);
-
-        // Hỗ trợ luồng chọn ghế
         LichChieu? LayLichChieu(int maLich);
         LichChieu? LayLichChieuChiTiet(int maLich);
         List<Ghe> LayDanhSachGheTheoPhong(int maPhong);

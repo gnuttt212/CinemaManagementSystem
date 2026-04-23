@@ -32,8 +32,6 @@ namespace Cinema.Web.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Edit(KhachHangDTO dto)
         {
-            // We just update info, not password
-            // ModelState might fail on some lists, but we can clear them if needed
             ModelState.Remove("LichSuHoaDon");
             
             if (ModelState.IsValid)

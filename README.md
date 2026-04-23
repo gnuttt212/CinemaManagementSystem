@@ -1,4 +1,4 @@
-# Hệ Thống Quản Lý Rạp Phim
+# CinemaManagementSystem
 
 ## Giới thiệu
 
@@ -7,11 +7,9 @@ Dự án đã được khắc phục hoàn toàn các lỗi về logic, đồng 
 
 ## Thành viên nhóm
 
-| STT | Họ và Tên       | MSSV       | Vai trò     |
-| --- | --------------- | ---------- | ----------- |
-| 1   | Trần Thanh Tung | 2351010232 | Trưởng nhóm |
-| 2   |                 |            | Thành viên  |
-| 3   |                 |            | Thành viên  |
+| STT | Họ và Tên       | MSSV       |
+| --- | --------------- | ---------- |
+| 1   | Trần Thanh Tung | 2351010232 |
 
 ## Phiên bản phần mềm sử dụng
 
@@ -107,11 +105,8 @@ dotnet build
 dotnet run
 ```
 
-5. **Truy cập & Tài khoản mặc định**
+5. **Truy cập**
 
 - **Trang khách hàng:** `https://localhost:7059/`
 - **Trang Quản lý (Admin):** `https://localhost:7059/Admin`
 - **Trang Nhân viên:** `https://localhost:7059/NhanVien`
-- **Tài khoản test:** (Mật khẩu: `123456`)
-  - Admin: `admin` / `123456`
-  - Nhân viên: `staff` / `123456`

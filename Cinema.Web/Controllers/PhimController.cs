@@ -137,9 +137,6 @@ namespace Cinema.Web.Controllers
         }
     }
 
-    /// <summary>
-    /// DTO đơn giản cho việc chọn đồ ăn từ form
-    /// </summary>
     public class DoAnChonDTO
     {
         public int MaDoAn { get; set; }

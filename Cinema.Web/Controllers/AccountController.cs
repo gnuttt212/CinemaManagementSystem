@@ -119,17 +119,6 @@ namespace Cinema.Web.Controllers
                     PhanQuyen = "NhanVien"
                 });
 
-                
-                _db.KhachHangs.Add(new Cinema.DAL.Models.KhachHang
-                {
-                    TaiKhoan = "user",
-                    MatKhau = defaultPassword,
-                    HoTen = "Khách Hàng Mẫu",
-                    Email = "user@example.com",
-                    Sdt = "0987654321",
-                    DiemTichLuy = 100
-                });
-
                 _db.SaveChanges();
                 return Content("Đã reset và tạo lại dữ liệu tài khoản thành công! Mật khẩu mặc định: 123456");
             }
