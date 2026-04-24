@@ -1,112 +1,109 @@
-# CinemaManagementSystem
+# Cinema Management System
 
-## Giới thiệu
+Đồ án môn học **Lập trình Cơ sở dữ liệu** — Xây dựng ứng dụng web quản lý rạp chiếu phim toàn diện với đầy đủ chức năng dành cho Khách hàng, Nhân viên và Quản trị viên (Admin). Hệ thống được thiết kế theo kiến trúc **3 lớp (3-Tier Architecture)** chuẩn mực, tối ưu hiệu năng và tích hợp nhiều công nghệ hiện đại.
 
-Đồ án cuối kỳ môn Lập trình Cơ sở dữ liệu — Xây dựng ứng dụng web quản lý rạp chiếu phim với đầy đủ chức năng: đặt vé, chọn ghế, lọc suất chiếu theo ngày giờ trực quan, quản lý phim/suất chiếu/đồ ăn, báo cáo doanh thu và bảo vệ an toàn danh tính người dùng bằng thuật toán băm mật khẩu BCrypt.
-Dự án đã được khắc phục hoàn toàn các lỗi về logic, đồng bộ hóa 1 file SQL duy nhất và phát triển đầy đủ các tính năng nâng cao.
+## Các tính năng nổi bật
 
-## Thành viên nhóm
+### Dành cho Khách hàng
 
-| STT | Họ và Tên       | MSSV       |
-| --- | --------------- | ---------- |
-| 1   | Trần Thanh Tung | 2351010232 |
+- **Xác thực hiện đại:** Đăng ký, đăng nhập tài khoản an toàn (mật khẩu mã hóa BCrypt), hỗ trợ **đăng nhập một chạm bằng Google OAuth 2.0**.
+- **Đặt vé mượt mà:** Xem danh sách phim đang chiếu, sắp chiếu (tải cực nhanh nhờ **IMemoryCache**). Lọc suất chiếu trực quan theo ngày/giờ.
+- **Sơ đồ ghế động:** Chọn ghế với sơ đồ phòng chiếu tự động sinh theo sức chứa thực tế.
+- **Dịch vụ đi kèm:** Chọn bắp, nước, combo dễ dàng.
+- **Thanh toán trực tuyến:** Tích hợp cổng thanh toán **VNPay Sandbox** an toàn, nhanh chóng.
+- **Vé điện tử (E-Ticket):** Nhận ngay vé điện tử kèm **mã QR** sau khi thanh toán thành công.
+- **Cá nhân hóa:** Quản lý hồ sơ cá nhân, lịch sử giao dịch và đổi mật khẩu an toàn.
 
-## Phiên bản phần mềm sử dụng
+### Dành cho Quản trị viên (Admin) / Nhân viên
 
-| Phần mềm                      | Phiên bản     |
-| ----------------------------- | ------------- |
-| .NET SDK                      | 8.0           |
-| ASP.NET Core                  | 8.0           |
-| Entity Framework Core         | 8.0.0         |
-| SQL Server                    | Express 2019+ |
-| Visual Studio                 | 2022 (17.x)   |
-| Bootstrap / jQuery / Chart.js | Mới nhất      |
+- **Quản lý danh mục:** Toàn quyền thêm, sửa, xóa Phim (hỗ trợ upload ảnh), Dịch vụ (đồ ăn/thức uống).
+- **Quản lý Phòng chiếu & Suất chiếu:** Thiết lập phòng chiếu (tự sinh sơ đồ ghế), sắp xếp lịch chiếu thông minh (tự động tính toán giờ kết thúc dựa trên thời lượng phim).
+- **Thống kê & Báo cáo:** Xem dashboard tổng quan, biểu đồ doanh thu theo phim trực quan (Chart.js) và **xuất báo cáo ra file Excel** (ClosedXML).
 
-## Kiến trúc dự án (3-Layer Architecture)
+## Công nghệ sử dụng
 
-```
+| Lĩnh vực                 | Công nghệ / Thư viện                                            |
+| :----------------------- | :-------------------------------------------------------------- |
+| **Framework Chính**      | ASP.NET Core MVC (.NET 8.0)                                     |
+| **Kiến trúc**            | 3-Layer Architecture (Presentation - BUS - DAL)                 |
+| **Cơ sở dữ liệu**        | Microsoft SQL Server (T-SQL)                                    |
+| **Data Access**          | Entity Framework Core 8.0, ADO.NET (`SqlDataReader`, `DataSet`) |
+| **Truy vấn & Export**    | LINQ to Objects, LINQ to Entities, LINQ to XML                  |
+| **Giao diện (UI)**       | Razor Views, Bootstrap 5, jQuery, SweetAlert2, Chart.js         |
+| **Bảo mật & Thanh toán** | BCrypt.Net, Google OAuth 2.0, VNPay API                         |
+| **Tối ưu & Báo cáo**     | IMemoryCache, ClosedXML (Xuất Excel)                            |
+| **Kiểm thử (Testing)**   | xUnit, Moq                                                      |
+
+## Kiến trúc dự án (Solution Structure)
+
+```text
 CinemaManagementSystem/
 ├── Cinema.DAL/            # Data Access Layer (EF Core DbContext, Models, ADO.NET)
-│   ├── Models/            # Entity classes (Database First) + DbContext
-│   └── AdoNet/            # ADO.NET thuần (SqlConnection, DataAdapter, DataSet)
-├── Cinema.BUS/            # Business Logic Layer (xử lý nghiệp vụ, Interface + Implementation)
+├── Cinema.BUS/            # Business Logic Layer (xử lý nghiệp vụ, Interface + Impl)
 ├── Cinema.DTO/            # Data Transfer Objects (trao đổi giữa các lớp)
-├── Cinema.Web/            # Presentation Layer (ASP.NET Core MVC + Web API)
-│   ├── Controllers/       # MVC Controllers (giao diện người dùng)
-│   ├── ApiControllers/    # RESTful Web API Controllers (JSON)
+├── Cinema.Web/            # Presentation Layer (ASP.NET Core MVC + RESTful Web API)
 │   ├── Areas/
-│   │   ├── Admin/         # Khu vực Quản lý (Admin)
-│   │   └── NhanVien/      # Khu vực Nhân viên (Staff)
-│   └── Views/             # Razor Views
+│   │   ├── Admin/         # Khu vực Quản lý
+│   │   └── NhanVien/      # Khu vực Nhân viên
+│   └── ApiControllers/    # Web API endpoints
+├── Cinema.Tests/          # Unit Testing (xUnit + Moq cho tầng BUS)
 └── DatabaseScripts/       # T-SQL Scripts hợp nhất duy nhất
 ```
 
-## Các kỹ thuật trọng tâm đã triển khai
+## Các kỹ thuật T-SQL & CSDL trọng tâm
 
-### 1. Lập trình CSDL (T-SQL)
+- **Database Scripts:** Hợp nhất schema và seed data vào 1 file duy nhất `CinemaManagementSystem_Full.sql`.
+- **View:** `vw_DoanhThuTheoPhim` thống kê doanh thu phục vụ biểu đồ và Excel.
+- **Function & Stored Procedure:** Tính toán tổng tiền hóa đơn, lấy danh sách phim đang chiếu `sp_LayDanhSachPhimDangChieu`.
+- **Trigger:** Ngăn chặn xóa hóa đơn sai quy tắc (`trg_NganXoaHoaDonCoCTHD`).
+- **Transaction:** Đảm bảo tính nguyên tử (Atomicity) khi thanh toán (Lưu Hóa đơn + Vé + Dịch vụ cùng lúc bằng `BeginTransaction`).
 
-- **Database Scripts:** Đã hợp nhất vào một file duy nhất `CinemaManagementSystem_Full.sql` (bao gồm schema, seed data đã hash BCrypt sẵn).
-- **View:** `vw_DoanhThuTheoPhim` — Thống kê doanh thu theo từng phim.
-- **Function:** Tự tính toán doanh thu bán vé trong CSDL.
-- **Stored Procedure:** `sp_LayDanhSachPhimDangChieu` — Lấy danh sách phim có lịch chiếu hôm nay.
+## ⚙️ Hướng dẫn Cài đặt & Chạy dự án
 
-### 2. Entity Framework Core & Bảo mật
+### Yêu cầu hệ thống
 
-- **Database First:** Sử dụng EF Core thao tác với 10 entity (`Phim`, `LichChieu`, `HoaDon`,...).
-- **Code First:** Migration tự động tạo bảng `NhatKyHeThong`.
-- **Bảo mật (Authentication):** Quản lý Session chặt chẽ, mật khẩu tài khoản quản trị/nhân viên được mã hóa **BCrypt**. Cấu trúc phân quyền `AdminAuthorize` và `NhanVienAuthorize`.
+- **.NET 8.0 SDK** trở lên
+- **SQL Server** (Express hoặc Developer)
+- Visual Studio 2022 (khuyên dùng)
 
-### 3. ADO.NET (Kết nối và Phi kết nối)
-
-- `SqlDataReader`: Đọc dữ liệu View `vw_DoanhThuTheoPhim` an toàn, có kiểm tra duplicate key cho Chart.js.
-- `SqlDataAdapter` & `DataTable`/`DataSet`: Cung cấp dữ liệu dạng bảng/danh sách thông qua Web API (`/api/phimapi/adonet`).
-
-### 4. LINQ & LINQ to XML
-
-- **LINQ to Objects/Entities:** Tối ưu truy vấn dữ liệu từ DB, Eager Loading (`Include`, `ThenInclude`).
-- **LINQ to XML:** Có khả năng Export và Import thông tin danh sách phim ra file định dạng XML thông qua Web API.
-
-### 5. Web API (RESTful)
-
-- **PhimApiController:** Full CRUD phim, xuất/nhập XML, cung cấp dữ liệu qua ADO.NET.
-- **DoAnApiController:** Full CRUD đồ ăn/dịch vụ.
-- **LichChieuApiController:** Full CRUD lịch chiếu (Suất chiếu) với các kiểm tra Foreign Key.
-
-## Hướng dẫn cài đặt & chạy
-
-### Yêu cầu
-
-- .NET 8 SDK
-- SQL Server Express
-
-### Các bước
+### Các bước khởi chạy
 
 1. **Clone dự án**
 
-```bash
-git clone https://github.com/gnuttt212/CinemaManagementSystem.git
-cd CinemaManagementSystem
-```
+   ```bash
+   git clone https://github.com/gnuttt212/CinemaManagementSystem.git
+   cd CinemaManagementSystem
+   ```
 
 2. **Khởi tạo Database**
-
-- Mở SSMS, tạo một cơ sở dữ liệu trống.
-- Mở file `DatabaseScripts/CinemaManagementSystem_Full.sql` và chạy toàn bộ (F5) để tự động tạo Tables, Views, Stored Procedures và Seed Data (tài khoản đăng nhập).
+   - Mở SQL Server Management Studio (SSMS), tạo Database mới tên `QuanLyRapPhim`.
+   - Mở file `DatabaseScripts/CinemaManagementSystem_Full.sql` và nhấn `F5` để chạy. Script sẽ tự động tạo bảng, View, SP và dữ liệu mẫu (các tài khoản Admin/Nhân viên).
 
 3. **Cấu hình Connection String**
+   - Mở file `Cinema.Web/appsettings.json` và cập nhật chuỗi `DefaultConnection` cho phù hợp với SQL Server của máy bạn.
 
-- Mở file `Cinema.Web/appsettings.json` và cập nhật `DefaultConnection` trỏ đến DB bạn vừa tạo.
+4. **Cấu hình Google OAuth (User Secrets - Tùy chọn nhưng khuyên dùng để test Login Google)**
+   Mở terminal tại thư mục `Cinema.Web` và chạy:
 
-4. **Chạy ứng dụng**
+   ```bash
+   dotnet user-secrets init
+   dotnet user-secrets set "Authentication:Google:ClientId" "YOUR_GOOGLE_CLIENT_ID"
+   dotnet user-secrets set "Authentication:Google:ClientSecret" "YOUR_GOOGLE_CLIENT_SECRET"
+   ```
 
-```bash
-cd Cinema.Web
-dotnet build
-dotnet run
-```
+5. **Build và Chạy**
 
-5. **Truy cập**
+   ```bash
+   dotnet build
+   cd Cinema.Web
+   dotnet run
+   ```
 
-- **Trang khách hàng:** `https://localhost:7059/`
-- **Trang Quản lý (Admin):** `https://localhost:7059/Admin`
-- **Trang Nhân viên:** `https://localhost:7059/NhanVien`
+6. **Đường dẫn truy cập**
+   - **Khách hàng:** `https://localhost:7059/`
+   - **Admin:** `https://localhost:7059/Admin` (Tài khoản/Mật khẩu nằm trong file Script)
+   - **Nhân viên:** `https://localhost:7059/NhanVien`
+
+---
+
+_Được phát triển bởi Trần Thanh Tung và các cộng sự (Năm học 2025-2026)._
