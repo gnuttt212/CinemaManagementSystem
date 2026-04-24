@@ -173,5 +173,64 @@ namespace Cinema.Tests
             Assert.False(result);
             _mockContext.Verify(m => m.SaveChanges(), Times.Never());
         }
+
+        [Fact]
+        public void LayChiTietPhim_Found_ReturnsPhimDTO()
+        {
+            var data = new List<Phim>
+            {
+                new Phim { MaPhim = 1, TenPhim = "Phim 1" }
+            };
+            
+            var mockDbSet = GetQueryableMockDbSet(data);
+            mockDbSet.Setup(m => m.Find(It.IsAny<object[]>())).Returns<object[]>(ids => data.FirstOrDefault(d => d.MaPhim == (int)ids[0]));
+            _mockContext.Setup(c => c.Phims).Returns(mockDbSet.Object);
+
+            var lichChieuData = new List<LichChieu>();
+            var mockLichChieuDbSet = GetQueryableMockDbSet(lichChieuData);
+            _mockContext.Setup(c => c.LichChieus).Returns(mockLichChieuDbSet.Object);
+
+            var result = _phimBus.LayChiTietPhim(1);
+
+            Assert.NotNull(result);
+            Assert.Equal(1, result.MaPhim);
+            Assert.Equal("Phim 1", result.TenPhim);
+        }
+
+        [Fact]
+        public void LayChiTietPhim_NotFound_ReturnsNull()
+        {
+            var data = new List<Phim>();
+            
+            var mockDbSet = GetQueryableMockDbSet(data);
+            mockDbSet.Setup(m => m.Find(It.IsAny<object[]>())).Returns<object[]>(ids => data.FirstOrDefault(d => d.MaPhim == (int)ids[0]));
+
+            _mockContext.Setup(c => c.Phims).Returns(mockDbSet.Object);
+
+            var result = _phimBus.LayChiTietPhim(1);
+
+            Assert.Null(result);
+        }
+
+        [Fact]
+        public void TimKiemPhim_ReturnsFilteredList()
+        {
+            var data = new List<Phim>
+            {
+                new Phim { MaPhim = 1, TenPhim = "Lật Mặt 7" },
+                new Phim { MaPhim = 2, TenPhim = "Mai" },
+                new Phim { MaPhim = 3, TenPhim = "Lật Mặt 6" }
+            };
+
+            var mockDbSet = GetQueryableMockDbSet(data);
+            _mockContext.Setup(c => c.Phims).Returns(mockDbSet.Object);
+
+            var result = _phimBus.TimKiemPhim("Lật Mặt");
+
+            Assert.NotNull(result);
+            Assert.Equal(2, result.Count);
+            Assert.Contains(result, p => p.TenPhim == "Lật Mặt 7");
+            Assert.Contains(result, p => p.TenPhim == "Lật Mặt 6");
+        }
     }
 }
