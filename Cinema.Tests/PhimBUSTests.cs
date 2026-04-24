@@ -37,7 +37,6 @@ namespace Cinema.Tests
         [Fact]
         public void LayDanhSachPhim_ReturnsListOfPhimDTO()
         {
-            // Arrange
             var data = new List<Phim>
             {
                 new Phim { MaPhim = 1, TenPhim = "Phim 1", TheLoai = "Hành động" },
@@ -46,11 +45,8 @@ namespace Cinema.Tests
 
             var mockDbSet = GetQueryableMockDbSet(data);
             _mockContext.Setup(c => c.Phims).Returns(mockDbSet.Object);
-
-            // Act
             var result = _phimBus.LayDanhSachPhim();
 
-            // Assert
             Assert.NotNull(result);
             Assert.Equal(2, result.Count);
             Assert.Equal("Phim 1", result[0].TenPhim);
@@ -60,7 +56,6 @@ namespace Cinema.Tests
         [Fact]
         public void ThemPhim_Success_ReturnsMaPhim()
         {
-            // Arrange
             var data = new List<Phim>();
             var mockDbSet = GetQueryableMockDbSet(data);
             
@@ -75,10 +70,8 @@ namespace Cinema.Tests
 
             var newPhim = new PhimDTO { TenPhim = "Phim Moi", ThoiLuong = 120 };
 
-            // Act
             var result = _phimBus.ThemPhim(newPhim);
 
-            // Assert
             Assert.Equal(1, result); 
             _mockContext.Verify(m => m.SaveChanges(), Times.Once());
             Assert.Single(data);
@@ -88,7 +81,6 @@ namespace Cinema.Tests
         [Fact]
         public void ThemPhim_Exception_ReturnsZero()
         {
-            // Arrange
             var data = new List<Phim>();
             var mockDbSet = GetQueryableMockDbSet(data);
             
@@ -97,17 +89,14 @@ namespace Cinema.Tests
 
             var newPhim = new PhimDTO { TenPhim = "Phim Moi", ThoiLuong = 120 };
 
-            // Act
             var result = _phimBus.ThemPhim(newPhim);
 
-            // Assert
             Assert.Equal(0, result);
         }
         
         [Fact]
         public void SuaPhim_Success_ReturnsTrue()
         {
-            // Arrange
             var data = new List<Phim>
             {
                 new Phim { MaPhim = 1, TenPhim = "Phim Cu", ThoiLuong = 100 }
@@ -121,10 +110,8 @@ namespace Cinema.Tests
 
             var updateDto = new PhimDTO { MaPhim = 1, TenPhim = "Phim Moi", ThoiLuong = 120 };
 
-            // Act
             var result = _phimBus.SuaPhim(updateDto);
 
-            // Assert
             Assert.True(result);
             Assert.Equal("Phim Moi", data[0].TenPhim);
             Assert.Equal(120, data[0].ThoiLuong);
@@ -134,7 +121,6 @@ namespace Cinema.Tests
         [Fact]
         public void SuaPhim_NotFound_ReturnsFalse()
         {
-            // Arrange
             var data = new List<Phim>();
             
             var mockDbSet = GetQueryableMockDbSet(data);
@@ -144,10 +130,8 @@ namespace Cinema.Tests
 
             var updateDto = new PhimDTO { MaPhim = 1, TenPhim = "Phim Moi" };
 
-            // Act
             var result = _phimBus.SuaPhim(updateDto);
 
-            // Assert
             Assert.False(result);
             _mockContext.Verify(m => m.SaveChanges(), Times.Never());
         }
@@ -155,7 +139,6 @@ namespace Cinema.Tests
         [Fact]
         public void XoaPhim_Success_ReturnsTrue()
         {
-            // Arrange
             var data = new List<Phim>
             {
                 new Phim { MaPhim = 1, TenPhim = "Phim 1" }
@@ -168,10 +151,8 @@ namespace Cinema.Tests
             _mockContext.Setup(c => c.Phims).Returns(mockDbSet.Object);
             _mockContext.Setup(m => m.SaveChanges()).Returns(1);
 
-            // Act
             var result = _phimBus.XoaPhim(1);
 
-            // Assert
             Assert.True(result);
             Assert.Empty(data);
             _mockContext.Verify(m => m.SaveChanges(), Times.Once());
@@ -180,7 +161,6 @@ namespace Cinema.Tests
         [Fact]
         public void XoaPhim_NotFound_ReturnsFalse()
         {
-            // Arrange
             var data = new List<Phim>();
             
             var mockDbSet = GetQueryableMockDbSet(data);
@@ -188,10 +168,8 @@ namespace Cinema.Tests
 
             _mockContext.Setup(c => c.Phims).Returns(mockDbSet.Object);
 
-            // Act
             var result = _phimBus.XoaPhim(1);
 
-            // Assert
             Assert.False(result);
             _mockContext.Verify(m => m.SaveChanges(), Times.Never());
         }

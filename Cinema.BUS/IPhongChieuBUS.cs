@@ -8,7 +8,7 @@ namespace Cinema.BUS
         List<PhongChieuDTO> LayDanhSachPhong();
         PhongChieuDTO LayChiTietPhong(int maPhong);
         bool ThemPhong(PhongChieuDTO dto);
-        string SuaPhong(PhongChieuDTO dto); // return error message or empty string on success
+        string SuaPhong(PhongChieuDTO dto); 
         string XoaPhong(int maPhong);
     }
 }

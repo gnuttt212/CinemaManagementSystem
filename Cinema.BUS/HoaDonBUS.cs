@@ -106,7 +106,6 @@ namespace Cinema.BUS
                     var lichChieu = _context.LichChieus.Find(cart.MaLich);
                     if (lichChieu == null) return 0;
 
-                    // Tìm ghế trong phòng dựa trên tên ghế (HàngSố)
                     var dsGheTrongPhong = new List<Ghe>();
                     foreach (var tenGhe in cart.DanhSachGhe)
                     {
@@ -213,7 +212,7 @@ namespace Cinema.BUS
                         MaKh = khachHang.MaKh,
                         NgayDat = DateTime.Now,
                         TongTien = cart.TongTien,
-                        TrangThai = "Chờ thanh toán" // Chưa thanh toán, chờ VNPay callback
+                        TrangThai = "Chờ thanh toán"
                     };
                     _context.HoaDons.Add(hoaDon);
                     _context.SaveChanges();

@@ -57,11 +57,9 @@ namespace Cinema.BUS
                     SucChua = dto.SucChua
                 };
                 
-                // Lưu phòng trước để lấy Mã Phòng
                 _db.PhongChieus.Add(phong);
                 _db.SaveChanges();
 
-                // Sinh ghế tự động dựa trên sức chứa
                 if (phong.SucChua.HasValue && phong.SucChua.Value > 0)
                 {
                     SinhGheTuDong(phong.MaPhong, phong.SucChua.Value);
@@ -87,14 +85,11 @@ namespace Cinema.BUS
 
                 if (sucChuaChanged)
                 {
-                    // Kiểm tra xem phòng này đã có ghế được đặt trong hóa đơn chưa
                     bool hasBookedSeats = _db.ChiTietHoaDons.Any(ct => ct.MaGheNavigation.MaPhong == dto.MaPhong);
                     if (hasBookedSeats)
                     {
                         return "Không thể thay đổi sức chứa vì đã có ghế được đặt cho phòng này.";
                     }
-
-                    // Kiểm tra xem phòng này có lịch chiếu chưa (Tùy chọn, ở đây ta chỉ check ghế)
                 }
 
                 phong.TenPhong = dto.TenPhong;
@@ -103,11 +98,9 @@ namespace Cinema.BUS
 
                 if (sucChuaChanged)
                 {
-                    // Xóa các ghế cũ
                     var oldSeats = _db.Ghes.Where(g => g.MaPhong == dto.MaPhong).ToList();
                     _db.Ghes.RemoveRange(oldSeats);
 
-                    // Sinh ghế mới
                     if (phong.SucChua.HasValue && phong.SucChua.Value > 0)
                     {
                         SinhGheTuDong(phong.MaPhong, phong.SucChua.Value);
@@ -115,7 +108,7 @@ namespace Cinema.BUS
                 }
 
                 _db.SaveChanges();
-                return string.Empty; // Success
+                return string.Empty; 
             }
             catch (Exception ex)
             {
@@ -133,7 +126,6 @@ namespace Cinema.BUS
                 bool hasLichChieu = _db.LichChieus.Any(lc => lc.MaPhong == maPhong);
                 if (hasLichChieu) return "Không thể xóa phòng chiếu vì đã có lịch chiếu.";
 
-                // Xóa các ghế của phòng
                 var seats = _db.Ghes.Where(g => g.MaPhong == maPhong).ToList();
                 _db.Ghes.RemoveRange(seats);
 
@@ -149,13 +141,12 @@ namespace Cinema.BUS
 
         private void SinhGheTuDong(int maPhong, int sucChua)
         {
-            int gheTheoHang = 10; // Giả sử mỗi hàng có 10 ghế
+            int gheTheoHang = 10;
             int soHang = (int)Math.Ceiling((double)sucChua / gheTheoHang);
             int gheDaTao = 0;
 
             for (int r = 0; r < soHang; r++)
             {
-                // Tên hàng: A, B, C...
                 string hang = ((char)('A' + r)).ToString();
                 for (int s = 1; s <= gheTheoHang; s++)
                 {
@@ -166,7 +157,7 @@ namespace Cinema.BUS
                         MaPhong = maPhong,
                         Hang = hang,
                         SoGhe = s,
-                        LoaiGhe = "Thường" // Mặc định
+                        LoaiGhe = "Thường"
                     };
                     _db.Ghes.Add(ghe);
                     gheDaTao++;

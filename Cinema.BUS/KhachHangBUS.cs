@@ -119,15 +119,12 @@ namespace Cinema.BUS
         {
             try
             {
-                // Tìm khách hàng theo email
                 var kh = _db.KhachHangs.FirstOrDefault(k => k.Email == email);
 
                 if (kh == null)
-                {
-                    // Tự động tạo tài khoản mới từ Google
                     kh = new KhachHang
                     {
-                        TaiKhoan = email, // Dùng email làm tài khoản
+                        TaiKhoan = email, 
                         MatKhau = BCrypt.Net.BCrypt.HashPassword(Guid.NewGuid().ToString()), // Mật khẩu ngẫu nhiên
                         HoTen = hoTen ?? email,
                         Email = email,
