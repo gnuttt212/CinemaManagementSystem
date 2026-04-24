@@ -122,10 +122,11 @@ namespace Cinema.BUS
                 var kh = _db.KhachHangs.FirstOrDefault(k => k.Email == email);
 
                 if (kh == null)
+                {
                     kh = new KhachHang
                     {
                         TaiKhoan = email, 
-                        MatKhau = BCrypt.Net.BCrypt.HashPassword(Guid.NewGuid().ToString()), // Mật khẩu ngẫu nhiên
+                        MatKhau = BCrypt.Net.BCrypt.HashPassword(Guid.NewGuid().ToString()),
                         HoTen = hoTen ?? email,
                         Email = email,
                         DiemTichLuy = 0

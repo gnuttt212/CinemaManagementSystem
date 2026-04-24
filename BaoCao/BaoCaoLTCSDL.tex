@@ -168,9 +168,9 @@ BoldItalicFont=Times New Roman Bold Italic.ttf,
 
 Đồ án này trình bày quá trình thiết kế và xây dựng hệ thống Quản lý Rạp Phim --- một ứng dụng web cho phép quản lý phim, suất chiếu, đặt vé trực tuyến và thanh toán. Hệ thống được xây dựng trên nền tảng \textbf{ASP.NET Core MVC (.NET 8)} với kiến trúc \textbf{3 lớp} (Presentation -- Business Logic -- Data Access), sử dụng \textbf{Entity Framework Core} kết hợp \textbf{ADO.NET} và cơ sở dữ liệu \textbf{SQL Server (T-SQL)}.
 
-Người dùng cuối có thể duyệt danh sách phim, chọn suất chiếu trực quan qua bộ lọc ngày tháng, chọn ghế ngồi, thêm dịch vụ bắp nước/combo, xác nhận thanh toán và nhận vé điện tử (E-Ticket) kèm mã QR. Phía quản trị viên có thể quản lý toàn bộ danh mục phim, suất chiếu, dịch vụ và xem báo cáo doanh thu theo phim thông qua biểu đồ Chart.js tích hợp. Mật khẩu người dùng được mã hóa bảo mật toàn diện bằng thuật toán an toàn tuyệt đối BCrypt.
+Người dùng cuối có thể duyệt danh sách phim, chọn suất chiếu trực quan qua bộ lọc ngày tháng, chọn ghế ngồi với cơ chế \textbf{sinh ghế động}, thêm dịch vụ bắp nước/combo, xác nhận \textbf{thanh toán trực tuyến qua cổng VNPay} và nhận vé điện tử (E-Ticket) kèm mã QR. Để tăng trải nghiệm, hệ thống hỗ trợ \textbf{đăng nhập một chạm qua Google OAuth 2.0} và tối ưu hóa hiệu năng bằng \textbf{IMemoryCache}. Phía quản trị viên có thể quản lý toàn bộ danh mục phim, phòng chiếu, suất chiếu, dịch vụ, xuất \textbf{báo cáo doanh thu ra file Excel (ClosedXML)} và xem biểu đồ Chart.js trực quan. Hệ thống cũng được đảm bảo chất lượng thông qua việc \textbf{viết Unit Test bằng xUnit và Moq}.
 
-Ngoài ra, hệ thống cũng phát triển \textbf{RESTful Web API} với đầy đủ các endpoint CRUD, hỗ trợ export/import dữ liệu qua định dạng XML sử dụng \textbf{LINQ to XML}.
+Ngoài ra, hệ thống phát triển \textbf{RESTful Web API} với đầy đủ các endpoint CRUD, hỗ trợ export/import dữ liệu qua định dạng XML sử dụng \textbf{LINQ to XML}. Mật khẩu người dùng được mã hóa bảo mật toàn diện bằng thuật toán an toàn tuyệt đối BCrypt.
 
 Báo cáo được tổ chức theo các chương: Chương 1 trình bày tổng quan hệ thống; Chương 2 phân tích và thiết kế cơ sở dữ liệu T-SQL; Chương 3 mô tả kiến trúc phần mềm 3 lớp; Chương 4 trình bày các kỹ thuật triển khai bao gồm Entity Framework, LINQ, ADO.NET (DataSet/DataAdapter), LINQ to XML và Web API; Chương 5 kết luận và hướng phát triển.
 
@@ -216,8 +216,8 @@ Báo cáo được tổ chức theo các chương: Chương 1 trình bày tổng
 \noindent Hệ thống Quản lý Rạp Phim cung cấp hai nhóm chức năng chính:
 
 \begin{itemize}
-    \item \textbf{Khách hàng:} Đăng ký, đăng nhập, duyệt danh sách phim, chọn suất chiếu, chọn ghế, thêm dịch vụ bắp nước/combo, thanh toán và nhận E-Ticket có mã QR. Sau khi đăng nhập, người dùng có thể cập nhật thông tin cá nhân (Profile) và đổi mật khẩu.
-    \item \textbf{Quản trị viên:} Quản lý phim (thêm, sửa, xóa, upload ảnh), quản lý suất chiếu (tự động tính giờ kết thúc), quản lý dịch vụ bắp nước (CRUD), xem báo cáo doanh thu theo từng bộ phim qua biểu đồ.
+    \item \textbf{Khách hàng:} Đăng ký, \textbf{đăng nhập bằng Google}, duyệt danh sách phim (tốc độ cao nhờ Caching), chọn suất chiếu, chọn ghế, thêm dịch vụ, \textbf{thanh toán qua ví điện tử VNPay} và nhận E-Ticket có mã QR. Sau khi đăng nhập, người dùng có thể cập nhật Profile và đổi mật khẩu.
+    \item \textbf{Quản trị viên:} Quản lý phim, quản lý \textbf{phòng chiếu (với cơ chế sinh ghế động theo sức chứa)}, quản lý suất chiếu (tự động tính giờ kết thúc), quản lý dịch vụ bắp nước, xem báo cáo doanh thu và \textbf{xuất báo cáo ra file Excel}.
 \end{itemize}
 
 \noindent Hình~\ref{fig1} là logo của trường, được sử dụng trong giao diện ứng dụng.
@@ -481,7 +481,7 @@ public int LuuVaThanhToan(CartItemDTO cart, string username)
             \hline
             \textbf{Controller} & \textbf{Chức năng} \\
             \hline
-            \texttt{AccountController}           & Đăng nhập, đăng ký, đăng xuất \\
+            \texttt{AccountController}           & Đăng nhập, đăng nhập bằng Google OAuth, đăng ký, đăng xuất \\
             \hline
             \texttt{PhimController}              & Danh sách phim, tìm kiếm, chi tiết, chọn ghế \\
             \hline
@@ -493,11 +493,13 @@ public int LuuVaThanhToan(CartItemDTO cart, string username)
             \hline
             \texttt{Admin/PhimController}        & Quản trị phim: CRUD + upload ảnh lên \texttt{/images/phim/} \\
             \hline
+            \texttt{Admin/PhongChieuController}  & Quản trị phòng chiếu: CRUD, tự động sinh sơ đồ ghế \\
+            \hline
             \texttt{Admin/SuatChieuController}   & Quản trị suất chiếu: CRUD, tự tính giờ kết thúc \\
             \hline
-            \texttt{Admin/DoAnController}      & Quản trị dịch vụ: CRUD (thêm mới trong phiên này) \\
+            \texttt{Admin/DoAnController}      & Quản trị dịch vụ: CRUD \\
             \hline
-            \texttt{Admin/DoanhThuController}    & Báo cáo doanh thu theo phim + biểu đồ Chart.js \\
+            \texttt{Admin/DoanhThuController}    & Báo cáo doanh thu qua biểu đồ Chart.js và xuất file Excel \\
             \hline
             \texttt{Admin/HomeController}        & Dashboard: tổng phim, vé bán, doanh thu, khách hàng \\
             \hline
@@ -879,21 +881,19 @@ public static T Get<T>(this ISession session, string key)
 \begin{itemize}
     \item \textbf{Lập trình CSDL T-SQL:} Xây dựng 10 bảng quan hệ trong SQL Server với đầy đủ View (\texttt{vw\_DoanhThuTheoPhim}), Function (\texttt{fn\_TinhTongTienHoaDon}), Stored Procedure (\texttt{sp\_LayDanhSachPhimDangChieu}), Trigger (\texttt{trg\_NganXoaHoaDonCoCTHD}) và Transaction (EF Core \texttt{BeginTransaction/Commit/Rollback}).
     \item \textbf{Kiến trúc 3 lớp:} Tách biệt hoàn toàn Presentation (Cinema.Web), Business Logic (Cinema.BUS) và Data Access (Cinema.DAL), giao tiếp qua DTO và Interface.
-    \item \textbf{ADO.NET:} Triển khai cả mô hình kết nối (\texttt{SqlDataReader}) và phi kết nối (\texttt{SqlDataAdapter}, \texttt{DataTable}, \texttt{DataSet} với \texttt{DataRelation}).
-    \item \textbf{LINQ:} Sử dụng LINQ to Objects/Entities xuyên suốt tầng BUS và LINQ to XML cho tính năng Export/Import dữ liệu.
-    \item \textbf{Entity Framework:} Cấu hình song song Database First (scaffold 10 entity) và Code First (model \texttt{NhatKyHeThong} với Data Annotation). Biên dịch tự động toàn bộ Model sang mã T-SQL qua lệnh \texttt{dotnet-ef}.
-    \item \textbf{Web API RESTful:} 3 Controller API (\texttt{PhimApiController}, \texttt{DoAnApiController}, \texttt{LichChieuApiController}) với các endpoint trả JSON chuẩn REST (GET/POST/PUT/DELETE).
-    \item \textbf{Tính năng người dùng:} Đặt vé, chọn ghế, dịch vụ combo, thanh toán, E-Ticket QR, hồ sơ cá nhân và \textbf{đổi mật khẩu}. Lọc suất chiếu theo ngày hiện tại và tương lai trực quan.
-    \item \textbf{Bảo mật hệ thống:} Mã hóa mật khẩu người dùng bằng thư viện \textbf{BCrypt} ngăn chặn băm ngược, tránh rò rỉ dữ liệu khi cơ sở dữ liệu bị lộ.
-    \item \textbf{Khu vực Admin:} CRUD phim, suất chiếu, dịch vụ, báo cáo doanh thu theo phim.
+    \item \textbf{Công nghệ \& Tối ưu:} Tích hợp \textbf{IMemoryCache} để tăng tốc load danh sách phim, xuất báo cáo ra file Excel với thư viện \textbf{ClosedXML}, kiểm thử mã nguồn với \textbf{xUnit và Moq}.
+    \item \textbf{ADO.NET \& LINQ:} Triển khai cả mô hình kết nối và phi kết nối (\texttt{DataSet}, \texttt{SqlDataReader}). Sử dụng LINQ to XML cho tính năng Export/Import.
+    \item \textbf{Web API RESTful:} 3 Controller API trả dữ liệu JSON chuẩn REST.
+    \item \textbf{Tính năng người dùng:} \textbf{Đăng nhập một chạm bằng Google OAuth 2.0}, đặt vé với hệ thống phòng chiếu \textbf{sinh sơ đồ ghế động}, \textbf{thanh toán trực tuyến bằng cổng VNPay Sandbox}, E-Ticket có mã QR.
+    \item \textbf{Bảo mật hệ thống:} Mã hóa mật khẩu người dùng bằng thư viện \textbf{BCrypt}.
 \end{itemize}
 
 \noindent\textbf{Hướng phát triển tiếp theo:}
 
 \begin{itemize}
-    \item Tích hợp \textbf{cổng thanh toán trực tuyến} (VNPay, MOMO) thay vì thanh toán giả lập.
+    \item Áp dụng \textbf{SignalR} để đồng bộ hóa việc đặt ghế theo thời gian thực (tránh trùng ghế khi nhiều người mua cùng lúc).
     \item Áp dụng \textbf{JWT Authentication} thay thế Session để hỗ trợ REST API cho ứng dụng mobile.
-    \item Triển khai \textbf{CI/CD} trên Azure / AWS và logging tập trung với Serilog.
+    \item Container hóa hệ thống bằng \textbf{Docker} và triển khai CI/CD trên GitHub Actions.
 \end{itemize}
 
 % ============================================================
