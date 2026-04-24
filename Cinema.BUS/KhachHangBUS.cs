@@ -115,6 +115,41 @@ namespace Cinema.BUS
             catch { return false; }
         }
 
+        public KhachHangDTO? DangNhapGoogle(string email, string hoTen)
+        {
+            try
+            {
+                // Tìm khách hàng theo email
+                var kh = _db.KhachHangs.FirstOrDefault(k => k.Email == email);
+
+                if (kh == null)
+                {
+                    // Tự động tạo tài khoản mới từ Google
+                    kh = new KhachHang
+                    {
+                        TaiKhoan = email, // Dùng email làm tài khoản
+                        MatKhau = BCrypt.Net.BCrypt.HashPassword(Guid.NewGuid().ToString()), // Mật khẩu ngẫu nhiên
+                        HoTen = hoTen ?? email,
+                        Email = email,
+                        DiemTichLuy = 0
+                    };
+                    _db.KhachHangs.Add(kh);
+                    _db.SaveChanges();
+                }
+
+                return new KhachHangDTO
+                {
+                    MaKH = kh.MaKh,
+                    TaiKhoan = kh.TaiKhoan,
+                    HoTen = kh.HoTen ?? "",
+                    Email = kh.Email ?? "",
+                    SDT = kh.Sdt,
+                    DiemTichLuy = kh.DiemTichLuy ?? 0
+                };
+            }
+            catch { return null; }
+        }
+
         public List<KhachHangDTO> LayDanhSach()
         {
             return _db.KhachHangs.Select(k => new KhachHangDTO

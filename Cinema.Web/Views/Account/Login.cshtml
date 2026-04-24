@@ -48,6 +48,15 @@
                             ĐĂNG NHẬP
                         </button>
 
+                        <div class="position-relative mt-4 mb-4">
+                            <hr>
+                            <span class="position-absolute top-50 start-50 translate-middle bg-white px-2 text-muted small">hoặc</span>
+                        </div>
+
+                        <a asp-action="GoogleLogin" class="btn btn-outline-danger btn-lg w-100 fw-bold shadow-sm mb-3" style="border-radius: 10px;">
+                            <i class="bi bi-google me-2"></i> Đăng nhập bằng Google
+                        </a>
+
                         <p class="small">
                             Chưa có tài khoản?
                             <a asp-controller="Account" asp-action="Register" class="text-primary fw-bold text-decoration-none">

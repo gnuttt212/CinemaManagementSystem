@@ -1,0 +1,43 @@
+@model Cinema.DTO.PhongChieuDTO
+@{
+    ViewData["Title"] = "Thêm phòng chiếu mới";
+}
+
+<div class="card shadow border-0 rounded-4 w-50 mx-auto">
+    <div class="card-header bg-primary text-white py-3">
+        <h5 class="mb-0 fw-bold"><i class="bi bi-plus-circle me-2"></i> Thêm Phòng Chiếu</h5>
+    </div>
+    <div class="card-body p-4">
+        <form asp-action="Create" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <div class="mb-3">
+                <label asp-for="TenPhong" class="form-label fw-bold">Tên Phòng</label>
+                <input asp-for="TenPhong" class="form-label form-control" required />
+                <span asp-validation-for="TenPhong" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="LoaiPhong" class="form-label fw-bold">Loại Phòng (2D, 3D...)</label>
+                <select asp-for="LoaiPhong" class="form-select">
+                    <option value="2D">2D</option>
+                    <option value="3D">3D</option>
+                    <option value="IMAX">IMAX</option>
+                </select>
+                <span asp-validation-for="LoaiPhong" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="SucChua" class="form-label fw-bold">Sức chứa (Ghế)</label>
+                <input asp-for="SucChua" type="number" min="1" max="500" class="form-control" required />
+                <span asp-validation-for="SucChua" class="text-danger"></span>
+                <small class="text-muted">Hệ thống sẽ tự động sinh ghế tương ứng với sức chứa (ví dụ A1, A2... B1, B2...).</small>
+            </div>
+
+            <div class="d-flex justify-content-end mt-4">
+                <a asp-action="Index" class="btn btn-secondary me-2">Hủy</a>
+                <button type="submit" class="btn btn-primary">Lưu phòng chiếu</button>
+            </div>
+        </form>
+    </div>
+</div>

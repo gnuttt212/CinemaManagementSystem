@@ -9,6 +9,8 @@ namespace Cinema.BUS
         bool KiemTraGheDaDat(int maLich, int maGhe);
         List<int> LayDanhSachMaGheDaDat(int maLich);
         int LuuVaThanhToan(CartItemDTO cart, string taiKhoan);
+        int LuuDonChuaThanhToan(CartItemDTO cart, string taiKhoan);
+        bool CapNhatTrangThaiHoaDon(int maHD, string trangThai);
         HoaDonDTO LayChiTietHoaDon(int maHD);
         HoaDonDTO LayChiTietHoaDonFull(int maHD);
     }

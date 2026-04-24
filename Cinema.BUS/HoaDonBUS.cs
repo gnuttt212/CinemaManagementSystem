@@ -175,5 +175,97 @@ namespace Cinema.BUS
                 }
             }
         }
+
+        public int LuuDonChuaThanhToan(CartItemDTO cart, string taiKhoan)
+        {
+            using (var transaction = _context.Database.BeginTransaction())
+            {
+                try
+                {
+                    var khachHang = _context.KhachHangs.FirstOrDefault(kh => kh.TaiKhoan == taiKhoan);
+                    if (khachHang == null) return 0;
+
+                    var lichChieu = _context.LichChieus.Find(cart.MaLich);
+                    if (lichChieu == null) return 0;
+
+                    var dsGheTrongPhong = new List<Ghe>();
+                    foreach (var tenGhe in cart.DanhSachGhe)
+                    {
+                        if (tenGhe.Length >= 2)
+                        {
+                            string hang = tenGhe.Substring(0, 1);
+                            if (int.TryParse(tenGhe.Substring(1), out int soGhe))
+                            {
+                                var ghe = _context.Ghes.FirstOrDefault(g => g.Hang == hang && g.SoGhe == soGhe && g.MaPhong == lichChieu.MaPhong);
+                                if (ghe != null) dsGheTrongPhong.Add(ghe);
+                            }
+                        }
+                    }
+
+                    if (dsGheTrongPhong.Count != cart.DanhSachGhe.Count) return 0;
+
+                    var dsMaGhe = dsGheTrongPhong.Select(g => g.MaGhe).ToList();
+                    bool biTrungGhe = _context.ChiTietHoaDons.Any(ct => ct.MaLich == cart.MaLich && dsMaGhe.Contains(ct.MaGhe));
+                    if (biTrungGhe) return -1;
+
+                    var hoaDon = new HoaDon
+                    {
+                        MaKh = khachHang.MaKh,
+                        NgayDat = DateTime.Now,
+                        TongTien = cart.TongTien,
+                        TrangThai = "Chờ thanh toán" // Chưa thanh toán, chờ VNPay callback
+                    };
+                    _context.HoaDons.Add(hoaDon);
+                    _context.SaveChanges();
+
+                    foreach (var ghe in dsGheTrongPhong)
+                    {
+                        _context.ChiTietHoaDons.Add(new ChiTietHoaDon
+                        {
+                            MaHd = hoaDon.MaHd,
+                            MaGhe = ghe.MaGhe,
+                            MaLich = cart.MaLich,
+                            GiaVe = lichChieu.GiaVe
+                        });
+                    }
+
+                    if (cart.DoAns != null)
+                    {
+                        foreach (var doAn in cart.DoAns)
+                        {
+                            _context.ChiTietDoAns.Add(new ChiTietDoAn
+                            {
+                                MaHd = hoaDon.MaHd,
+                                MaDoAn = doAn.MaDoAn,
+                                SoLuong = doAn.SoLuong,
+                                Gia = doAn.Gia
+                            });
+                        }
+                    }
+
+                    _context.SaveChanges();
+                    transaction.Commit();
+
+                    return hoaDon.MaHd;
+                }
+                catch (Exception)
+                {
+                    transaction.Rollback();
+                    return 0;
+                }
+            }
+        }
+
+        public bool CapNhatTrangThaiHoaDon(int maHD, string trangThai)
+        {
+            try
+            {
+                var hd = _context.HoaDons.Find(maHD);
+                if (hd == null) return false;
+                hd.TrangThai = trangThai;
+                return _context.SaveChanges() > 0;
+            }
+            catch { return false; }
+        }
     }
 }

@@ -3,6 +3,7 @@ using Cinema.DTO;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication;
 
 namespace Cinema.Web.Controllers
 {
@@ -62,6 +63,42 @@ namespace Cinema.Web.Controllers
 
             ViewBag.Error = "Tên đăng nhập hoặc mật khẩu không chính xác!";
             return View();
+        }
+
+        [HttpGet]
+        public IActionResult GoogleLogin()
+        {
+            string redirectUrl = Url.Action("GoogleResponse", "Account");
+            var properties = new Microsoft.AspNetCore.Authentication.AuthenticationProperties { RedirectUri = redirectUrl };
+            return Challenge(properties, Microsoft.AspNetCore.Authentication.Google.GoogleDefaults.AuthenticationScheme);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GoogleResponse()
+        {
+            var result = await HttpContext.AuthenticateAsync(Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme);
+
+            if (result?.Principal != null)
+            {
+                var claims = result.Principal.Identities.FirstOrDefault()?.Claims;
+                var email = claims?.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Email)?.Value;
+                var name = claims?.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Name)?.Value;
+
+                if (!string.IsNullOrEmpty(email))
+                {
+                    // Tìm hoặc tạo tài khoản khách hàng từ email Google
+                    var khachHang = _khachHangBus.DangNhapGoogle(email, name ?? email);
+
+                    if (khachHang != null)
+                    {
+                        HttpContext.Session.SetString("UserAccount", khachHang.TaiKhoan);
+                        HttpContext.Session.SetString("Role", "Customer");
+                        return RedirectToAction("Index", "Home");
+                    }
+                }
+            }
+
+            return RedirectToAction("Login");
         }
 
         [HttpGet]

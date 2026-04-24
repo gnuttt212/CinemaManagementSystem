@@ -37,5 +37,44 @@ namespace Cinema.Web.Areas.Admin.Controllers
 
             return View(model);
         }
+
+        public IActionResult ExportExcel()
+        {
+            var thongKePhim = _db.ChiTietHoaDons
+                .Include(ct => ct.MaLichNavigation)
+                .ThenInclude(lc => lc!.MaPhimNavigation)
+                .Where(ct => ct.MaLichNavigation != null && ct.MaLichNavigation.MaPhimNavigation != null)
+                .GroupBy(ct => ct.MaLichNavigation!.MaPhimNavigation!.TenPhim)
+                .Select(g => new DoanhThuTheoPhim
+                {
+                    TenPhim = g.Key ?? "N/A",
+                    DoanhThu = g.Sum(ct => ct.GiaVe ?? 0)
+                }).ToList();
+
+            using (var workbook = new ClosedXML.Excel.XLWorkbook())
+            {
+                var worksheet = workbook.Worksheets.Add("DoanhThuTheoPhim");
+                var currentRow = 1;
+
+                worksheet.Cell(currentRow, 1).Value = "Tên Phim";
+                worksheet.Cell(currentRow, 2).Value = "Doanh Thu (VNĐ)";
+
+                foreach (var item in thongKePhim)
+                {
+                    currentRow++;
+                    worksheet.Cell(currentRow, 1).Value = item.TenPhim;
+                    worksheet.Cell(currentRow, 2).Value = item.DoanhThu;
+                }
+
+                worksheet.Columns().AdjustToContents();
+
+                using (var stream = new System.IO.MemoryStream())
+                {
+                    workbook.SaveAs(stream);
+                    var content = stream.ToArray();
+                    return File(content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "BaoCaoDoanhThu.xlsx");
+                }
+            }
+        }
     }
 }

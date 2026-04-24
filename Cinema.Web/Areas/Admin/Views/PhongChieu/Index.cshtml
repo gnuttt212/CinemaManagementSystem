@@ -1,0 +1,69 @@
+@model IEnumerable<Cinema.DTO.PhongChieuDTO>
+@{
+    ViewData["Title"] = "Danh sách Phòng Chiếu";
+}
+
+<div class="card shadow border-0 rounded-4">
+    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 fw-bold text-primary">DANH SÁCH PHÒNG CHIẾU</h5>
+        <a asp-area="Admin" asp-controller="PhongChieu" asp-action="Create" class="btn btn-primary rounded-pill">
+            <i class="bi bi-plus-circle me-1"></i> Thêm phòng chiếu
+        </a>
+    </div>
+    <div class="card-body">
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success">@TempData["Success"]</div>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger">@TempData["Error"]</div>
+        }
+        
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Mã Phòng</th>
+                    <th>Tên Phòng</th>
+                    <th>Loại Phòng</th>
+                    <th>Sức Chứa (Ghế)</th>
+                    <th>Ghế đã tạo</th>
+                    <th class="text-center">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.MaPhong</td>
+                        <td class="fw-bold">@item.TenPhong</td>
+                        <td><span class="badge bg-info text-dark">@item.LoaiPhong</span></td>
+                        <td>@item.SucChua</td>
+                        <td>
+                            @if(item.SoGheDaTao > 0)
+                            {
+                                <span class="badge bg-success">@item.SoGheDaTao ghế</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning text-dark">Chưa tạo ghế</span>
+                            }
+                        </td>
+                        <td class="text-center">
+                            <div class="btn-group">
+                                <a asp-area="Admin" asp-controller="PhongChieu" asp-action="Edit" asp-route-id="@item.MaPhong"
+                                   class="btn btn-sm btn-outline-warning mx-1">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <a asp-area="Admin" asp-controller="PhongChieu" asp-action="Delete" asp-route-id="@item.MaPhong"
+                                   class="btn btn-sm btn-outline-danger mx-1">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

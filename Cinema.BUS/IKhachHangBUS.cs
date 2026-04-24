@@ -11,6 +11,7 @@ namespace Cinema.BUS
         KhachHangDTO LayThongTinProfile(string taiKhoan);
         bool CapNhatProfile(KhachHangDTO model);
         bool DoiMatKhau(string taiKhoan, string matKhauCu, string matKhauMoi);
+        KhachHangDTO? DangNhapGoogle(string email, string hoTen);
         
         List<KhachHangDTO> LayDanhSach();
         KhachHangDTO? LayTheoMa(int maKh);

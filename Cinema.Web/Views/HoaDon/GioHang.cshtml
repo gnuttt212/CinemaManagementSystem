@@ -53,8 +53,16 @@
                 <div class="border-top pt-3">
                     <h2 class="text-warning text-center fw-bold">@Model.TongTien.ToString("N0") đ</h2>
                 </div>
-                <button onclick="xacNhanThanhToan()" class="btn btn-warning btn-lg w-100 mt-4 fw-bold py-3">
-                    XÁC NHẬN THANH TOÁN
+
+                <p class="text-center text-muted small mt-3 mb-2">Chọn phương thức thanh toán</p>
+
+                <button onclick="xacNhanThanhToan()" class="btn btn-warning btn-lg w-100 fw-bold py-3 mb-3">
+                    <i class="bi bi-credit-card me-2"></i> THANH TOÁN TRỰC TIẾP
+                </button>
+
+                <button onclick="thanhToanVnPay()" class="btn btn-lg w-100 fw-bold py-3" style="background-color: #cc0000; color: white; border: none;">
+                    <img src="https://sandbox.vnpayment.vn/paymentv2/images/icons/logo_vnpay.png" alt="VNPay" style="height: 24px; margin-right: 8px;" />
+                    THANH TOÁN VNPAY
                 </button>
             </div>
         </div>
@@ -68,6 +76,20 @@
                 $.post('/HoaDon/XacNhanThanhToan', function (res) {
                     if (res.success) {
                         window.location.href = '/HoaDon/ThanhToanThanhCong?id=' + res.maHD;
+                    } else {
+                        alert("Lỗi: " + res.message);
+                    }
+                }).fail(function () {
+                    alert("Không thể kết nối tới máy chủ. Vui lòng thử lại!");
+                });
+            }
+        }
+
+        function thanhToanVnPay() {
+            if (confirm("Bạn sẽ được chuyển đến cổng thanh toán VNPay. Tiếp tục?")) {
+                $.post('/HoaDon/ThanhToanVnPay', function (res) {
+                    if (res.success) {
+                        window.location.href = res.redirectUrl;
                     } else {
                         alert("Lỗi: " + res.message);
                     }
