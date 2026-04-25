@@ -32,7 +32,7 @@
 | **Giao diện (UI)**       | Razor Views, Bootstrap 5, jQuery, SweetAlert2, Chart.js         |
 | **Bảo mật & Thanh toán** | BCrypt.Net, Google OAuth 2.0, VNPay API                         |
 | **Tối ưu & Báo cáo**     | IMemoryCache, ClosedXML (Xuất Excel)                            |
-| **Kiểm thử (Testing)**   | xUnit, Moq                                                      |
+| **Kiểm thử (Testing)**   | xUnit, Moq (20 Unit Tests bao phủ tầng BUS)                     |
 
 ## Kiến trúc dự án (Solution Structure)
 
@@ -46,7 +46,7 @@ CinemaManagementSystem/
 │   │   ├── Admin/         # Khu vực Quản lý
 │   │   └── NhanVien/      # Khu vực Nhân viên
 │   └── ApiControllers/    # Web API endpoints
-├── Cinema.Tests/          # Unit Testing (xUnit + Moq cho tầng BUS)
+├── Cinema.Tests/          # Unit Testing (xUnit + Moq, 20 test cases bao phủ tầng BUS)
 └── DatabaseScripts/       # T-SQL Scripts hợp nhất duy nhất
 ```
 

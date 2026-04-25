@@ -881,7 +881,7 @@ public static T Get<T>(this ISession session, string key)
 \begin{itemize}
     \item \textbf{Lập trình CSDL T-SQL:} Xây dựng 10 bảng quan hệ trong SQL Server với đầy đủ View (\texttt{vw\_DoanhThuTheoPhim}), Function (\texttt{fn\_TinhTongTienHoaDon}), Stored Procedure (\texttt{sp\_LayDanhSachPhimDangChieu}), Trigger (\texttt{trg\_NganXoaHoaDonCoCTHD}) và Transaction (EF Core \texttt{BeginTransaction/Commit/Rollback}).
     \item \textbf{Kiến trúc 3 lớp:} Tách biệt hoàn toàn Presentation (Cinema.Web), Business Logic (Cinema.BUS) và Data Access (Cinema.DAL), giao tiếp qua DTO và Interface.
-    \item \textbf{Công nghệ \& Tối ưu:} Tích hợp \textbf{IMemoryCache} để tăng tốc load danh sách phim, xuất báo cáo ra file Excel với thư viện \textbf{ClosedXML}, kiểm thử mã nguồn với \textbf{xUnit và Moq}.
+    \item \textbf{Công nghệ \& Tối ưu:} Tích hợp \textbf{IMemoryCache} để tăng tốc load danh sách phim, xuất báo cáo ra file Excel với thư viện \textbf{ClosedXML}, kiểm thử mã nguồn với \textbf{xUnit và Moq} (hoàn thành 20 Unit Tests bao phủ toàn diện tầng BUS).
     \item \textbf{ADO.NET \& LINQ:} Triển khai cả mô hình kết nối và phi kết nối (\texttt{DataSet}, \texttt{SqlDataReader}). Sử dụng LINQ to XML cho tính năng Export/Import.
     \item \textbf{Web API RESTful:} 3 Controller API trả dữ liệu JSON chuẩn REST.
     \item \textbf{Tính năng người dùng:} \textbf{Đăng nhập một chạm bằng Google OAuth 2.0}, đặt vé với hệ thống phòng chiếu \textbf{sinh sơ đồ ghế động}, \textbf{thanh toán trực tuyến bằng cổng VNPay Sandbox}, E-Ticket có mã QR.
