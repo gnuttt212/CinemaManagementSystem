@@ -58,7 +58,7 @@ CinemaManagementSystem/
 - **Trigger:** Ngăn chặn xóa hóa đơn sai quy tắc (`trg_NganXoaHoaDonCoCTHD`).
 - **Transaction:** Đảm bảo tính nguyên tử (Atomicity) khi thanh toán (Lưu Hóa đơn + Vé + Dịch vụ cùng lúc bằng `BeginTransaction`).
 
-## ⚙️ Hướng dẫn Cài đặt & Chạy dự án
+## Hướng dẫn Cài đặt & Chạy dự án
 
 ### Yêu cầu hệ thống
 
