@@ -1,72 +1,99 @@
 @model List<Cinema.DAL.Models.Ghe>
 
-<div class="container py-5">
-    <div class="screen w-75 mx-auto mb-5 text-center shadow-sm p-2 bg-light border">MÀN HÌNH</div>
+@{
+    ViewData["Title"] = "Chọn ghế và Dịch vụ";
+}
 
-    <div class="row justify-content-center mb-4">
-        @if (Model != null && Model.Any())
-        {
-            var dsGheDaDat = (List<int>)ViewBag.GheDaDat;
-
-            @foreach (var ghe in Model)
-            {
-                bool isOccupied = dsGheDaDat.Contains(ghe.MaGhe);
-                string tenGhe = $"{ghe.Hang}{ghe.SoGhe}";
-
-                <div class="col-1 mb-3 text-center">
-                    @if (isOccupied)
-                    {
-                        <button class="btn btn-danger btn-sm w-100 shadow-none" disabled
-                                style="cursor: not-allowed; opacity: 0.7;">
-                            <i class="bi bi-x-lg"></i>
-                        </button>
-                    }
-                    else
-                    {
-                        <button class="btn @(ghe.LoaiGhe == "VIP" ? "btn-warning" : "btn-outline-secondary") btn-sm w-100 btn-ghe"
-                                data-id="@ghe.MaGhe"
-                                data-name="@tenGhe"
-                                data-price="@(ghe.LoaiGhe == "VIP" ? 1.2 : 1)">
-                            @tenGhe
-                        </button>
-                    }
-                </div>
-            }
-        }
-        else
-        {
-            <div class="col-12 text-center">
-                <div class="alert alert-warning">⚠️ Không tìm thấy ghế cho suất chiếu này!</div>
-            </div>
-        }
+<!-- HERO BANNER -->
+<div class="gsap-hero" style="min-height: 30vh; margin-bottom: 2rem;">
+    <div class="gsap-hero-bg" style="background-image: url('https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'); filter: brightness(0.3);"></div>
+    <div class="gsap-hero-overlay"></div>
+    <div class="gsap-hero-content pt-5 mt-4">
+        <h1 class="gsap-hero-title mb-0" style="font-size: clamp(1.8rem, 3vw, 2.8rem);">
+            <span class="line"><span class="line-inner text-white">CHỌN <span class="highlight">GHẾ & DỊCH VỤ</span></span></span>
+        </h1>
+        <p class="gsap-hero-subtitle mt-2 text-white opacity-75">Lựa chọn vị trí ngồi tốt nhất và combo yêu thích của bạn</p>
     </div>
 </div>
 
-    <div class="d-flex justify-content-center gap-4 mb-5">
-        <div><span class="badge bg-outline-secondary border text-dark">Ghế Thường</span></div>
-        <div><span class="badge bg-warning text-dark">Ghế VIP (+20%)</span></div>
-        <div><span class="badge bg-danger">Đã đặt</span></div>
-        <div><span class="badge bg-success">Đang chọn</span></div>
+<div class="container py-4 mb-5">
+    <!-- MÀN HÌNH -->
+    <div class="gsap-reveal-scale mb-5">
+        <div class="w-75 mx-auto text-center p-3 rounded" style="background: linear-gradient(180deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%); border-top: 5px solid var(--cinema-accent); box-shadow: 0 10px 30px rgba(245, 197, 24, 0.1);">
+            <h5 class="text-white fw-bold mb-0" style="letter-spacing: 5px; opacity: 0.8;">MÀN HÌNH</h5>
+        </div>
     </div>
 
-    <h3 class="mt-5 text-primary text-center"><i class="bi bi-cup-straw"></i> COMBO BẮP & NƯỚC</h3>
-    <div class="row mt-4 px-5">
+    <!-- SƠ ĐỒ GHẾ -->
+    <div class="gsap-auth-card p-4 p-md-5 mb-5 gsap-reveal">
+        <div class="row justify-content-center">
+            @if (Model != null && Model.Any())
+            {
+                var dsGheDaDat = (List<int>)ViewBag.GheDaDat;
+
+                @foreach (var ghe in Model)
+                {
+                    bool isOccupied = dsGheDaDat.Contains(ghe.MaGhe);
+                    string tenGhe = $"{ghe.Hang}{ghe.SoGhe}";
+
+                    <div class="col-1 mb-3 text-center px-1">
+                        @if (isOccupied)
+                        {
+                            <button class="btn btn-sm w-100 shadow-none border-0 seat-btn" disabled
+                                    style="background: rgba(229, 9, 20, 0.3); color: var(--cinema-primary); cursor: not-allowed;">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        }
+                        else
+                        {
+                            <button class="btn btn-sm w-100 btn-ghe seat-btn @(ghe.LoaiGhe == "VIP" ? "seat-vip" : "seat-normal")"
+                                    data-id="@ghe.MaGhe"
+                                    data-name="@tenGhe"
+                                    data-price="@(ghe.LoaiGhe == "VIP" ? 1.2 : 1)">
+                                @tenGhe
+                            </button>
+                        }
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="col-12 text-center py-4">
+                    <div class="alert alert-warning border-warning bg-warning bg-opacity-25 text-warning">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i> Không tìm thấy sơ đồ ghế cho suất chiếu này!
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- CHÚ THÍCH -->
+        <div class="d-flex flex-wrap justify-content-center gap-4 mt-5 pt-4 border-top border-secondary border-opacity-50">
+            <div class="d-flex align-items-center"><div class="seat-legend seat-normal me-2"></div><span class="text-muted small">Ghế Thường</span></div>
+            <div class="d-flex align-items-center"><div class="seat-legend seat-vip me-2"></div><span class="text-muted small">Ghế VIP (+20%)</span></div>
+            <div class="d-flex align-items-center"><div class="seat-legend seat-occupied me-2"></div><span class="text-muted small">Đã đặt</span></div>
+            <div class="d-flex align-items-center"><div class="seat-legend seat-selected me-2"></div><span class="text-muted small">Đang chọn</span></div>
+        </div>
+    </div>
+
+    <!-- DỊCH VỤ -->
+    <h3 class="gsap-section-title mt-5 mb-4 text-center d-block gsap-reveal"><i class="bi bi-cup-straw text-primary me-2"></i>COMBO BẮP NƯỚC</h3>
+    <div class="row g-4 px-lg-5 mb-5 gsap-reveal">
         @if (ViewBag.DoAns != null)
         {
             @foreach (var dv in (List<Cinema.DTO.DoAnDTO>)ViewBag.DoAns)
             {
-                <div class="col-md-6 mb-3">
-                    <div class="card p-3 shadow-sm d-flex flex-row align-items-center justify-content-between">
+                <div class="col-md-6">
+                    <div class="gsap-feature-card p-3 d-flex flex-row align-items-center justify-content-between h-100">
                         <div>
-                            <h6 class="mb-0 fw-bold">@dv.TenDoAn</h6>
-                            <small class="text-danger">@dv.Gia.ToString("N0") đ</small>
+                            <h6 class="mb-1 fw-bold text-white">@dv.TenDoAn</h6>
+                            <small style="color: var(--cinema-accent);">@dv.Gia.ToString("N0") đ</small>
                         </div>
-                        <div class="d-flex align-items-center gap-2">
-                            <button type="button" class="btn btn-sm btn-outline-primary btn-minus" data-id="@dv.MaDoAn">-</button>
-                            <input type="text" class="form-control text-center input-qty"
-                                   style="width: 50px;" value="0" readonly
+                        <div class="d-flex align-items-center gap-2 bg-dark rounded-pill p-1 border border-secondary border-opacity-50">
+                            <button type="button" class="btn btn-sm btn-dark rounded-circle btn-minus d-flex align-items-center justify-content-center text-white" style="width: 32px; height: 32px;" data-id="@dv.MaDoAn"><i class="bi bi-dash"></i></button>
+                            <input type="text" class="form-control form-control-sm text-center input-qty bg-transparent border-0 text-white fw-bold p-0"
+                                   style="width: 30px;" value="0" readonly
                                    data-id="@dv.MaDoAn" data-price="@dv.Gia" data-name="@dv.TenDoAn">
-                            <button type="button" class="btn btn-sm btn-outline-primary btn-plus" data-id="@dv.MaDoAn">+</button>
+                            <button type="button" class="btn btn-sm btn-primary rounded-circle btn-plus d-flex align-items-center justify-content-center text-white" style="width: 32px; height: 32px;" data-id="@dv.MaDoAn"><i class="bi bi-plus"></i></button>
                         </div>
                     </div>
                 </div>
@@ -74,25 +101,72 @@
         }
     </div>
 
-    <div class="card p-4 shadow-sm mt-5">
-        <h5>Thông tin chọn: <span id="listGhe" class="text-primary fw-bold">Chưa chọn gì</span></h5>
-        <h4>Tổng cộng: <span id="totalPrice" class="text-danger fw-bold">0</span> đ</h4>
-        <button onclick="booking()" class="btn btn-success btn-lg mt-3 fw-bold">XÁC NHẬN CHỌN GHẾ & DỊCH VỤ</button>
+    <!-- TỔNG KẾT & ĐẶT VÉ -->
+    <div class="gsap-cta-banner p-4 p-md-5 mt-5 text-start gsap-reveal-scale">
+        <div class="row align-items-center">
+            <div class="col-md-8 mb-4 mb-md-0 border-end border-secondary border-opacity-25">
+                <h5 class="text-white mb-3">Thông tin vé:</h5>
+                <p class="mb-2"><span class="text-muted">Ghế đã chọn:</span> <span id="listGhe" class="fw-bold" style="color: var(--cinema-accent);">Chưa chọn</span></p>
+                <p class="mb-0"><span class="text-muted">Dịch vụ đi kèm:</span> <span id="listDv" class="text-info fw-bold">Không có</span></p>
+            </div>
+            <div class="col-md-4 text-md-center">
+                <p class="text-muted mb-1">Tổng cộng</p>
+                <h2 id="totalPrice" class="text-danger fw-bold mb-4">0 đ</h2>
+                <button onclick="booking()" id="btnConfirm" class="btn-cinema-primary w-100 py-3" style="font-size: 1.1rem;">
+                    XÁC NHẬN ĐẶT VÉ
+                </button>
+            </div>
+        </div>
     </div>
 </div>
+
 <style>
-    .screen {
-        border-top: 5px solid #ffc107;
-        border-radius: 50% / 10px;
-        font-weight: bold;
-        color: #666;
+    .seat-btn {
+        height: 40px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        transition: all 0.2s ease;
+        border-radius: 8px 8px 4px 4px;
+        position: relative;
+    }
+    
+    .seat-normal {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: var(--cinema-text);
+    }
+    .seat-normal:hover {
+        background: rgba(255, 255, 255, 0.15);
+        color: white;
+    }
+    
+    .seat-vip {
+        background: rgba(245, 197, 24, 0.1);
+        border: 1px solid rgba(245, 197, 24, 0.3);
+        color: var(--cinema-accent);
+    }
+    .seat-vip:hover {
+        background: rgba(245, 197, 24, 0.2);
+        color: var(--cinema-accent);
+    }
+    
+    .seat-btn.active {
+        background: var(--cinema-gradient-1) !important;
+        border-color: var(--cinema-primary) !important;
+        color: white !important;
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px var(--cinema-primary-glow);
     }
 
-    .btn-ghe.active {
-        background-color: #198754 !important;
-        color: white !important;
-        border-color: #198754 !important;
+    .seat-legend {
+        width: 20px;
+        height: 20px;
+        border-radius: 4px 4px 2px 2px;
     }
+    .seat-legend.seat-normal { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); }
+    .seat-legend.seat-vip { background: rgba(245, 197, 24, 0.2); border: 1px solid rgba(245, 197, 24, 0.4); }
+    .seat-legend.seat-occupied { background: rgba(229, 9, 20, 0.3); }
+    .seat-legend.seat-selected { background: var(--cinema-primary); box-shadow: 0 0 10px var(--cinema-primary-glow); }
 </style>
 
 @section Scripts {
@@ -103,6 +177,12 @@
         $(document).ready(function () {
             $('.btn-ghe').click(function () {
                 $(this).toggleClass('active');
+                
+                // Add tiny pop animation using GSAP
+                if ($(this).hasClass('active')) {
+                    gsap.from(this, { scale: 0.8, duration: 0.3, ease: "back.out(2)" });
+                }
+
                 let seatName = $(this).data('name');
                 let priceMultiplier = parseFloat($(this).data('price'));
 
@@ -116,6 +196,7 @@
             $('.btn-plus').click(function () {
                 let input = $(this).siblings('.input-qty');
                 input.val(parseInt(input.val()) + 1);
+                gsap.from(input, { y: -5, opacity: 0.5, duration: 0.2 });
                 updateUI();
             });
             $('.btn-minus').click(function () {
@@ -123,6 +204,7 @@
                 let val = parseInt(input.val()) - 1;
                 if (val >= 0) {
                     input.val(val);
+                    gsap.from(input, { y: 5, opacity: 0.5, duration: 0.2 });
                     updateUI();
                 }
             });
@@ -142,18 +224,49 @@
                 }
             });
 
-            let seatStr = selectedSeats.map(s => s.name).join(', ') || "Chưa chọn ghế";
-            let dvStr = serviceDetails.join(', ') || "Chưa chọn combo";
-            $('#listGhe').html(`Ghế: <span class="text-success">${seatStr}</span> | Dịch vụ: <span class="text-info">${dvStr}</span>`);
+            let seatStr = selectedSeats.map(s => s.name).join(', ') || "Chưa chọn";
+            let dvStr = serviceDetails.join(', ') || "Không có";
+            
+            $('#listGhe').text(seatStr);
+            $('#listDv').text(dvStr);
+            
             let finalTotal = totalGhe + totalDV;
-            $('#totalPrice').text(finalTotal.toLocaleString('vi-VN'));
+            
+            // Animate price change
+            let priceObj = { val: parseInt($('#totalPrice').text().replace(/[^0-9]/g, '')) || 0 };
+            gsap.to(priceObj, {
+                val: finalTotal,
+                duration: 0.5,
+                ease: "power2.out",
+                onUpdate: function() {
+                    $('#totalPrice').text(Math.round(priceObj.val).toLocaleString('vi-VN') + ' đ');
+                }
+            });
         }
 
         function booking() {
             if (selectedSeats.length === 0) {
-                alert("Vui lòng chọn ít nhất một ghế!");
+                gsap.to('#btnConfirm', { x: [-10, 10, -10, 10, 0], duration: 0.4 });
+                
+                const alertHtml = `
+                    <div id="seatAlert" class="position-fixed top-0 start-50 translate-middle-x mt-5 p-3 rounded" 
+                         style="background: var(--cinema-card); border: 1px solid var(--cinema-primary); z-index: 1050; opacity: 0;">
+                        <div class="d-flex align-items-center text-white">
+                            <i class="bi bi-exclamation-circle text-primary fs-4 me-3"></i>
+                            <div>Vui lòng chọn ít nhất một ghế!</div>
+                        </div>
+                    </div>
+                `;
+                $('body').append(alertHtml);
+                
+                gsap.to('#seatAlert', { y: 20, opacity: 1, duration: 0.4, ease: 'back.out' });
+                setTimeout(() => {
+                    gsap.to('#seatAlert', { y: 0, opacity: 0, duration: 0.4, ease: 'power2.in', onComplete: () => $('#seatAlert').remove() });
+                }, 3000);
+                
                 return;
             }
+            
             let selectedServices = [];
             $('.input-qty').each(function () {
                 let qty = parseInt($(this).val());
@@ -162,13 +275,22 @@
                 }
             });
 
+            // Loading state
+            $('#btnConfirm').html('<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> ĐANG XỬ LÝ...');
+            $('#btnConfirm').addClass('disabled');
+
             $.post('/Phim/LuuGheVaoSession', {
                 ghes: selectedSeats.map(s => s.name),
                 maLich: @(ViewBag.MaLich ?? 0),
                 doAns: selectedServices 
             }, function (res) {
-                if (res.success) window.location.href = '/HoaDon/GioHang';
-                else alert("Lỗi: " + res.message);
+                if (res.success) {
+                    window.location.href = '/HoaDon/GioHang';
+                } else {
+                    alert("Lỗi: " + res.message);
+                    $('#btnConfirm').html('XÁC NHẬN ĐẶT VÉ');
+                    $('#btnConfirm').removeClass('disabled');
+                }
             });
         }
     </script>

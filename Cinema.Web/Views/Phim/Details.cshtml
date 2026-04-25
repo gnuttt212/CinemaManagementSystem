@@ -4,84 +4,90 @@
     ViewData["Title"] = Model.TenPhim;
 }
 
-<div class="container mt-5">
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a asp-action="Index">Trang chủ</a></li>
-            <li class="breadcrumb-item active">@Model.TenPhim</li>
+<div class="container mt-5 pt-4 mb-5">
+    <!-- BREADCRUMB -->
+    <nav aria-label="breadcrumb" class="gsap-reveal-left mb-4">
+        <ol class="breadcrumb gsap-breadcrumb m-0">
+            <li class="breadcrumb-item"><a asp-action="Index"><i class="bi bi-house-door me-1"></i>Trang chủ</a></li>
+            <li class="breadcrumb-item"><a asp-action="Index">Lịch chiếu</a></li>
+            <li class="breadcrumb-item active" aria-current="page">@Model.TenPhim</li>
         </ol>
     </nav>
 
-    <div class="row mt-4">
-        <div class="col-md-4">
-            <div class="position-relative">
+    <div class="row g-5">
+        <!-- POSTER (Left) -->
+        <div class="col-md-4 gsap-reveal-left">
+            <div class="gsap-detail-poster position-sticky" style="top: 100px;">
                 <img src="@(string.IsNullOrEmpty(Model.Poster) ? $"https://via.placeholder.com/400x600?text={Model.TenPhim}" : Model.Poster.StartsWith("http") ? Model.Poster : $"/images/phim/{Model.Poster}")"
-                     class="img-fluid rounded shadow-lg" alt="@Model.TenPhim" />
+                     alt="@Model.TenPhim" onerror="this.onerror=null; this.src='https://via.placeholder.com/400x600?text=No+Image';">
             </div>
         </div>
 
-        <div class="col-md-8">
-            <h1 class="display-4 fw-bold text-uppercase">@Model.TenPhim</h1>
-            <hr />
-
-            <div class="d-flex gap-4 mb-4">
-                <p class="fs-5">
-                    <i class="bi bi-clock-history text-primary"></i>
-                    <strong>Thời lượng:</strong> @Model.ThoiLuong phút
-                </p>
-                <p class="fs-5">
-                    <i class="bi bi-tags-fill text-warning"></i>
-                    <strong>Thể loại:</strong> @(Model.TheLoai ?? "N/A")
-                </p>
-            </div>
-
-            <div class="d-flex gap-4 mb-4">
-                <p class="fs-5">
-                    <i class="bi bi-camera-reels text-info"></i>
-                    <strong>Đạo diễn:</strong> @(Model.DaoDien ?? "N/A")
-                </p>
-                @if (Model.NgayKhoiChieu.HasValue)
-                {
-                    <p class="fs-5">
-                        <i class="bi bi-calendar-event text-success"></i>
-                        <strong>Khởi chiếu:</strong> @Model.NgayKhoiChieu.Value.ToString("dd/MM/yyyy")
-                    </p>
-                }
-            </div>
-
-            <div class="card bg-light border-0 p-3 mb-4">
-                <h5 class="fw-bold">Nội dung phim</h5>
-                <p class="text-muted" style="text-align: justify;">
-                    @(string.IsNullOrEmpty(Model.MoTa) ? "Thông tin mô tả phim đang được cập nhật..." : Model.MoTa)
-                </p>
-            </div>
-
-            <h3 class="mt-5 text-primary"><i class="bi bi-calendar-check"></i> CHỌN SUẤT CHIẾU</h3>
-            <div class="d-flex flex-wrap gap-3 mt-3">
-                @if (Model.LichChieus != null && Model.LichChieus.Any())
-                {
-                    @foreach (var suat in Model.LichChieus)
+        <!-- DETAILS (Right) -->
+        <div class="col-md-8 gsap-reveal-right">
+            <div class="gsap-detail-info">
+                <h1>@Model.TenPhim</h1>
+                
+                <div class="d-flex flex-wrap gap-4 mt-3 mb-4 gsap-detail-meta">
+                    <span>
+                        <i class="bi bi-clock-history text-primary"></i>
+                        <strong>@Model.ThoiLuong phút</strong>
+                    </span>
+                    <span>
+                        <i class="bi bi-tags-fill text-warning"></i>
+                        <strong>@(Model.TheLoai ?? "N/A")</strong>
+                    </span>
+                    <span>
+                        <i class="bi bi-camera-reels text-info"></i>
+                        <strong>@(Model.DaoDien ?? "N/A")</strong>
+                    </span>
+                    @if (Model.NgayKhoiChieu.HasValue)
                     {
-                        <button type="button"
-                                class="btn btn-outline-dark btn-lg px-4 btn-suat"
-                                data-id="@suat.MaLich">
-                            <i class="bi bi-play-circle"></i> @(suat.GioChieu.HasValue ? suat.GioChieu.Value.ToString(@"hh\:mm") : "N/A")
-                        </button>
+                        <span>
+                            <i class="bi bi-calendar-event text-success"></i>
+                            <strong>@Model.NgayKhoiChieu.Value.ToString("dd/MM/yyyy")</strong>
+                        </span>
                     }
-                }
-                else
-                {
-                    <div class="alert alert-warning w-100">
-                        <i class="bi bi-info-circle"></i> Hiện chưa có suất chiếu nào cho phim này. Vui lòng quay lại sau!
-                    </div>
-                }
-            </div>
+                </div>
 
-            <div class="mt-5 pt-3">
-                <a id="btnDatVe" href="javascript:void(0)" onclick="checkSelection()"
-                   class="btn btn-success btn-lg px-5 py-3 shadow w-100 fw-bold border-3">
-                    <i class="bi bi-ticket-perforated"></i> TIẾN HÀNH ĐẶT VÉ NGAY
-                </a>
+                <hr class="my-4">
+
+                <div class="gsap-detail-synopsis mb-5">
+                    <h5 class="mb-3"><i class="bi bi-card-text me-2 text-primary"></i>Nội dung phim</h5>
+                    <p class="m-0 lh-lg text-justify">
+                        @(string.IsNullOrEmpty(Model.MoTa) ? "Thông tin mô tả phim đang được cập nhật..." : Model.MoTa)
+                    </p>
+                </div>
+
+                <h3 class="gsap-section-title mt-5">CHỌN SUẤT CHIẾU</h3>
+                
+                <div class="d-flex flex-wrap gap-3 mt-4 mb-5">
+                    @if (Model.LichChieus != null && Model.LichChieus.Any())
+                    {
+                        @foreach (var suat in Model.LichChieus)
+                        {
+                            <button type="button"
+                                    class="btn gsap-showtime-btn"
+                                    data-id="@suat.MaLich">
+                                <i class="bi bi-play-circle me-1"></i> @(suat.GioChieu.HasValue ? suat.GioChieu.Value.ToString(@"hh\:mm") : "N/A")
+                            </button>
+                        }
+                    }
+                    else
+                    {
+                        <div class="gsap-feature-card w-100 text-start p-4">
+                            <h5 class="text-warning mb-1"><i class="bi bi-exclamation-triangle me-2"></i>Chưa có suất chiếu</h5>
+                            <p class="m-0">Hiện chưa có suất chiếu nào cho phim này. Vui lòng quay lại sau!</p>
+                        </div>
+                    }
+                </div>
+
+                <div class="mt-4 pt-2 border-top border-secondary">
+                    <a id="btnDatVe" href="javascript:void(0)" onclick="checkSelection()"
+                       class="btn-cinema-primary w-100 d-block text-center py-3 fs-5 mt-4" style="text-decoration: none;">
+                        <i class="bi bi-ticket-perforated-fill me-2"></i> ĐẶT VÉ NGAY
+                    </a>
+                </div>
             </div>
         </div>
     </div>
@@ -90,14 +96,23 @@
 @section Scripts {
     <script>
         $(document).ready(function () {
-            $('.btn-suat').click(function () {
-                $('.btn-suat').removeClass('active btn-dark text-white').addClass('btn-outline-dark');
-                $(this).addClass('active btn-dark text-white').removeClass('btn-outline-dark');
+            $('.gsap-showtime-btn').click(function () {
+                // Animate selection with GSAP
+                gsap.to('.gsap-showtime-btn', { scale: 1, duration: 0.2 });
+                gsap.to(this, { scale: 1.05, duration: 0.3, ease: 'back.out(1.5)' });
+
+                $('.gsap-showtime-btn').removeClass('active');
+                $(this).addClass('active');
 
                 let maLich = $(this).data('id');
                 $('#btnDatVe').attr('data-selected-id', maLich);
-
                 $('#btnDatVe').attr('href', '/Phim/ChonGhe?maLich=' + maLich);
+                
+                // Pulse CTA
+                gsap.fromTo('#btnDatVe', 
+                    { scale: 1 }, 
+                    { scale: 1.02, duration: 0.4, yoyo: true, repeat: 1, ease: 'power2.inOut', boxShadow: '0 0 30px rgba(229, 9, 20, 0.6)' }
+                );
             });
         });
 
@@ -106,31 +121,31 @@
             let finalHref = $('#btnDatVe').attr('href');
 
             if (!selectedId || finalHref === "javascript:void(0)") {
-                alert("Bạn chưa chọn giờ chiếu! Vui lòng chọn một khung giờ để tiếp tục.");
+                // Shake animation for error
+                gsap.to('#btnDatVe', {
+                    x: [-10, 10, -10, 10, 0],
+                    duration: 0.4,
+                    ease: 'power1.inOut'
+                });
+                
+                // Show custom toast/alert instead of native alert
+                const alertHtml = `
+                    <div id="cinemaAlert" class="position-fixed top-0 start-50 translate-middle-x mt-5 p-3 rounded" 
+                         style="background: var(--cinema-card); border: 1px solid var(--cinema-primary); z-index: 1050; opacity: 0;">
+                        <div class="d-flex align-items-center text-white">
+                            <i class="bi bi-exclamation-circle text-primary fs-4 me-3"></i>
+                            <div>Vui lòng chọn một suất chiếu để tiếp tục!</div>
+                        </div>
+                    </div>
+                `;
+                $('body').append(alertHtml);
+                
+                const tl = gsap.timeline();
+                tl.to('#cinemaAlert', { y: 20, opacity: 1, duration: 0.4, ease: 'back.out' })
+                  .to('#cinemaAlert', { y: 0, opacity: 0, duration: 0.4, delay: 2.5, ease: 'power2.in', onComplete: () => $('#cinemaAlert').remove() });
             } else {
                 window.location.href = finalHref;
             }
         }
     </script>
 }
-
-<style>
-    .btn-suat {
-        transition: all 0.3s ease;
-        border-radius: 10px;
-    }
-
-        .btn-suat:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-    .breadcrumb-item a {
-        text-decoration: none;
-        color: #6c757d;
-    }
-
-    .breadcrumb-item.active {
-        color: #0d6efd;
-        font-weight: bold;
-    }
-</style>

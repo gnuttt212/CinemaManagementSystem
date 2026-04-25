@@ -165,6 +165,12 @@ namespace Cinema.Web.Controllers
             }
         }
 
+        [HttpGet]
+        public IActionResult ForgotPassword()
+        {
+            return View();
+        }
+
         public IActionResult Logout()
         {
             HttpContext.Session.Clear();

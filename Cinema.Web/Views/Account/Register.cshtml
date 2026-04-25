@@ -4,61 +4,59 @@
     ViewData["Title"] = "Đăng ký thành viên";
 }
 
-<div class="container">
-    <div class="row justify-content-center align-items-center" style="min-height: 85vh;">
-        <div class="col-md-6">
-            <div class="card shadow-lg border-0" style="border-radius: 15px;">
-                <div class="card-body p-5">
-                    <div class="text-center mb-4">
-                        <h2 class="fw-bold text-success">TẠO TÀI KHOẢN</h2>
-                        <p class="text-muted">Gia nhập cộng đồng người yêu điện ảnh ngay hôm nay</p>
+<div class="gsap-hero" style="min-height: 100vh;">
+    <!-- Background image to match cinematic theme -->
+    <div class="gsap-hero-bg" style="background-image: url('https://images.unsplash.com/photo-1440404653325-ab127d49abc1?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'); filter: brightness(0.2);"></div>
+    <div class="glow-orb glow-orb-red" style="top: 10%; left: 10%;"></div>
+    <div class="glow-orb glow-orb-gold" style="bottom: 10%; right: 10%;"></div>
+
+    <div class="container position-relative z-2 py-5 mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-5 gsap-reveal-scale">
+                <div class="gsap-auth-card">
+                    <div class="text-center mb-5">
+                        <h2 class="gsap-section-title mb-2">TẠO TÀI KHOẢN</h2>
+                        <p class="text-muted">Gia nhập cộng đồng người yêu điện ảnh</p>
                     </div>
 
                     @if (ViewBag.Error != null)
                     {
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            <i class="bi bi-exclamation-octagon-fill"></i> @ViewBag.Error
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        <div class="alert alert-danger bg-danger text-white border-0 alert-dismissible fade show" role="alert" style="background-color: rgba(220, 53, 69, 0.8) !important;">
+                            <i class="bi bi-exclamation-octagon-fill me-2"></i> @ViewBag.Error
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     }
 
                     <form asp-controller="Account" asp-action="Register" method="post">
-                        <div class="row">
-                            <div class="col-md-12 mb-3">
-                                <div class="form-floating">
-                                    <input asp-for="HoTen" class="form-control" placeholder="Họ và tên" required>
-                                    <label asp-for="HoTen"><i class="bi bi-person-badge"></i> Họ và tên</label>
-                                </div>
-                            </div>
-
-                            <div class="col-md-12 mb-3">
-                                <div class="form-floating">
-                                    <input asp-for="Email" type="email" class="form-control" placeholder="Email" required>
-                                    <label asp-for="Email"><i class="bi bi-envelope"></i> Địa chỉ Email</label>
-                                </div>
-                            </div>
-
-                            <div class="col-md-12 mb-3">
-                                <div class="form-floating">
-                                    <input asp-for="TaiKhoan" class="form-control" placeholder="Tên đăng nhập" required>
-                                    <label asp-for="TaiKhoan"><i class="bi bi-person"></i> Tên đăng nhập</label>
-                                </div>
-                            </div>
-
-                            <div class="col-md-12 mb-4">
-                                <div class="form-floating">
-                                    <input asp-for="MatKhau" type="password" class="form-control" placeholder="Mật khẩu" required>
-                                    <label asp-for="MatKhau"><i class="bi bi-shield-lock"></i> Mật khẩu</label>
-                                </div>
-                            </div>
+                        <div class="form-floating mb-3">
+                            <input asp-for="HoTen" class="form-control" placeholder="Họ và tên" required>
+                            <label asp-for="HoTen"><i class="bi bi-person-badge me-2"></i> Họ và tên</label>
                         </div>
 
-                        <button type="submit" class="btn btn-success btn-lg w-100 fw-bold shadow-sm" style="border-radius: 10px;">
+                        <div class="form-floating mb-3">
+                            <input asp-for="Email" type="email" class="form-control" placeholder="Email" required>
+                            <label asp-for="Email"><i class="bi bi-envelope me-2"></i> Địa chỉ Email</label>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input asp-for="TaiKhoan" class="form-control" placeholder="Tên đăng nhập" required>
+                            <label asp-for="TaiKhoan"><i class="bi bi-person me-2"></i> Tên đăng nhập</label>
+                        </div>
+
+                        <div class="form-floating mb-4">
+                            <input asp-for="MatKhau" type="password" class="form-control" placeholder="Mật khẩu" required>
+                            <label asp-for="MatKhau"><i class="bi bi-shield-lock me-2"></i> Mật khẩu</label>
+                        </div>
+
+                        <button type="submit" class="btn-cinema-primary w-100 py-3 mb-4" style="font-size: 1.1rem;">
                             ĐĂNG KÝ NGAY
                         </button>
 
-                        <div class="text-center mt-4">
-                            <p class="small">Đã có tài khoản? <a asp-action="Login" class="text-success fw-bold text-decoration-none">Đăng nhập tại đây</a></p>
+                        <div class="text-center">
+                            <p class="small text-muted">
+                                Đã có tài khoản? 
+                                <a asp-action="Login" class="text-white fw-bold ms-1" style="text-decoration: none; border-bottom: 1px dashed var(--cinema-primary);">Đăng nhập</a>
+                            </p>
                         </div>
                     </form>
                 </div>

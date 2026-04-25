@@ -31,7 +31,7 @@ namespace Cinema.Web.Controllers
                 dsPhim = _phimBus.LayDanhSachPhimDangChieu();
                 
                 var cacheEntryOptions = new MemoryCacheEntryOptions()
-                    .SetAbsoluteExpiration(TimeSpan.FromMinutes(30)); // Cache 30 mins
+                    .SetAbsoluteExpiration(TimeSpan.FromMinutes(30));
                     
                 _cache.Set(cacheKey, dsPhim, cacheEntryOptions);
             }

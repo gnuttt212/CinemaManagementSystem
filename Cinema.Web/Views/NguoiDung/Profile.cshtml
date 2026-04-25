@@ -4,98 +4,123 @@
     ViewData["Title"] = "Thông tin cá nhân";
 }
 
-<div class="container mt-5 mb-5">
-    <div class="row">
-        <div class="col-md-4 mb-4">
-            <div class="card shadow border-0 rounded-4 p-3">
-                <div class="card-body text-center">
-                    <img src="https://ui-avatars.com/api/?name=@Model.HoTen&background=0D6EFD&color=fff&size=128"
-                         class="rounded-circle shadow mb-3" alt="Avatar" width="120">
+<!-- HERO BANNER -->
+<div class="gsap-hero" style="min-height: 35vh; margin-bottom: 2rem;">
+    <div class="gsap-hero-bg" style="background-image: url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'); filter: brightness(0.25);"></div>
+    <div class="gsap-hero-overlay"></div>
+    <div class="gsap-hero-content pt-5">
+        <h1 class="gsap-hero-title mb-0" style="font-size: clamp(2rem, 4vw, 3rem);">
+            <span class="line"><span class="line-inner text-white">HỒ SƠ <span class="highlight">CỦA BẠN</span></span></span>
+        </h1>
+        <p class="gsap-hero-subtitle mt-3 text-white">Quản lý thông tin cá nhân và xem lại lịch sử đặt vé</p>
+    </div>
+</div>
 
-                    <h4 class="fw-bold text-uppercase">@Model.HoTen</h4>
-                    <p class="text-muted mb-4">@@@Model.TaiKhoan</p>
+<div class="container mt-5 pt-5 mb-5">
+    <div class="row g-4">
+        <!-- CỘT THÔNG TIN NGƯỜI DÙNG -->
+        <div class="col-md-4 mb-4 gsap-reveal-left">
+            <div class="gsap-feature-card p-4 text-center">
+                <img src="https://ui-avatars.com/api/?name=@Model.HoTen&background=e50914&color=fff&size=128"
+                     class="rounded-circle shadow mb-4" alt="Avatar" width="120" style="border: 3px solid var(--cinema-border);">
 
-                    <div class="text-start bg-light p-3 rounded-3">
-                        <p class="mb-2 border-bottom pb-2">
-                            <i class="bi bi-envelope-at-fill text-primary me-2"></i>
-                            <strong>Email:</strong> <br />
-                            <span class="text-break">@Model.Email</span>
-                        </p>
-                        <p class="mb-2 border-bottom pb-2">
-                            <i class="bi bi-telephone-fill text-success me-2"></i>
-                            <strong>SĐT:</strong> <br />
-                            <span>@(Model.SDT ?? "Chưa cập nhật")</span>
-                        </p>
-                        <p class="mb-0">
-                            <i class="bi bi-star-fill text-warning me-2"></i>
-                            <strong>Điểm tích lũy:</strong> <br />
-                            <span class="fw-bold text-primary">@Model.DiemTichLuy điểm</span>
-                        </p>
+                <h4 class="fw-bold text-uppercase text-white">@Model.HoTen</h4>
+                <p class="text-muted mb-4">@@@Model.TaiKhoan</p>
+
+                <!-- KHU VỰC THÔNG TIN SỬA ĐỔI ĐỂ KHÔNG BỊ LÓA MẮT -->
+                <div class="text-start p-4 rounded-3 mb-4" style="background: rgba(255, 255, 255, 0.05); border: 1px solid var(--cinema-border);">
+                    <div class="mb-3 border-bottom border-secondary pb-3">
+                        <div class="d-flex align-items-center mb-1">
+                            <i class="bi bi-envelope-at-fill text-warning me-2"></i>
+                            <strong class="text-white">Email</strong>
+                        </div>
+                        <span class="text-muted text-break">@Model.Email</span>
                     </div>
-
-                    <a asp-controller="NguoiDung" asp-action="EditProfile" class="btn btn-outline-primary w-100 mt-4 rounded-pill fw-bold mb-2">
-                        <i class="bi bi-pencil-square me-2"></i> Chỉnh sửa hồ sơ
-                    </a>
-                    <a asp-controller="NguoiDung" asp-action="DoiMatKhau" class="btn btn-warning w-100 rounded-pill fw-bold shadow-sm text-dark">
-                        <i class="bi bi-shield-lock-fill me-2"></i> Đổi Mật Khẩu
-                    </a>
+                    
+                    <div class="mb-3 border-bottom border-secondary pb-3">
+                        <div class="d-flex align-items-center mb-1">
+                            <i class="bi bi-telephone-fill text-success me-2"></i>
+                            <strong class="text-white">Số điện thoại</strong>
+                        </div>
+                        <span class="text-muted">@(Model.SDT ?? "Chưa cập nhật")</span>
+                    </div>
+                    
+                    <div class="mb-0">
+                        <div class="d-flex align-items-center mb-1">
+                            <i class="bi bi-star-fill text-primary me-2"></i>
+                            <strong class="text-white">Điểm tích lũy</strong>
+                        </div>
+                        <span class="fs-5 fw-bold" style="color: var(--cinema-accent);">@Model.DiemTichLuy điểm</span>
+                    </div>
                 </div>
+
+                <a asp-controller="NguoiDung" asp-action="EditProfile" class="btn-cinema-primary w-100 mb-3 d-block py-2 text-decoration-none">
+                    <i class="bi bi-pencil-square me-2"></i> Chỉnh sửa hồ sơ
+                </a>
+                <a asp-controller="NguoiDung" asp-action="DoiMatKhau" class="btn-cinema-outline w-100 d-block py-2 text-decoration-none border-white text-white">
+                    <i class="bi bi-shield-lock-fill me-2"></i> Đổi Mật Khẩu
+                </a>
             </div>
         </div>
 
-        <div class="col-md-8">
+        <!-- CỘT LỊCH SỬ GIAO DỊCH -->
+        <div class="col-md-8 gsap-reveal-right">
             @if (TempData["SuccessMessage"] != null)
             {
-                <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm rounded-4" role="alert">
+                <div class="alert bg-success bg-opacity-25 text-success border-success mb-4 rounded-3" role="alert">
                     <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             }
-            <div class="card shadow border-0 rounded-4">
-                <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
-                    <h4 class="mb-0 fw-bold">
-                        <i class="bi bi-ticket-perforated-fill me-2 text-danger"></i>LỊCH SỬ ĐẶT VÉ
+
+            <div class="gsap-auth-card p-0 overflow-hidden" style="border-radius: var(--cinema-radius);">
+                <div class="card-header border-bottom py-4 px-4 d-flex justify-content-between align-items-center" style="background: rgba(255, 255, 255, 0.02); border-color: var(--cinema-border) !important;">
+                    <h4 class="mb-0 fw-bold text-white">
+                        <i class="bi bi-ticket-perforated-fill me-2" style="color: var(--cinema-primary);"></i>LỊCH SỬ ĐẶT VÉ
                     </h4>
-                    <span class="badge bg-secondary rounded-pill">@Model.LichSuHoaDon?.Count giao dịch</span>
+                    <span class="badge" style="background: rgba(229, 9, 20, 0.2); color: var(--cinema-primary); border: 1px solid rgba(229, 9, 20, 0.3); font-size: 0.9rem; padding: 8px 16px;">
+                        @Model.LichSuHoaDon?.Count giao dịch
+                    </span>
                 </div>
-                <div class="card-body">
+                
+                <div class="card-body p-0">
                     @if (Model.LichSuHoaDon != null && Model.LichSuHoaDon.Any())
                     {
                         <div class="table-responsive">
-                            <table class="table table-hover align-middle">
-                                <thead class="table-light text-uppercase small fw-bold text-muted">
-                                    <tr>
-                                        <th>Mã HD</th>
-                                        <th>Thời gian</th>
-                                        <th class="text-end">Tổng tiền</th>
-                                        <th class="text-center">Trạng thái</th>
-                                        <th class="text-center">Hành động</th>
+                            <table class="table table-borderless table-hover align-middle mb-0" style="color: var(--cinema-text);">
+                                <thead style="background: rgba(255, 255, 255, 0.05); border-bottom: 1px solid var(--cinema-border);">
+                                    <tr class="text-uppercase small fw-bold text-muted">
+                                        <th class="ps-4 py-3">Mã HD</th>
+                                        <th class="py-3">Thời gian</th>
+                                        <th class="text-end py-3">Tổng tiền</th>
+                                        <th class="text-center py-3">Trạng thái</th>
+                                        <th class="text-center pe-4 py-3">Hành động</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach (var hd in Model.LichSuHoaDon.OrderByDescending(x => x.NgayDat))
                                     {
-                                        <tr>
-                                            <td class="fw-bold">#@hd.MaHD</td>
+                                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.05); transition: background-color 0.2s;">
+                                            <td class="fw-bold ps-4 text-white">#@hd.MaHD</td>
                                             <td>
-                                                <div class="fw-bold">@hd.NgayDat?.ToString("dd/MM/yyyy")</div>
+                                                <div class="fw-bold text-white">@hd.NgayDat?.ToString("dd/MM/yyyy")</div>
                                                 <div class="small text-muted">@hd.NgayDat?.ToString("HH:mm")</div>
                                             </td>
-                                            <td class="text-end text-danger fw-bold">
+                                            <td class="text-end fw-bold" style="color: var(--cinema-accent);">
                                                 @hd.TongTien?.ToString("N0") đ
                                             </td>
                                             <td class="text-center">
                                                 @{
                                                     var badgeClass = hd.TrangThai == "Đã thanh toán" 
-                                                        ? "bg-success-subtle text-success border-success-subtle" 
-                                                        : "bg-warning-subtle text-warning border-warning-subtle";
+                                                        ? "bg-success bg-opacity-25 text-success border border-success border-opacity-25" 
+                                                        : "bg-warning bg-opacity-25 text-warning border border-warning border-opacity-25";
                                                 }
-                                                <span class="badge @badgeClass border rounded-pill px-3">@(hd.TrangThai ?? "N/A")</span>
+                                                <span class="badge rounded-pill px-3 py-2 @badgeClass">@(hd.TrangThai ?? "N/A")</span>
                                             </td>
-                                            <td class="text-center">
+                                            <td class="text-center pe-4">
                                                 <a asp-controller="HoaDon" asp-action="ThanhToanThanhCong" asp-route-id="@hd.MaHD"
-                                                   class="btn btn-sm btn-primary rounded-pill px-3 shadow-sm">
-                                                    <i class="bi bi-qr-code-scan"></i> Xem vé
+                                                   class="btn btn-sm btn-outline-light rounded-pill px-3" style="font-size: 0.85rem;">
+                                                    <i class="bi bi-qr-code-scan me-1"></i> Xem vé
                                                 </a>
                                             </td>
                                         </tr>
@@ -106,10 +131,10 @@
                     }
                     else
                     {
-                        <div class="text-center py-5">
-                            <i class="bi bi-cart-x text-muted display-1"></i>
-                            <p class="mt-3 text-muted fs-5">Bạn chưa thực hiện giao dịch nào.</p>
-                            <a asp-controller="Phim" asp-action="Index" class="btn btn-primary rounded-pill px-4 shadow">
+                        <div class="text-center py-5 px-3">
+                            <i class="bi bi-cart-x text-muted display-1 opacity-50"></i>
+                            <p class="mt-4 text-muted fs-5">Bạn chưa thực hiện giao dịch nào.</p>
+                            <a asp-controller="Phim" asp-action="Index" class="btn-cinema-primary d-inline-block mt-3 px-4 py-2" style="text-decoration: none;">
                                 <i class="bi bi-play-circle me-2"></i>Đặt vé ngay
                             </a>
                         </div>
@@ -120,33 +145,8 @@
     </div>
 </div>
 
-@section Styles {
-    <style>
-        body {
-            background-color: #f8f9fa;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        .card {
-            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-        }
-
-            .card:hover {
-                transform: translateY(-3px);
-                box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
-            }
-
-        .table thead th {
-            border-bottom: none;
-            letter-spacing: 0.5px;
-        }
-
-        .badge {
-            font-weight: 500;
-        }
-
-        tbody tr:first-child {
-            background-color: rgba(13, 110, 253, 0.03);
-        }
-    </style>
-}
+<style>
+    .table-hover tbody tr:hover {
+        background-color: rgba(255, 255, 255, 0.05);
+    }
+</style>
