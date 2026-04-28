@@ -8,11 +8,11 @@
 
 - **Xác thực hiện đại:** Đăng ký, đăng nhập tài khoản an toàn (mật khẩu mã hóa BCrypt), hỗ trợ **đăng nhập một chạm bằng Google OAuth 2.0**.
 - **Đặt vé mượt mà:** Xem danh sách phim đang chiếu, sắp chiếu (tải cực nhanh nhờ **IMemoryCache**). Lọc lịch chiếu trực quan theo ngày/giờ.
-- **Sơ đồ ghế động:** Chọn ghế với sơ đồ phòng chiếu tự động sinh theo sức chứa thực tế.
+- **Sơ đồ ghế động:** Chọn ghế với sơ đồ phòng chiếu tự động sinh theo sức chứa thực tế và **đồng bộ hóa khóa ghế realtime bằng SignalR**.
 - **Dịch vụ đi kèm:** Chọn bắp, nước, combo dễ dàng.
 - **Thanh toán trực tuyến:** Tích hợp cổng thanh toán **VNPay Sandbox** an toàn, nhanh chóng.
 - **Vé điện tử (E-Ticket):** Nhận ngay vé điện tử kèm **mã QR** sau khi thanh toán thành công.
-- **Cá nhân hóa:** Quản lý hồ sơ cá nhân, lịch sử giao dịch và đổi mật khẩu an toàn.
+- **Cá nhân hóa:** Quản lý hồ sơ cá nhân qua menu điều hướng trực quan, xem lịch sử giao dịch và đổi mật khẩu an toàn. Giao diện được tối ưu trải nghiệm người dùng với các hoạt ảnh mượt mà bằng **GSAP**.
 
 ### Dành cho Quản trị viên (Admin)
 
@@ -37,7 +37,8 @@
 | **Cơ sở dữ liệu**        | Microsoft SQL Server (T-SQL)                                    |
 | **Data Access**          | Entity Framework Core 8.0, ADO.NET (`SqlDataReader`, `DataSet`) |
 | **Truy vấn & Export**    | LINQ to Objects, LINQ to Entities, LINQ to XML                  |
-| **Giao diện (UI)**       | Razor Views, Bootstrap 5, jQuery, SweetAlert2, Chart.js         |
+| **Giao diện (UI)**       | Razor Views, Bootstrap 5, jQuery, SweetAlert2, Chart.js, GSAP   |
+| **Real-time**            | SignalR                                                         |
 | **Bảo mật & Thanh toán** | BCrypt.Net, Google OAuth 2.0, VNPay API                         |
 | **Tối ưu & Báo cáo**     | IMemoryCache, ClosedXML (Xuất Excel)                            |
 | **Kiểm thử (Testing)**   | xUnit, Moq (20 Unit Tests bao phủ tầng BUS)                     |

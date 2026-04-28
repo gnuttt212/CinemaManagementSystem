@@ -166,13 +166,13 @@ BoldItalicFont=Times New Roman Bold Italic.ttf,
 
 Đồ án này trình bày quá trình thiết kế và xây dựng hệ thống Quản lý Rạp Phim --- một ứng dụng web cho phép quản lý phim, suất chiếu, đặt vé trực tuyến và thanh toán. Hệ thống được xây dựng trên nền tảng \textbf{ASP.NET Core MVC (.NET 8)} với kiến trúc \textbf{3 lớp} (Presentation -- Business Logic -- Data Access), sử dụng \textbf{Entity Framework Core} kết hợp \textbf{ADO.NET} và cơ sở dữ liệu \textbf{SQL Server (T-SQL)}.
 
-Người dùng cuối có thể duyệt danh sách phim, chọn suất chiếu trực quan qua bộ lọc ngày tháng, chọn ghế ngồi với cơ chế \textbf{sinh ghế động}, thêm dịch vụ bắp nước/combo, xác nhận \textbf{thanh toán trực tuyến qua cổng VNPay} và nhận vé điện tử (E-Ticket) kèm mã QR. Để tăng trải nghiệm, hệ thống hỗ trợ \textbf{đăng nhập một chạm qua Google OAuth 2.0} và tối ưu hóa hiệu năng bằng \textbf{IMemoryCache}. Phía quản trị viên có thể quản lý toàn bộ danh mục phim, phòng chiếu, suất chiếu, dịch vụ, xuất \textbf{báo cáo doanh thu ra file Excel (ClosedXML)} và xem biểu đồ Chart.js trực quan. Hệ thống cũng được đảm bảo chất lượng thông qua việc \textbf{viết Unit Test bằng xUnit và Moq}.
+Người dùng cuối có thể duyệt danh sách phim, chọn suất chiếu trực quan qua bộ lọc ngày tháng, chọn ghế ngồi với cơ chế \textbf{sinh ghế động} và \textbf{khóa ghế theo thời gian thực bằng SignalR}, thêm dịch vụ bắp nước/combo, xác nhận \textbf{thanh toán trực tuyến qua cổng VNPay} và nhận vé điện tử (E-Ticket) kèm mã QR. Để tăng trải nghiệm, hệ thống hỗ trợ \textbf{đăng nhập một chạm qua Google OAuth 2.0}, giao diện hiện đại với \textbf{GSAP Animation}, điều hướng hồ sơ người dùng trực quan, và tối ưu hóa hiệu năng bằng \textbf{IMemoryCache}. Phía quản trị viên có thể quản lý toàn bộ danh mục phim, phòng chiếu, suất chiếu, dịch vụ, xuất \textbf{báo cáo doanh thu ra file Excel (ClosedXML)} và xem biểu đồ Chart.js trực quan. Hệ thống cũng được đảm bảo chất lượng thông qua việc \textbf{viết Unit Test bằng xUnit và Moq}.
 
 Ngoài ra, hệ thống phát triển \textbf{RESTful Web API} với đầy đủ các endpoint CRUD, hỗ trợ export/import dữ liệu qua định dạng XML sử dụng \textbf{LINQ to XML}. Mật khẩu người dùng được mã hóa bảo mật toàn diện bằng thuật toán an toàn tuyệt đối BCrypt.
 
 Báo cáo được tổ chức theo các chương: Chương 1 trình bày tổng quan hệ thống; Chương 2 phân tích và thiết kế cơ sở dữ liệu T-SQL; Chương 3 mô tả kiến trúc phần mềm 3 lớp; Chương 4 trình bày các kỹ thuật triển khai bao gồm Entity Framework, LINQ, ADO.NET (DataSet/DataAdapter), LINQ to XML và Web API; Chương 5 kết luận và hướng phát triển.
 
-\noindent{\textbf{Từ khóa:}} ASP.NET Core MVC, Entity Framework Core, SQL Server T-SQL, ADO.NET, LINQ, LINQ to XML, RESTful Web API, Kiến trúc 3 lớp, Quản lý rạp phim, xUnit, BCrypt, VNPay, Google OAuth 2.0.
+\noindent{\textbf{Từ khóa:}} ASP.NET Core MVC, Entity Framework Core, SQL Server T-SQL, ADO.NET, LINQ, LINQ to XML, RESTful Web API, Kiến trúc 3 lớp, Quản lý rạp phim, xUnit, BCrypt, VNPay, Google OAuth 2.0, SignalR, GSAP.
 
 \newpage
 \tableofcontents
@@ -210,7 +210,7 @@ Báo cáo được tổ chức theo các chương: Chương 1 trình bày tổng
 \noindent Hệ thống Quản lý Rạp Phim cung cấp hai nhóm chức năng chính:
 
 \begin{itemize}
-    \item \textbf{Khách hàng:} Đăng ký, \textbf{đăng nhập bằng Google}, duyệt danh sách phim (tốc độ cao nhờ Caching), chọn suất chiếu, chọn ghế, thêm dịch vụ, \textbf{thanh toán qua ví điện tử VNPay} và nhận E-Ticket có mã QR. Sau khi đăng nhập, người dùng có thể cập nhật Profile và đổi mật khẩu.
+    \item \textbf{Khách hàng:} Đăng ký, \textbf{đăng nhập bằng Google}, duyệt danh sách phim (tốc độ cao nhờ Caching), chọn suất chiếu, chọn ghế (tích hợp \textbf{SignalR} khóa ghế realtime), thêm dịch vụ, \textbf{thanh toán qua ví điện tử VNPay} và nhận E-Ticket có mã QR. Sau khi đăng nhập, người dùng có thể cập nhật Profile qua menu điều hướng trực quan và đổi mật khẩu. Giao diện được tạo hiệu ứng mượt mà với \textbf{GSAP}.
     \item \textbf{Quản trị viên:} Quản lý phim, quản lý \textbf{phòng chiếu (với cơ chế sinh ghế động theo sức chứa)}, quản lý suất chiếu (tự động tính giờ kết thúc), quản lý dịch vụ bắp nước, xem báo cáo doanh thu và \textbf{xuất báo cáo ra file Excel}.
 \end{itemize}
 
@@ -240,7 +240,9 @@ Báo cáo được tổ chức theo các chương: Chương 1 trình bày tổng
             \hline
             Cơ sở dữ liệu     & Microsoft SQL Server Express 2019+ \\
             \hline
-            Frontend           & Razor View, Bootstrap 5.3.2, jQuery 3.7.1 \\
+            Frontend           & Razor View, Bootstrap 5.3.2, jQuery 3.7.1, GSAP \\
+            \hline
+            Real-time          & SignalR \\
             \hline
             Biểu đồ            & Chart.js (latest) \\
             \hline
@@ -916,14 +918,14 @@ public static T Get<T>(this ISession session, string key)
     \item \textbf{Công nghệ \& Tối ưu:} Tích hợp \textbf{IMemoryCache} để tăng tốc load danh sách phim, xuất báo cáo ra file Excel với thư viện \textbf{ClosedXML}, kiểm thử mã nguồn với \textbf{xUnit và Moq} (hoàn thành 20 Unit Tests bao phủ tầng BUS: PhimBUS, DoAnBUS, NhanVienBUS, PhongChieuBUS).
     \item \textbf{ADO.NET \& LINQ:} Triển khai cả mô hình kết nối và phi kết nối (\texttt{DataSet}, \texttt{SqlDataReader}). Sử dụng LINQ to XML cho tính năng Export/Import.
     \item \textbf{Web API RESTful:} 3 Controller API trả dữ liệu JSON chuẩn REST.
-    \item \textbf{Tính năng người dùng:} \textbf{Đăng nhập một chạm bằng Google OAuth 2.0}, đặt vé với hệ thống phòng chiếu \textbf{sinh sơ đồ ghế động}, \textbf{thanh toán trực tuyến bằng cổng VNPay Sandbox}, E-Ticket có mã QR.
+    \item \textbf{Tính năng người dùng:} \textbf{Đăng nhập một chạm bằng Google OAuth 2.0}, đặt vé với hệ thống phòng chiếu \textbf{sinh sơ đồ ghế động}, đồng bộ hóa khóa ghế realtime bằng \textbf{SignalR}, \textbf{thanh toán trực tuyến bằng cổng VNPay Sandbox}, E-Ticket có mã QR.
+    \item \textbf{Giao diện (UI/UX):} Ứng dụng công nghệ \textbf{GSAP} mang lại trải nghiệm hoạt ảnh mượt mà, kết hợp hệ thống điều hướng hồ sơ người dùng (User Profile Navigation) trực quan.
     \item \textbf{Bảo mật hệ thống:} Mã hóa mật khẩu người dùng bằng thư viện \textbf{BCrypt}.
 \end{itemize}
 
 \noindent\textbf{Hướng phát triển tiếp theo:}
 
 \begin{itemize}
-    \item Áp dụng \textbf{SignalR} để đồng bộ hóa việc đặt ghế theo thời gian thực (tránh trùng ghế khi nhiều người mua cùng lúc).
     \item Áp dụng \textbf{JWT Authentication} thay thế Session để hỗ trợ REST API cho ứng dụng mobile.
     \item Container hóa hệ thống bằng \textbf{Docker} và triển khai CI/CD trên GitHub Actions.
 \end{itemize}
