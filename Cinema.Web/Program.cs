@@ -8,6 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddMemoryCache();
+builder.Services.AddSignalR();
 
 builder.Services.AddDbContext<QuanLyRapPhimContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -58,6 +59,8 @@ app.UseSession();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.MapHub<Cinema.Web.Hubs.SeatHub>("/seatHub");
 
 app.MapControllerRoute(
     name: "MyAreas",

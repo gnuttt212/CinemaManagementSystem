@@ -7,18 +7,26 @@
 ### Dành cho Khách hàng
 
 - **Xác thực hiện đại:** Đăng ký, đăng nhập tài khoản an toàn (mật khẩu mã hóa BCrypt), hỗ trợ **đăng nhập một chạm bằng Google OAuth 2.0**.
-- **Đặt vé mượt mà:** Xem danh sách phim đang chiếu, sắp chiếu (tải cực nhanh nhờ **IMemoryCache**). Lọc suất chiếu trực quan theo ngày/giờ.
+- **Đặt vé mượt mà:** Xem danh sách phim đang chiếu, sắp chiếu (tải cực nhanh nhờ **IMemoryCache**). Lọc lịch chiếu trực quan theo ngày/giờ.
 - **Sơ đồ ghế động:** Chọn ghế với sơ đồ phòng chiếu tự động sinh theo sức chứa thực tế.
 - **Dịch vụ đi kèm:** Chọn bắp, nước, combo dễ dàng.
 - **Thanh toán trực tuyến:** Tích hợp cổng thanh toán **VNPay Sandbox** an toàn, nhanh chóng.
 - **Vé điện tử (E-Ticket):** Nhận ngay vé điện tử kèm **mã QR** sau khi thanh toán thành công.
 - **Cá nhân hóa:** Quản lý hồ sơ cá nhân, lịch sử giao dịch và đổi mật khẩu an toàn.
 
-### Dành cho Quản trị viên (Admin) / Nhân viên
+### Dành cho Quản trị viên (Admin)
 
 - **Quản lý danh mục:** Toàn quyền thêm, sửa, xóa Phim (hỗ trợ upload ảnh), Dịch vụ (đồ ăn/thức uống).
-- **Quản lý Phòng chiếu & Suất chiếu:** Thiết lập phòng chiếu (tự sinh sơ đồ ghế), sắp xếp lịch chiếu thông minh (tự động tính toán giờ kết thúc dựa trên thời lượng phim).
+- **Quản lý Phòng chiếu & Lịch chiếu:** Thiết lập phòng chiếu (tự sinh sơ đồ ghế), sắp xếp lịch chiếu thông minh (tự động tính toán giờ kết thúc dựa trên thời lượng phim).
+- **Quản lý Nhân viên & Khách hàng:** CRUD nhân viên, xem/sửa/xóa thông tin khách hàng.
+- **Quản lý Khuyến mãi:** Tạo và quản lý chương trình khuyến mãi (% giảm giá, điều kiện, thời hạn).
 - **Thống kê & Báo cáo:** Xem dashboard tổng quan, biểu đồ doanh thu theo phim trực quan (Chart.js) và **xuất báo cáo ra file Excel** (ClosedXML).
+
+### Dành cho Nhân viên
+
+- **Dashboard riêng:** Khu vực quản lý riêng biệt cho nhân viên.
+- **Quản lý nội dung:** Quản lý phim, lịch chiếu, dịch vụ trong phạm vi quyền hạn.
+- **Xem báo cáo:** Theo dõi doanh thu.
 
 ## Công nghệ sử dụng
 
@@ -38,16 +46,22 @@
 
 ```text
 CinemaManagementSystem/
-├── Cinema.DAL/            # Data Access Layer (EF Core DbContext, Models, ADO.NET)
-├── Cinema.BUS/            # Business Logic Layer (xử lý nghiệp vụ, Interface + Impl)
+├── Cinema.DAL/            # Data Access Layer (EF Core DbContext, 12 Models, ADO.NET)
+│   ├── Models/            # Entity classes + QuanLyRapPhimContext
+│   ├── AdoNet/            # ICinemaAdoNetDAL + CinemaAdoNetDAL
+│   └── Migrations/        # EF Core Migrations (Code First cho NhatKyHeThong)
+├── Cinema.BUS/            # Business Logic Layer (7 Interface + 7 Implementation)
 ├── Cinema.DTO/            # Data Transfer Objects (trao đổi giữa các lớp)
 ├── Cinema.Web/            # Presentation Layer (ASP.NET Core MVC + RESTful Web API)
+│   ├── Controllers/       # 6 Controller chính (Account, Phim, HoaDon, ...)
+│   ├── ApiControllers/    # 3 RESTful API (PhimApi, DichVuApi, LichChieuApi)
 │   ├── Areas/
-│   │   ├── Admin/         # Khu vực Quản lý
-│   │   └── NhanVien/      # Khu vực Nhân viên
-│   └── ApiControllers/    # Web API endpoints
-├── Cinema.Tests/          # Unit Testing (xUnit + Moq, 20 test cases bao phủ tầng BUS)
-└── DatabaseScripts/       # T-SQL Scripts hợp nhất duy nhất
+│   │   ├── Admin/         # Khu vực Quản lý (8 Controllers)
+│   │   └── NhanVien/      # Khu vực Nhân viên (5 Controllers)
+│   └── Views/             # Razor Views
+├── Cinema.Tests/          # Unit Testing (xUnit + Moq, 20 test cases)
+├── DatabaseScripts/       # T-SQL Scripts hợp nhất duy nhất
+└── HashTool/              # Công cụ tạo hash BCrypt
 ```
 
 ## Các kỹ thuật T-SQL & CSDL trọng tâm
@@ -99,11 +113,17 @@ CinemaManagementSystem/
    dotnet run
    ```
 
-6. **Đường dẫn truy cập**
+6. **Chạy Unit Tests**
+
+   ```bash
+   dotnet test Cinema.Tests
+   ```
+
+7. **Đường dẫn truy cập**
    - **Khách hàng:** `https://localhost:7059/`
    - **Admin:** `https://localhost:7059/Admin` (Tài khoản/Mật khẩu nằm trong file Script)
    - **Nhân viên:** `https://localhost:7059/NhanVien`
 
 ---
 
-_Được phát triển bởi Trần Thanh Tung và các cộng sự (Năm học 2025-2026)._
+_Được phát triển bởi Trần Thanh Tung — MSSV: 2351010232 (Năm học 2025-2026)._

@@ -79,7 +79,6 @@ namespace Cinema.Web.Controllers
             if (cart == null || cart.DanhSachGhe == null || !cart.DanhSachGhe.Any())
                 return Json(new { success = false, message = "Giỏ hàng của bạn đang trống!" });
 
-            // Lưu hóa đơn với trạng thái "Chờ thanh toán"
             int maHD = _hoaDonBus.LuuDonChuaThanhToan(cart, userAccount);
 
             if (maHD <= 0)
@@ -89,10 +88,8 @@ namespace Cinema.Web.Controllers
                 return Json(new { success = false, message = "Lưu hóa đơn thất bại!" });
             }
 
-            // Xóa giỏ hàng
             HttpContext.Session.Remove("GioHang");
 
-            // Tạo URL thanh toán VNPay
             string vnpUrl = TaoUrlVnPay(maHD, cart.TongTien, cart.TenPhim);
 
             return Json(new { success = true, redirectUrl = vnpUrl });
@@ -122,13 +119,11 @@ namespace Cinema.Web.Controllers
             {
                 if (isValid && vnpResponseCode == "00")
                 {
-                    // Thanh toán thành công
                     _hoaDonBus.CapNhatTrangThaiHoaDon(maHD, "Đã thanh toán");
                     return RedirectToAction("ThanhToanThanhCong", new { id = maHD });
                 }
                 else
                 {
-                    // Thanh toán thất bại - hủy hóa đơn
                     _hoaDonBus.CapNhatTrangThaiHoaDon(maHD, "Thanh toán thất bại");
                     ViewBag.Message = "Thanh toán VNPay không thành công. Mã lỗi: " + vnpResponseCode;
                     return View("VnPayFail");
@@ -160,7 +155,7 @@ namespace Cinema.Web.Controllers
             vnPay.AddRequestData("vnp_Version", "2.1.0");
             vnPay.AddRequestData("vnp_Command", "pay");
             vnPay.AddRequestData("vnp_TmnCode", vnpTmnCode);
-            vnPay.AddRequestData("vnp_Amount", ((long)(tongTien * 100)).ToString()); // VNPay tính theo đơn vị nhỏ nhất (x100)
+            vnPay.AddRequestData("vnp_Amount", ((long)(tongTien * 100)).ToString()); 
             vnPay.AddRequestData("vnp_CreateDate", DateTime.Now.ToString("yyyyMMddHHmmss"));
             vnPay.AddRequestData("vnp_CurrCode", "VND");
             vnPay.AddRequestData("vnp_IpAddr", HttpContext.Connection.RemoteIpAddress?.MapToIPv4().ToString() ?? "127.0.0.1");

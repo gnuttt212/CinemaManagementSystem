@@ -86,7 +86,6 @@ namespace Cinema.Web.Controllers
 
                 if (!string.IsNullOrEmpty(email))
                 {
-                    // Tìm hoặc tạo tài khoản khách hàng từ email Google
                     var khachHang = _khachHangBus.DangNhapGoogle(email, name ?? email);
 
                     if (khachHang != null)
@@ -120,49 +119,6 @@ namespace Cinema.Web.Controllers
                 ModelState.AddModelError("", "Tài khoản đã tồn tại hoặc có lỗi xảy ra!");
             }
             return View(req);
-        }
-
-        [HttpGet]
-        public IActionResult ResetData([FromServices] Cinema.DAL.Models.QuanLyRapPhimContext _db)
-        {
-            try
-            {
-                
-                _db.Database.ExecuteSqlRaw("DELETE FROM ChiTietHoaDon");
-                _db.Database.ExecuteSqlRaw("DELETE FROM ChiTietDoAn");
-                _db.Database.ExecuteSqlRaw("DELETE FROM HoaDon");
-                _db.Database.ExecuteSqlRaw("DELETE FROM KhachHang");
-                _db.Database.ExecuteSqlRaw("DELETE FROM NhanVien");
-
-                string defaultPassword = BCrypt.Net.BCrypt.HashPassword("123456");
-
-                
-                _db.NhanViens.Add(new Cinema.DAL.Models.NhanVien
-                {
-                    TaiKhoan = "admin",
-                    MatKhau = defaultPassword,
-                    HoTen = "Quản Trị Hệ Thống",
-                    ChucVu = "Giám Đốc",
-                    PhanQuyen = "Admin"
-                });
-
-                
-                _db.NhanViens.Add(new Cinema.DAL.Models.NhanVien
-                {
-                    TaiKhoan = "staff",
-                    MatKhau = defaultPassword,
-                    HoTen = "Nhân Viên Bán Vé",
-                    ChucVu = "Nhân Viên",
-                    PhanQuyen = "NhanVien"
-                });
-
-                _db.SaveChanges();
-                return Content("Đã reset và tạo lại dữ liệu tài khoản thành công! Mật khẩu mặc định: 123456");
-            }
-            catch (Exception ex)
-            {
-                return Content("Có lỗi xảy ra (có thể do ràng buộc khóa ngoại): " + ex.Message);
-            }
         }
 
         [HttpGet]

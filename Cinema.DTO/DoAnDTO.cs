@@ -10,4 +10,10 @@ namespace Cinema.DTO
         public int SoLuong { get; set; } = 0;
         public decimal ThanhTien => Gia * SoLuong;
     }
+
+    public class DoAnChonDTO
+    {
+        public int MaDoAn { get; set; }
+        public int SoLuong { get; set; }
+    }
 }

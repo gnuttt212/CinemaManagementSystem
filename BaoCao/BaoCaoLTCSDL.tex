@@ -121,15 +121,13 @@ BoldItalicFont=Times New Roman Bold Italic.ttf,
 \vskip0.3cm
 
 \begin{center}
-\textbf{Thành viên}
+\textbf{Sinh vi\^en th\d{u}c hi\d{e}n}
 \end{center}
 
 \vskip0.6cm
 
 \begin{center}
-\textbf{Trần Thanh Tung}\\
-\textbf{Họ Đệm Tên 2}\\
-\textbf{Họ Đệm Tên 3}
+\textbf{Trần Thanh Tung}
 \end{center}
 
 \vskip3.5cm
@@ -154,7 +152,7 @@ BoldItalicFont=Times New Roman Bold Italic.ttf,
 \begin{table}[h]
     \begin{tabular}{ll}
         Tên đồ án       & Hệ thống Quản lý Rạp Phim (Cinema Management System) \\
-        Thành viên      & Trần Thanh Tung \\
+        Sinh viên       & Trần Thanh Tung (MSSV: 2351010232) \\
         Môn học:        & Lập trình Cơ sở dữ liệu \\
         Người hướng dẫn & ThS. Phạm Hoàng An \\
         Năm học         & 2025-2026 \\
@@ -174,7 +172,7 @@ Ngoài ra, hệ thống phát triển \textbf{RESTful Web API} với đầy đ�
 
 Báo cáo được tổ chức theo các chương: Chương 1 trình bày tổng quan hệ thống; Chương 2 phân tích và thiết kế cơ sở dữ liệu T-SQL; Chương 3 mô tả kiến trúc phần mềm 3 lớp; Chương 4 trình bày các kỹ thuật triển khai bao gồm Entity Framework, LINQ, ADO.NET (DataSet/DataAdapter), LINQ to XML và Web API; Chương 5 kết luận và hướng phát triển.
 
-\noindent{\textbf{Từ khóa:}} ASP.NET Core MVC, Entity Framework Core, SQL Server T-SQL, ADO.NET, LINQ, LINQ to XML, RESTful Web API, Kiến trúc 3 lớp, Quản lý rạp phim.
+\noindent{\textbf{Từ khóa:}} ASP.NET Core MVC, Entity Framework Core, SQL Server T-SQL, ADO.NET, LINQ, LINQ to XML, RESTful Web API, Kiến trúc 3 lớp, Quản lý rạp phim, xUnit, BCrypt, VNPay, Google OAuth 2.0.
 
 \newpage
 \tableofcontents
@@ -196,15 +194,11 @@ Báo cáo được tổ chức theo các chương: Chương 1 trình bày tổng
 
 \begin{table}[H]
     \begin{center}
-        \begin{tabular}{|c|l|l|c|}
+        \begin{tabular}{|c|l|l|}
             \hline
-            \textbf{MSSV} & \textbf{Họ tên} & \textbf{Nhiệm vụ} & \textbf{Ghi chú} \\
+            \textbf{MSSV} & \textbf{Họ tên} & \textbf{Nhiệm vụ} \\
             \hline
-            2351010232 & Trần Thanh Tung & Backend -- BUS \& DAL Layer, API & \\
-            \hline
-            & Họ Đệm Tên 2 & Thiết kế CSDL, T-SQL & \\
-            \hline
-            & Họ Đệm Tên 3 & Frontend -- Razor Views, Admin UI & \\
+            2351010232 & Trần Thanh Tung & Toàn bộ hệ thống (Full-stack) \\
             \hline
         \end{tabular}
     \end{center}
@@ -266,7 +260,7 @@ Báo cáo được tổ chức theo các chương: Chương 1 trình bày tổng
 \section{Sơ đồ thực thể mối quan hệ (ERD)}\label{Sec2.1}
 
 \begin{de}\label{def1}
-    \textbf{Các thực thể chính} trong hệ thống bao gồm: \texttt{NhanVien}, \texttt{KhachHang}, \texttt{Phim}, \texttt{PhongChieu}, \texttt{LichChieu}, \texttt{Ghe}, \texttt{HoaDon}, \texttt{ChiTietHoaDon}, \texttt{DoAn} và \texttt{ChiTietDoAn}. Mỗi thực thể ánh xạ tương ứng với một bảng trong cơ sở dữ liệu \texttt{QuanLyRapPhim}. Toàn bộ ánh xạ này được thể hiện trong \texttt{QuanLyRapPhimContext.cs} thông qua phương thức \texttt{OnModelCreating()}.
+    \textbf{Các thực thể chính} trong hệ thống bao gồm: \texttt{NhanVien}, \texttt{KhachHang}, \texttt{Phim}, \texttt{PhongChieu}, \texttt{LichChieu}, \texttt{Ghe}, \texttt{HoaDon}, \texttt{ChiTietHoaDon}, \texttt{DoAn}, \texttt{ChiTietDoAn}, \texttt{KhuyenMai} và \texttt{NhatKyHeThong}. Mỗi thực thể ánh xạ tương ứng với một bảng trong cơ sở dữ liệu \texttt{QuanLyRapPhim}. Toàn bộ ánh xạ này được thể hiện trong \texttt{QuanLyRapPhimContext.cs} thông qua phương thức \texttt{OnModelCreating()}.
 \end{de}
 
 \vspace{0.5cm}
@@ -298,6 +292,10 @@ Báo cáo được tổ chức theo các chương: Chương 1 trình bày tổng
             DoAn        & MaDoAn       & Dịch vụ bắp nước, đồ ăn \\
             \hline
             ChiTietDoAn & (MaHD, MaDoAn) & Chi tiết đồ ăn trong hóa đơn \\
+            \hline
+            KhuyenMai   & MaKM         & Chương trình khuyến mãi (tên, \% giảm, điều kiện, thời hạn) \\
+            \hline
+            NhatKyHeThong & MaNhatKy   & Nhật ký hoạt động hệ thống (Code First) \\
             \hline
         \end{tabular}
     \end{center}
@@ -481,6 +479,8 @@ public int LuuVaThanhToan(CartItemDTO cart, string username)
             \hline
             \textbf{Controller} & \textbf{Chức năng} \\
             \hline
+            \multicolumn{2}{|c|}{\textit{Khu vực Khách hàng (Controllers/)}} \\
+            \hline
             \texttt{AccountController}           & Đăng nhập, đăng nhập bằng Google OAuth, đăng ký, đăng xuất \\
             \hline
             \texttt{PhimController}              & Danh sách phim, tìm kiếm, chi tiết, chọn ghế \\
@@ -489,19 +489,37 @@ public int LuuVaThanhToan(CartItemDTO cart, string username)
             \hline
             \texttt{NguoiDungController}         & Hồ sơ (Profile), cập nhật thông tin, đổi mật khẩu \\
             \hline
-            \texttt{DoAnController}            & Danh sách dịch vụ bắp nước/combo \\
+            \texttt{DichVuController}            & Danh sách dịch vụ bắp nước/combo \\
+            \hline
+            \multicolumn{2}{|c|}{\textit{Khu vực Quản trị (Areas/Admin/Controllers/)}} \\
             \hline
             \texttt{Admin/PhimController}        & Quản trị phim: CRUD + upload ảnh lên \texttt{/images/phim/} \\
             \hline
             \texttt{Admin/PhongChieuController}  & Quản trị phòng chiếu: CRUD, tự động sinh sơ đồ ghế \\
             \hline
-            \texttt{Admin/SuatChieuController}   & Quản trị suất chiếu: CRUD, tự tính giờ kết thúc \\
+            \texttt{Admin/SuatChieuController}   & Quản trị lịch chiếu: CRUD, tự tính giờ kết thúc \\
             \hline
-            \texttt{Admin/DoAnController}      & Quản trị dịch vụ: CRUD \\
+            \texttt{Admin/DichVuController}      & Quản trị dịch vụ đồ ăn/nước uống: CRUD \\
             \hline
             \texttt{Admin/DoanhThuController}    & Báo cáo doanh thu qua biểu đồ Chart.js và xuất file Excel \\
             \hline
             \texttt{Admin/HomeController}        & Dashboard: tổng phim, vé bán, doanh thu, khách hàng \\
+            \hline
+            \texttt{Admin/KhachHangController}   & Quản lý khách hàng: xem, sửa, xóa \\
+            \hline
+            \texttt{Admin/NhanVienController}    & Quản lý nhân viên: CRUD \\
+            \hline
+            \multicolumn{2}{|c|}{\textit{Khu vực Nhân viên (Areas/NhanVien/Controllers/)}} \\
+            \hline
+            \texttt{NhanVien/HomeController}     & Dashboard nhân viên \\
+            \hline
+            \texttt{NhanVien/PhimController}     & Quản lý phim phía nhân viên \\
+            \hline
+            \texttt{NhanVien/SuatChieuController} & Quản lý lịch chiếu phía nhân viên \\
+            \hline
+            \texttt{NhanVien/DichVuController}   & Quản lý dịch vụ phía nhân viên \\
+            \hline
+            \texttt{NhanVien/DoanhThuController} & Xem báo cáo doanh thu phía nhân viên \\
             \hline
         \end{tabular}
     \end{center}
@@ -524,13 +542,19 @@ public int LuuVaThanhToan(CartItemDTO cart, string username)
             \hline
             \textbf{Interface / Class} & \textbf{Chức năng chính} \\
             \hline
-            \texttt{IPhimBUS / PhimBUS}           & CRUD phim, tìm kiếm, gọi SP, lấy ghế theo suất \\
+            \texttt{IPhimBUS / PhimBUS}               & CRUD phim, tìm kiếm, gọi SP, lấy ghế theo lịch chiếu \\
             \hline
-            \texttt{IHoaDonBUS / HoaDonBUS}       & Lưu hóa đơn + vé + dịch vụ trong Transaction \\
+            \texttt{IHoaDonBUS / HoaDonBUS}           & Lưu hóa đơn + vé + dịch vụ trong Transaction \\
             \hline
-            \texttt{INguoiDungBUS / NguoiDungBUS} & Đăng ký, đăng nhập, xem profile, đổi mật khẩu \\
+            \texttt{IKhachHangBUS / KhachHangBUS}     & Đăng ký, đăng nhập (\texttt{BCrypt} + Google), profile, đổi MK \\
             \hline
-            \texttt{IDoAnBUS / DoAnBUS}       & Lấy danh sách dịch vụ theo ID \\
+            \texttt{INhanVienBUS / NhanVienBUS}       & Đăng nhập nhân viên, CRUD nhân viên, đổi mật khẩu \\
+            \hline
+            \texttt{IDoAnBUS / DoAnBUS}               & Lấy danh sách dịch vụ, lấy theo ID \\
+            \hline
+            \texttt{IKhuyenMaiBUS / KhuyenMaiBUS}     & CRUD chương trình khuyến mãi \\
+            \hline
+            \texttt{IPhongChieuBUS / PhongChieuBUS}   & CRUD phòng chiếu, tự động sinh ghế theo sức chứa \\
             \hline
         \end{tabular}
     \end{center}
@@ -547,25 +571,31 @@ public int LuuVaThanhToan(CartItemDTO cart, string username)
             \hline
             \textbf{DTO Class} & \textbf{Mô tả} \\
             \hline
-            \texttt{PhimDTO}            & Thông tin phim + danh sách suất chiếu hiển thị \\
+            \texttt{PhimDTO}              & Thông tin phim + danh sách lịch chiếu hiển thị \\
             \hline
-            \texttt{SuatChieuDTO}       & Mã suất, giờ bắt đầu \\
+            \texttt{LichChieuDTO}         & Mã lịch, giờ chiếu, giá vé \\
             \hline
-            \texttt{SuatChieuHienThiDTO} & Mã suất, chuỗi giờ hiển thị (dạng \texttt{hh:mm}) \\
+            \texttt{LichChieuHienThiDTO}  & Mã lịch, chuỗi giờ hiển thị (dạng \texttt{hh:mm}) \\
             \hline
-            \texttt{GheDTO}             & Mã ghế, tên ghế, loại ghế, trạng thái đã đặt \\
+            \texttt{GheDTO}               & Mã ghế, hàng, số ghế, loại ghế, trạng thái đã đặt \\
             \hline
-            \texttt{DoAnDTO}          & Thông tin dịch vụ, số lượng chọn, thành tiền \\
+            \texttt{DoAnDTO}              & Thông tin dịch vụ, số lượng chọn, thành tiền \\
             \hline
-            \texttt{DoAnChonDTO}      & Dịch vụ người dùng chọn (MaDV, SoLuong, DonGia) \\
+            \texttt{CartItemDTO}          & Giỏ hàng: phim, ghế, dịch vụ, tổng tiền \\
             \hline
-            \texttt{CartItemDTO}        & Giỏ hàng: phim, ghế, dịch vụ, tổng tiền \\
+            \texttt{HoaDonDTO}            & Hóa đơn đầy đủ cho E-Ticket (phim, ghế, dịch vụ) \\
             \hline
-            \texttt{HoaDonDTO}          & Hóa đơn đầy đủ cho E-Ticket (phim, ghế, dịch vụ) \\
+            \texttt{ChiTietDoAnDTO}       & Chi tiết dịch vụ trong hóa đơn (tên, số lượng, giá) \\
             \hline
-            \texttt{NguoiDungDTO}       & Thông tin người dùng + lịch sử hóa đơn \\
+            \texttt{KhachHangDTO}         & Thông tin khách hàng + lịch sử hóa đơn \\
             \hline
-            \texttt{DoiMatKhauRequest}  & Mật khẩu cũ, mật khẩu mới, xác nhận mật khẩu mới \\
+            \texttt{NhanVienDTO}          & Thông tin nhân viên (họ tên, chức vụ, phân quyền) \\
+            \hline
+            \texttt{KhuyenMaiDTO}         & Khuyến mãi (tên, \% giảm, điều kiện, thời hạn) \\
+            \hline
+            \texttt{PhongChieuDTO}        & Phòng chiếu (tên, loại, sức chứa, số ghế đã tạo) \\
+            \hline
+            \texttt{DoiMatKhauRequest}    & Mật khẩu hiện tại, mật khẩu mới, xác nhận mật khẩu mới \\
             \hline
         \end{tabular}
     \end{center}
@@ -577,7 +607,7 @@ public int LuuVaThanhToan(CartItemDTO cart, string username)
 \noindent Tầng DAL sử dụng hai phương thức truy cập dữ liệu song song:
 
 \begin{itemize}
-    \item \textbf{Entity Framework Core (Database First):} Lớp \texttt{QuanLyRapPhimContext} kế thừa \texttt{DbContext} định nghĩa 10 \texttt{DbSet<T>} và ánh xạ cột qua \texttt{OnModelCreating()}. Chuỗi kết nối đọc từ \texttt{appsettings.json} qua DI.
+    \item \textbf{Entity Framework Core (Database First):} Lớp \texttt{QuanLyRapPhimContext} kế thừa \texttt{DbContext} định nghĩa 12 \texttt{DbSet<T>} (bao gồm cả \texttt{KhuyenMai} và \texttt{NhatKyHeThong}) và ánh xạ cột qua \texttt{OnModelCreating()}. Chuỗi kết nối đọc từ \texttt{appsettings.json} qua DI.
     \item \textbf{ADO.NET:} Lớp \texttt{CinemaAdoNetDAL} (triển khai \texttt{ICinemaAdoNetDAL}) cung cấp các phương thức truy cập thuần túy bằng \texttt{SqlConnection}, \texttt{SqlCommand}, \texttt{SqlDataAdapter}, \texttt{DataTable} và \texttt{DataSet}.
 \end{itemize}
 
@@ -812,7 +842,7 @@ public static T Get<T>(this ISession session, string key)
             \hline
             \texttt{GET}    & \texttt{/api/phimapi/adonet}       & Phim qua ADO.NET DataTable \\
             \hline
-            \texttt{GET}    & \texttt{/api/phimapi/adonet-dataset} & DataSet (Phim + SuatChieu) \\
+            \texttt{GET}    & \texttt{/api/phimapi/adonet-dataset} & DataSet (Phim + LichChieu) \\
             \hline
             \texttt{GET}    & \texttt{/api/phimapi/export-xml}   & Export XML (LINQ to XML) \\
             \hline
@@ -833,6 +863,8 @@ public static T Get<T>(this ISession session, string key)
             \texttt{GET}    & \texttt{/api/lichchieuapi}         & Lấy danh sách lịch chiếu \\
             \hline
             \texttt{GET}    & \texttt{/api/lichchieuapi/\{id\}}  & Chi tiết 1 lịch chiếu \\
+            \hline
+            \texttt{GET}    & \texttt{/api/lichchieuapi/phim/\{maPhim\}} & Lịch chiếu theo phim (từ hôm nay) \\
             \hline
             \texttt{POST}   & \texttt{/api/lichchieuapi}         & Thêm lịch chiếu \\
             \hline
@@ -879,9 +911,9 @@ public static T Get<T>(this ISession session, string key)
 \noindent Đồ án đã hoàn thành các mục tiêu đề ra:
 
 \begin{itemize}
-    \item \textbf{Lập trình CSDL T-SQL:} Xây dựng 10 bảng quan hệ trong SQL Server với đầy đủ View (\texttt{vw\_DoanhThuTheoPhim}), Function (\texttt{fn\_TinhTongTienHoaDon}), Stored Procedure (\texttt{sp\_LayDanhSachPhimDangChieu}), Trigger (\texttt{trg\_NganXoaHoaDonCoCTHD}) và Transaction (EF Core \texttt{BeginTransaction/Commit/Rollback}).
+    \item \textbf{Lập trình CSDL T-SQL:} Xây dựng 12 bảng quan hệ trong SQL Server với đầy đủ View (\texttt{vw\_DoanhThuTheoPhim}), Function (\texttt{fn\_TinhTongTienHoaDon}), Stored Procedure (\texttt{sp\_LayDanhSachPhimDangChieu}), Trigger (\texttt{trg\_NganXoaHoaDonCoCTHD}) và Transaction (EF Core \texttt{BeginTransaction/Commit/Rollback}).
     \item \textbf{Kiến trúc 3 lớp:} Tách biệt hoàn toàn Presentation (Cinema.Web), Business Logic (Cinema.BUS) và Data Access (Cinema.DAL), giao tiếp qua DTO và Interface.
-    \item \textbf{Công nghệ \& Tối ưu:} Tích hợp \textbf{IMemoryCache} để tăng tốc load danh sách phim, xuất báo cáo ra file Excel với thư viện \textbf{ClosedXML}, kiểm thử mã nguồn với \textbf{xUnit và Moq} (hoàn thành 20 Unit Tests bao phủ toàn diện tầng BUS).
+    \item \textbf{Công nghệ \& Tối ưu:} Tích hợp \textbf{IMemoryCache} để tăng tốc load danh sách phim, xuất báo cáo ra file Excel với thư viện \textbf{ClosedXML}, kiểm thử mã nguồn với \textbf{xUnit và Moq} (hoàn thành 20 Unit Tests bao phủ tầng BUS: PhimBUS, DoAnBUS, NhanVienBUS, PhongChieuBUS).
     \item \textbf{ADO.NET \& LINQ:} Triển khai cả mô hình kết nối và phi kết nối (\texttt{DataSet}, \texttt{SqlDataReader}). Sử dụng LINQ to XML cho tính năng Export/Import.
     \item \textbf{Web API RESTful:} 3 Controller API trả dữ liệu JSON chuẩn REST.
     \item \textbf{Tính năng người dùng:} \textbf{Đăng nhập một chạm bằng Google OAuth 2.0}, đặt vé với hệ thống phòng chiếu \textbf{sinh sơ đồ ghế động}, \textbf{thanh toán trực tuyến bằng cổng VNPay Sandbox}, E-Ticket có mã QR.

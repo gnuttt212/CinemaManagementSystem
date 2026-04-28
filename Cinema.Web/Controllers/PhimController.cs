@@ -36,11 +36,7 @@ namespace Cinema.Web.Controllers
 
         public IActionResult Search(string query)
         {
-            var dsPhim = _phimBus.LayDanhSachPhimDangChieu();
-            if (!string.IsNullOrEmpty(query))
-            {
-                dsPhim = dsPhim.Where(p => p.TenPhim.ToLower().Contains(query.ToLower())).ToList();
-            }
+            var dsPhim = _phimBus.TimKiemPhim(query);
             ViewBag.Query = query;
             return View("Index", dsPhim);
         }
@@ -135,11 +131,5 @@ namespace Cinema.Web.Controllers
                 return Json(new { success = false, message = "Lỗi hệ thống: " + ex.Message });
             }
         }
-    }
-
-    public class DoAnChonDTO
-    {
-        public int MaDoAn { get; set; }
-        public int SoLuong { get; set; }
     }
 }

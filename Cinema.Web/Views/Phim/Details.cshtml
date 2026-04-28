@@ -97,7 +97,6 @@
     <script>
         $(document).ready(function () {
             $('.gsap-showtime-btn').click(function () {
-                // Animate selection with GSAP
                 gsap.to('.gsap-showtime-btn', { scale: 1, duration: 0.2 });
                 gsap.to(this, { scale: 1.05, duration: 0.3, ease: 'back.out(1.5)' });
 
@@ -108,7 +107,6 @@
                 $('#btnDatVe').attr('data-selected-id', maLich);
                 $('#btnDatVe').attr('href', '/Phim/ChonGhe?maLich=' + maLich);
                 
-                // Pulse CTA
                 gsap.fromTo('#btnDatVe', 
                     { scale: 1 }, 
                     { scale: 1.02, duration: 0.4, yoyo: true, repeat: 1, ease: 'power2.inOut', boxShadow: '0 0 30px rgba(229, 9, 20, 0.6)' }
@@ -121,14 +119,12 @@
             let finalHref = $('#btnDatVe').attr('href');
 
             if (!selectedId || finalHref === "javascript:void(0)") {
-                // Shake animation for error
                 gsap.to('#btnDatVe', {
                     x: [-10, 10, -10, 10, 0],
                     duration: 0.4,
                     ease: 'power1.inOut'
                 });
                 
-                // Show custom toast/alert instead of native alert
                 const alertHtml = `
                     <div id="cinemaAlert" class="position-fixed top-0 start-50 translate-middle-x mt-5 p-3 rounded" 
                          style="background: var(--cinema-card); border: 1px solid var(--cinema-primary); z-index: 1050; opacity: 0;">

@@ -34,8 +34,6 @@ namespace Cinema.Web.Services
 
             string queryString = data.ToString();
             string rawData = "";
-
-            // Remove last '&'
             if (queryString.Length > 0)
             {
                 rawData = queryString.Remove(data.Length - 1, 1);
@@ -68,7 +66,6 @@ namespace Cinema.Web.Services
         private string GetResponseData()
         {
             var data = new StringBuilder();
-            // Loại bỏ vnp_SecureHashType và vnp_SecureHash khi tạo chuỗi hash
             if (_responseData.ContainsKey("vnp_SecureHashType"))
             {
                 _responseData.Remove("vnp_SecureHashType");
