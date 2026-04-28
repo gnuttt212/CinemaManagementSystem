@@ -2,63 +2,80 @@
 
 @{
     ViewData["Title"] = "Đổi mật khẩu";
+    var taiKhoan = Context.Session.GetString("UserAccount") ?? "User";
 }
 
-<div class="container mt-5 mb-5 d-flex justify-content-center">
-    <div class="col-md-6">
-        <div class="card shadow border-0 rounded-4 p-4">
-            <h3 class="fw-bold mb-4 text-center text-primary">
-                <i class="bi bi-shield-lock me-2"></i> ĐỔI MẬT KHẨU
-            </h3>
+<div class="container mt-5 pt-5 mb-5">
+    <div class="row g-4">
+        <div class="col-md-3 mb-4 gsap-reveal-left">
+            <div class="gsap-feature-card p-4 text-center">
+                <img src="https://ui-avatars.com/api/?name=@taiKhoan&background=e50914&color=fff&size=128"
+                     class="rounded-circle shadow mb-4" alt="Avatar" width="120" style="border: 3px solid var(--cinema-border);">
 
-            <p class="text-muted text-center mb-4">
-                Vui lòng nhập mật khẩu hiện tại và tạo mật khẩu mới an toàn hơn.
-            </p>
+                <h4 class="fw-bold text-uppercase text-white">@taiKhoan</h4>
+                <p class="text-muted mb-4">@@@taiKhoan</p>
 
-            <form asp-action="DoiMatKhau" method="post">
-                <div class="mb-3">
-                    <label class="form-label fw-bold">Mật khẩu hiện tại</label>
-                    <div class="input-group">
-                        <span class="input-group-text bg-light"><i class="bi bi-key"></i></span>
-                        <input type="password" class="form-control" asp-for="MatKhauHienTai" required placeholder="Nhập mật khẩu cũ..." />
-                    </div>
-                    <span asp-validation-for="MatKhauHienTai" class="text-danger small"></span>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label fw-bold">Mật khẩu mới</label>
-                    <div class="input-group">
-                        <span class="input-group-text bg-light"><i class="bi bi-lock"></i></span>
-                        <input type="password" class="form-control" asp-for="MatKhauMoi" required placeholder="Tối thiểu 6 ký tự..." />
-                    </div>
-                    <span asp-validation-for="MatKhauMoi" class="text-danger small"></span>
-                </div>
-
-                <div class="mb-4">
-                    <label class="form-label fw-bold">Xác nhận mật khẩu mới</label>
-                    <div class="input-group">
-                        <span class="input-group-text bg-light"><i class="bi bi-shield-check"></i></span>
-                        <input type="password" class="form-control" asp-for="XacNhanMatKhau" required placeholder="Nhập lại mật khẩu mới..." />
-                    </div>
-                    <span asp-validation-for="XacNhanMatKhau" class="text-danger small"></span>
-                </div>
-
-                @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ErrorCount > 0)
-                {
-                    <div class="alert alert-danger border-0 border-start border-4 border-danger py-2">
-                        @Html.ValidationSummary(true, "", new { @class = "mb-0 fw-bold" })
-                    </div>
-                }
-
-                <div class="d-flex justify-content-between mt-4">
-                    <a asp-action="Profile" class="btn btn-outline-secondary px-4 rounded-pill">
-                        <i class="bi bi-arrow-left me-1"></i> Quay lại
+                <div class="list-group text-start">
+                    <a asp-action="Profile" class="list-group-item list-group-item-action text-white" style="background: rgba(255, 255, 255, 0.05); border-color: var(--cinema-border); transition: background 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'">
+                        <i class="bi bi-person-lines-fill me-2"></i> Hồ sơ & Lịch sử
                     </a>
-                    <button type="submit" class="btn btn-primary px-4 rounded-pill fw-bold shadow-sm">
-                        Cập nhật mật khẩu <i class="bi bi-check2 ms-1"></i>
-                    </button>
+                    <a asp-action="EditProfile" class="list-group-item list-group-item-action text-white" style="background: rgba(255, 255, 255, 0.05); border-color: var(--cinema-border); transition: background 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'">
+                        <i class="bi bi-pencil-square me-2"></i> Chỉnh sửa hồ sơ
+                    </a>
+                    <a asp-action="DoiMatKhau" class="list-group-item list-group-item-action active" style="background-color: var(--cinema-primary); border-color: var(--cinema-primary); color: white;">
+                        <i class="bi bi-shield-lock-fill me-2"></i> Đổi mật khẩu
+                    </a>
                 </div>
-            </form>
+            </div>
+        </div>
+
+        <div class="col-md-9 gsap-reveal-right">
+            <div class="gsap-auth-card p-4" style="border-radius: var(--cinema-radius); background: rgba(255, 255, 255, 0.02); border: 1px solid var(--cinema-border) !important;">
+                <h4 class="fw-bold text-white mb-4"><i class="bi bi-shield-lock me-2" style="color: var(--cinema-primary);"></i>ĐỔI MẬT KHẨU</h4>
+                <p class="text-muted mb-4">Vui lòng nhập mật khẩu hiện tại và tạo mật khẩu mới an toàn hơn.</p>
+
+                <form asp-action="DoiMatKhau" method="post">
+                    <div class="mb-3">
+                        <label class="form-label text-white fw-bold">Mật khẩu hiện tại</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-dark border-secondary text-muted"><i class="bi bi-key"></i></span>
+                            <input type="password" class="form-control text-white bg-dark border-secondary" asp-for="MatKhauHienTai" required placeholder="Nhập mật khẩu cũ..." />
+                        </div>
+                        <span asp-validation-for="MatKhauHienTai" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-white fw-bold">Mật khẩu mới</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-dark border-secondary text-muted"><i class="bi bi-lock"></i></span>
+                            <input type="password" class="form-control text-white bg-dark border-secondary" asp-for="MatKhauMoi" required placeholder="Tối thiểu 6 ký tự..." />
+                        </div>
+                        <span asp-validation-for="MatKhauMoi" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label text-white fw-bold">Xác nhận mật khẩu mới</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-dark border-secondary text-muted"><i class="bi bi-shield-check"></i></span>
+                            <input type="password" class="form-control text-white bg-dark border-secondary" asp-for="XacNhanMatKhau" required placeholder="Nhập lại mật khẩu mới..." />
+                        </div>
+                        <span asp-validation-for="XacNhanMatKhau" class="text-danger small"></span>
+                    </div>
+
+                    @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ErrorCount > 0)
+                    {
+                        <div class="alert alert-danger bg-danger bg-opacity-25 text-danger border-danger">
+                            @Html.ValidationSummary(true, "", new { @class = "mb-0" })
+                        </div>
+                    }
+
+                    <div class="d-flex justify-content-end mt-4">
+                        <button type="submit" class="btn btn-cinema-primary px-4 py-2" style="border:none;">
+                            <i class="bi bi-check2 me-2"></i> Cập nhật mật khẩu
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </div>

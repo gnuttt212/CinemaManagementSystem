@@ -121,6 +121,7 @@ namespace Cinema.Web.Controllers
             return View(req);
         }
 
+
         [HttpGet]
         public IActionResult ForgotPassword()
         {

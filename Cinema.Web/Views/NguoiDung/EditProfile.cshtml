@@ -4,48 +4,75 @@
     ViewData["Title"] = "Chỉnh sửa thông tin";
 }
 
-<div class="container mt-5 mb-5 d-flex justify-content-center">
-    <div class="col-md-6">
-        <div class="card shadow border-0 rounded-4 p-4">
-            <h3 class="fw-bold mb-4 text-center">CẬP NHẬT HỒ SƠ</h3>
-            
-            <form asp-action="EditProfile" method="post">
-                <input type="hidden" name="MaKH" value="@Model.MaKH" />
-                <input type="hidden" name="TaiKhoan" value="@Model.TaiKhoan" />
+<div class="container mt-5 pt-5 mb-5">
+    <div class="row g-4">
+        <div class="col-md-3 mb-4 gsap-reveal-left">
+            <div class="gsap-feature-card p-4 text-center">
+                <img src="https://ui-avatars.com/api/?name=@Model.HoTen&background=e50914&color=fff&size=128"
+                     class="rounded-circle shadow mb-4" alt="Avatar" width="120" style="border: 3px solid var(--cinema-border);">
 
-                <div class="mb-3">
-                    <label class="form-label fw-bold">Tài khoản</label>
-                    <input type="text" class="form-control" value="@Model.TaiKhoan" disabled />
-                    <small class="text-muted">Tên tài khoản không thể thay đổi.</small>
+                <h4 class="fw-bold text-uppercase text-white">@Model.HoTen</h4>
+                <p class="text-muted mb-4">@@@Model.TaiKhoan</p>
+
+                <div class="list-group text-start">
+                    <a asp-action="Profile" class="list-group-item list-group-item-action text-white" style="background: rgba(255, 255, 255, 0.05); border-color: var(--cinema-border); transition: background 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'">
+                        <i class="bi bi-person-lines-fill me-2"></i> Hồ sơ & Lịch sử
+                    </a>
+                    <a asp-action="EditProfile" class="list-group-item list-group-item-action active" style="background-color: var(--cinema-primary); border-color: var(--cinema-primary); color: white;">
+                        <i class="bi bi-pencil-square me-2"></i> Chỉnh sửa hồ sơ
+                    </a>
+                    <a asp-action="DoiMatKhau" class="list-group-item list-group-item-action text-white" style="background: rgba(255, 255, 255, 0.05); border-color: var(--cinema-border); transition: background 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'">
+                        <i class="bi bi-shield-lock-fill me-2"></i> Đổi mật khẩu
+                    </a>
                 </div>
+            </div>
+        </div>
 
-                <div class="mb-3">
-                    <label class="form-label fw-bold">Họ và Tên</label>
-                    <input type="text" class="form-control" name="HoTen" value="@Model.HoTen" required />
-                </div>
+        <div class="col-md-9 gsap-reveal-right">
+            <div class="gsap-auth-card p-4" style="border-radius: var(--cinema-radius); background: rgba(255, 255, 255, 0.02); border: 1px solid var(--cinema-border) !important;">
+                <h4 class="fw-bold text-white mb-4"><i class="bi bi-pencil-square me-2" style="color: var(--cinema-primary);"></i>CẬP NHẬT HỒ SƠ</h4>
+                
+                <form asp-action="EditProfile" method="post">
+                    <input type="hidden" name="MaKH" value="@Model.MaKH" />
+                    <input type="hidden" name="TaiKhoan" value="@Model.TaiKhoan" />
 
-                <div class="mb-3">
-                    <label class="form-label fw-bold">Thư điện tử (Email)</label>
-                    <input type="email" class="form-control" name="Email" value="@Model.Email" />
-                </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-white fw-bold">Tài khoản</label>
+                            <input type="text" class="form-control text-white bg-dark border-secondary" value="@Model.TaiKhoan" disabled />
+                            <small class="text-muted">Tên tài khoản không thể thay đổi.</small>
+                        </div>
 
-                <div class="mb-4">
-                    <label class="form-label fw-bold">Số điện thoại</label>
-                    <input type="tel" class="form-control" name="SDT" value="@Model.SDT" />
-                </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-white fw-bold">Họ và Tên</label>
+                            <input type="text" class="form-control text-white bg-dark border-secondary" name="HoTen" value="@Model.HoTen" required />
+                        </div>
 
-                @if (!ViewData.ModelState.IsValid)
-                {
-                    <div class="alert alert-danger">
-                        @Html.ValidationSummary(false, "", new { @class = "mb-0" })
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-white fw-bold">Thư điện tử (Email)</label>
+                            <input type="email" class="form-control text-white bg-dark border-secondary" name="Email" value="@Model.Email" />
+                        </div>
+
+                        <div class="col-md-6 mb-4">
+                            <label class="form-label text-white fw-bold">Số điện thoại</label>
+                            <input type="tel" class="form-control text-white bg-dark border-secondary" name="SDT" value="@Model.SDT" />
+                        </div>
                     </div>
-                }
 
-                <div class="d-flex justify-content-between">
-                    <a asp-action="Profile" class="btn btn-secondary px-4 rounded-pill">Quay lại</a>
-                    <button type="submit" class="btn btn-primary px-4 rounded-pill fw-bold">Lưu thay đổi</button>
-                </div>
-            </form>
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div class="alert alert-danger bg-danger bg-opacity-25 text-danger border-danger">
+                            @Html.ValidationSummary(false, "", new { @class = "mb-0" })
+                        </div>
+                    }
+
+                    <div class="d-flex justify-content-end mt-2">
+                        <button type="submit" class="btn btn-cinema-primary px-4 py-2" style="border:none;">
+                            <i class="bi bi-save me-2"></i> Lưu thay đổi
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </div>

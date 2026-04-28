@@ -206,8 +206,6 @@ namespace Cinema.BUS
         {
             var lichChieu = _db.LichChieus.Find(maLich);
             if (lichChieu == null) return new List<GheDTO>();
-
-            // Pre-load tất cả ghế đã đặt cho lịch chiếu này (1 query duy nhất)
             var gheDaDat = new HashSet<int>(
                 _db.ChiTietHoaDons
                     .Where(ct => ct.MaLich == maLich)
@@ -223,7 +221,7 @@ namespace Cinema.BUS
                     Hang = g.Hang,
                     SoGhe = g.SoGhe,
                     LoaiGhe = g.LoaiGhe,
-                    DaDat = false // sẽ cập nhật phía dưới
+                    DaDat = false 
                 }).ToList()
                 .Select(g =>
                 {

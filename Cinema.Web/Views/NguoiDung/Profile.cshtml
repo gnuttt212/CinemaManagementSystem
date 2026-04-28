@@ -4,7 +4,6 @@
     ViewData["Title"] = "Thông tin cá nhân";
 }
 
-<!-- HERO BANNER -->
 <div class="gsap-hero" style="min-height: 35vh; margin-bottom: 2rem;">
     <div class="gsap-hero-bg" style="background-image: url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'); filter: brightness(0.25);"></div>
     <div class="gsap-hero-overlay"></div>
@@ -18,8 +17,7 @@
 
 <div class="container mt-5 pt-5 mb-5">
     <div class="row g-4">
-        <!-- CỘT THÔNG TIN NGƯỜI DÙNG -->
-        <div class="col-md-4 mb-4 gsap-reveal-left">
+        <div class="col-md-3 mb-4 gsap-reveal-left">
             <div class="gsap-feature-card p-4 text-center">
                 <img src="https://ui-avatars.com/api/?name=@Model.HoTen&background=e50914&color=fff&size=128"
                      class="rounded-circle shadow mb-4" alt="Avatar" width="120" style="border: 3px solid var(--cinema-border);">
@@ -27,44 +25,21 @@
                 <h4 class="fw-bold text-uppercase text-white">@Model.HoTen</h4>
                 <p class="text-muted mb-4">@@@Model.TaiKhoan</p>
 
-                <!-- KHU VỰC THÔNG TIN SỬA ĐỔI ĐỂ KHÔNG BỊ LÓA MẮT -->
-                <div class="text-start p-4 rounded-3 mb-4" style="background: rgba(255, 255, 255, 0.05); border: 1px solid var(--cinema-border);">
-                    <div class="mb-3 border-bottom border-secondary pb-3">
-                        <div class="d-flex align-items-center mb-1">
-                            <i class="bi bi-envelope-at-fill text-warning me-2"></i>
-                            <strong class="text-white">Email</strong>
-                        </div>
-                        <span class="text-muted text-break">@Model.Email</span>
-                    </div>
-                    
-                    <div class="mb-3 border-bottom border-secondary pb-3">
-                        <div class="d-flex align-items-center mb-1">
-                            <i class="bi bi-telephone-fill text-success me-2"></i>
-                            <strong class="text-white">Số điện thoại</strong>
-                        </div>
-                        <span class="text-muted">@(Model.SDT ?? "Chưa cập nhật")</span>
-                    </div>
-                    
-                    <div class="mb-0">
-                        <div class="d-flex align-items-center mb-1">
-                            <i class="bi bi-star-fill text-primary me-2"></i>
-                            <strong class="text-white">Điểm tích lũy</strong>
-                        </div>
-                        <span class="fs-5 fw-bold" style="color: var(--cinema-accent);">@Model.DiemTichLuy điểm</span>
-                    </div>
+                <div class="list-group text-start">
+                    <a asp-action="Profile" class="list-group-item list-group-item-action active" style="background-color: var(--cinema-primary); border-color: var(--cinema-primary); color: white;">
+                        <i class="bi bi-person-lines-fill me-2"></i> Hồ sơ & Lịch sử
+                    </a>
+                    <a asp-action="EditProfile" class="list-group-item list-group-item-action text-white" style="background: rgba(255, 255, 255, 0.05); border-color: var(--cinema-border); transition: background 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'">
+                        <i class="bi bi-pencil-square me-2"></i> Chỉnh sửa hồ sơ
+                    </a>
+                    <a asp-action="DoiMatKhau" class="list-group-item list-group-item-action text-white" style="background: rgba(255, 255, 255, 0.05); border-color: var(--cinema-border); transition: background 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'">
+                        <i class="bi bi-shield-lock-fill me-2"></i> Đổi mật khẩu
+                    </a>
                 </div>
-
-                <a asp-controller="NguoiDung" asp-action="EditProfile" class="btn-cinema-primary w-100 mb-3 d-block py-2 text-decoration-none">
-                    <i class="bi bi-pencil-square me-2"></i> Chỉnh sửa hồ sơ
-                </a>
-                <a asp-controller="NguoiDung" asp-action="DoiMatKhau" class="btn-cinema-outline w-100 d-block py-2 text-decoration-none border-white text-white">
-                    <i class="bi bi-shield-lock-fill me-2"></i> Đổi Mật Khẩu
-                </a>
             </div>
         </div>
 
-        <!-- CỘT LỊCH SỬ GIAO DỊCH -->
-        <div class="col-md-8 gsap-reveal-right">
+        <div class="col-md-9 gsap-reveal-right">
             @if (TempData["SuccessMessage"] != null)
             {
                 <div class="alert bg-success bg-opacity-25 text-success border-success mb-4 rounded-3" role="alert">
@@ -72,6 +47,35 @@
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             }
+
+            <div class="gsap-auth-card p-4 mb-4" style="border-radius: var(--cinema-radius); background: rgba(255, 255, 255, 0.02); border: 1px solid var(--cinema-border) !important;">
+                <h4 class="fw-bold text-white mb-4"><i class="bi bi-info-circle me-2" style="color: var(--cinema-primary);"></i>THÔNG TIN CÁ NHÂN</h4>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <div class="d-flex align-items-center mb-1">
+                            <i class="bi bi-envelope-at-fill text-warning me-2"></i>
+                            <strong class="text-white">Email</strong>
+                        </div>
+                        <span class="text-muted text-break">@Model.Email</span>
+                    </div>
+                    
+                    <div class="col-md-4 mb-3">
+                        <div class="d-flex align-items-center mb-1">
+                            <i class="bi bi-telephone-fill text-success me-2"></i>
+                            <strong class="text-white">Số điện thoại</strong>
+                        </div>
+                        <span class="text-muted">@(Model.SDT ?? "Chưa cập nhật")</span>
+                    </div>
+                    
+                    <div class="col-md-4 mb-3">
+                        <div class="d-flex align-items-center mb-1">
+                            <i class="bi bi-star-fill text-primary me-2"></i>
+                            <strong class="text-white">Điểm tích lũy</strong>
+                        </div>
+                        <span class="fs-5 fw-bold" style="color: var(--cinema-accent);">@Model.DiemTichLuy điểm</span>
+                    </div>
+                </div>
+            </div>
 
             <div class="gsap-auth-card p-0 overflow-hidden" style="border-radius: var(--cinema-radius);">
                 <div class="card-header border-bottom py-4 px-4 d-flex justify-content-between align-items-center" style="background: rgba(255, 255, 255, 0.02); border-color: var(--cinema-border) !important;">
