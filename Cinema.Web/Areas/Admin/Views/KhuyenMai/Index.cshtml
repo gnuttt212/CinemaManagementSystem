@@ -1,0 +1,163 @@
+@model IEnumerable<Cinema.DTO.KhuyenMaiDTO>
+@{
+    ViewData["Title"] = "Quản lý Khuyến Mãi";
+}
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show rounded-4 shadow-sm" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i> @TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show rounded-4 shadow-sm" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="card shadow border-0 rounded-4">
+    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 fw-bold text-primary">
+            <i class="bi bi-gift-fill me-2"></i> DANH SÁCH KHUYẾN MÃI
+        </h5>
+        <a asp-area="Admin" asp-controller="KhuyenMai" asp-action="Create" class="btn btn-success rounded-pill shadow-sm">
+            <i class="bi bi-plus-circle me-1"></i> Thêm khuyến mãi mới
+        </a>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Mã</th>
+                        <th width="25%">Tên Khuyến Mãi</th>
+                        <th>Giảm giá</th>
+                        <th>Điều kiện</th>
+                        <th>Ngày bắt đầu</th>
+                        <th>Ngày kết thúc</th>
+                        <th>Trạng thái</th>
+                        <th class="text-center">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr id="row-@item.MaKM">
+                                <td class="text-muted fw-bold">#@item.MaKM</td>
+                                <td class="fw-bold text-dark">
+                                    <i class="bi bi-gift text-warning me-2"></i> @item.TenKM
+                                </td>
+                                <td>
+                                    <span class="badge bg-danger bg-opacity-10 text-danger rounded-pill px-3 py-2 fs-6">
+                                        -@item.PhanTramGiam%
+                                    </span>
+                                </td>
+                                <td class="text-muted">
+                                    @(string.IsNullOrEmpty(item.DieuKien) ? "Không có" : item.DieuKien)
+                                </td>
+                                <td>
+                                    @if (item.NgayBatDau.HasValue)
+                                    {
+                                        <span class="text-success">
+                                            <i class="bi bi-calendar-event me-1"></i>@item.NgayBatDau.Value.ToString("dd/MM/yyyy")
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">—</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (item.NgayKetThuc.HasValue)
+                                    {
+                                        <span class="text-danger">
+                                            <i class="bi bi-calendar-x me-1"></i>@item.NgayKetThuc.Value.ToString("dd/MM/yyyy")
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">—</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (item.ConHieuLuc)
+                                    {
+                                        <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 py-2">
+                                            <i class="bi bi-check-circle-fill me-1"></i> Còn hiệu lực
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill px-3 py-2">
+                                            <i class="bi bi-x-circle-fill me-1"></i> Hết hạn
+                                        </span>
+                                    }
+                                </td>
+                                <td class="text-center">
+                                    <div class="btn-group">
+                                        <a asp-action="Edit" asp-route-id="@item.MaKM" class="btn btn-sm btn-outline-warning mx-1">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <button onclick="confirmDelete(@item.MaKM)" class="btn btn-sm btn-outline-danger mx-1">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="8" class="text-center text-muted py-5">
+                                <i class="bi bi-gift display-4 d-block mb-3 text-muted"></i>
+                                Chưa có khuyến mãi nào trên hệ thống.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function confirmDelete(id) {
+            Swal.fire({
+                title: 'Xóa khuyến mãi này?',
+                text: "Bạn sẽ không thể khôi phục lại dữ liệu!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Đồng ý xóa',
+                cancelButtonText: 'Hủy'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '@Url.Action("Delete", "KhuyenMai", new { area = "Admin" })',
+                        type: 'POST',
+                        data: { id: id },
+                        success: function (res) {
+                            if (res.success) {
+                                Swal.fire('Đã xóa!', 'Khuyến mãi đã được xóa thành công.', 'success')
+                                    .then(() => {
+                                        $("#row-" + id).fadeOut(400);
+                                    });
+                            } else {
+                                Swal.fire('Lỗi', res.message || 'Không thể xóa!', 'error');
+                            }
+                        }
+                    });
+                }
+            })
+        }
+    </script>
+}

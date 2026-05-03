@@ -1,0 +1,65 @@
+@model Cinema.DTO.KhuyenMaiDTO
+@{
+    ViewData["Title"] = "Thêm Khuyến Mãi Mới";
+}
+
+<div class="container-fluid">
+    <div class="card shadow border-0 rounded-4">
+        <div class="card-header bg-white py-3">
+            <h5 class="mb-0 fw-bold text-success"><i class="bi bi-plus-circle me-2"></i>THÊM KHUYẾN MÃI MỚI</h5>
+        </div>
+        <div class="card-body p-4">
+            <form asp-action="Create" method="post">
+                <div class="row">
+                    <div class="col-md-8 mb-4">
+                        <label class="form-label fw-bold">Tên Khuyến Mãi <span class="text-danger">*</span></label>
+                        <input asp-for="TenKM" class="form-control form-control-lg" required
+                               placeholder="VD: Giảm giá mùa hè, Flash Sale cuối tuần..." />
+                        <span asp-validation-for="TenKM" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <label class="form-label fw-bold text-danger">Phần Trăm Giảm (%) <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <input asp-for="PhanTramGiam" type="number" step="0.1" min="1" max="100"
+                                   class="form-control fw-bold fs-5 text-danger" required placeholder="10" />
+                            <span class="input-group-text bg-light text-danger fw-bold">%</span>
+                        </div>
+                        <span asp-validation-for="PhanTramGiam" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12 mb-4">
+                        <label class="form-label fw-bold">Điều Kiện Áp Dụng</label>
+                        <textarea asp-for="DieuKien" class="form-control" rows="3"
+                                  placeholder="VD: Áp dụng cho hóa đơn từ 200.000đ, chỉ áp dụng ngày thường..."></textarea>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <label class="form-label fw-bold text-success">
+                            <i class="bi bi-calendar-event me-1"></i> Ngày Bắt Đầu
+                        </label>
+                        <input asp-for="NgayBatDau" type="date" class="form-control" />
+                        <span asp-validation-for="NgayBatDau" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <label class="form-label fw-bold text-danger">
+                            <i class="bi bi-calendar-x me-1"></i> Ngày Kết Thúc
+                        </label>
+                        <input asp-for="NgayKetThuc" type="date" class="form-control" />
+                        <span asp-validation-for="NgayKetThuc" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="mt-4 text-end">
+                    <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4">Hủy bỏ</a>
+                    <button type="submit" class="btn btn-success rounded-pill px-5 shadow">
+                        <i class="bi bi-check-lg me-1"></i> Tạo Khuyến Mãi
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
