@@ -1,0 +1,108 @@
+@model Cinema.DTO.NhanVienDTO
+
+@{
+    ViewData["Title"] = "Thông tin cá nhân";
+    var role = Context.Session.GetString("Role");
+    var isAdmin = role == "Admin";
+    var backUrl = isAdmin ? "/Admin/Home" : "/NhanVien/Home";
+    var roleBadge = isAdmin ? "Quản trị viên" : "Nhân viên";
+    var roleBadgeColor = isAdmin ? "#e50914" : "#3b82f6";
+}
+
+<div class="gsap-hero" style="min-height: 35vh; margin-bottom: 2rem;">
+    <div class="gsap-hero-bg" style="background-image: url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'); filter: brightness(0.25);"></div>
+    <div class="gsap-hero-overlay"></div>
+    <div class="gsap-hero-content pt-5">
+        <h1 class="gsap-hero-title mb-0" style="font-size: clamp(2rem, 4vw, 3rem);">
+            <span class="line"><span class="line-inner text-white">HỒ SƠ <span class="highlight">CỦA BẠN</span></span></span>
+        </h1>
+        <p class="gsap-hero-subtitle mt-3 text-white">Quản lý thông tin tài khoản nhân viên</p>
+    </div>
+</div>
+
+<div class="container mt-5 pt-5 mb-5">
+    <div class="row justify-content-center g-4">
+        <div class="col-md-4 gsap-reveal-left">
+            <div class="gsap-feature-card p-4 text-center">
+                <img src="https://ui-avatars.com/api/?name=@Model.HoTen&background=3b82f6&color=fff&size=128"
+                     class="rounded-circle shadow mb-4" alt="Avatar" width="120" style="border: 3px solid var(--cinema-border);">
+
+                <h4 class="fw-bold text-uppercase text-white">@Model.HoTen</h4>
+                <p class="text-muted mb-2">@@@Model.TaiKhoan</p>
+                <span class="badge rounded-pill px-3 py-2 mb-4" style="background-color: @roleBadgeColor; font-size: 0.85rem;">
+                    <i class="bi bi-shield-check me-1"></i> @roleBadge
+                </span>
+
+                <div class="list-group text-start mt-3">
+                    <a class="list-group-item list-group-item-action active" style="background-color: var(--cinema-primary); border-color: var(--cinema-primary); color: white;">
+                        <i class="bi bi-person-lines-fill me-2"></i> Thông tin cá nhân
+                    </a>
+                    <a href="@backUrl" class="list-group-item list-group-item-action text-white" style="background: rgba(255, 255, 255, 0.05); border-color: var(--cinema-border); transition: background 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'">
+                        <i class="bi bi-arrow-left-circle me-2"></i> Quay lại trang quản lý
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 gsap-reveal-right">
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert bg-success bg-opacity-25 text-success border-success mb-4 rounded-3" role="alert">
+                    <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            <div class="gsap-auth-card p-4 mb-4" style="border-radius: var(--cinema-radius); background: rgba(255, 255, 255, 0.02); border: 1px solid var(--cinema-border) !important;">
+                <h4 class="fw-bold text-white mb-4"><i class="bi bi-info-circle me-2" style="color: var(--cinema-primary);"></i>THÔNG TIN TÀI KHOẢN</h4>
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center mb-1">
+                            <i class="bi bi-person-fill text-primary me-2"></i>
+                            <strong class="text-white">Họ và tên</strong>
+                        </div>
+                        <span class="text-muted">@(Model.HoTen ?? "Chưa cập nhật")</span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center mb-1">
+                            <i class="bi bi-person-vcard text-success me-2"></i>
+                            <strong class="text-white">Tài khoản</strong>
+                        </div>
+                        <span class="text-muted">@Model.TaiKhoan</span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center mb-1">
+                            <i class="bi bi-briefcase-fill text-warning me-2"></i>
+                            <strong class="text-white">Chức vụ</strong>
+                        </div>
+                        <span class="text-muted">@(Model.ChucVu ?? "Chưa cập nhật")</span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center mb-1">
+                            <i class="bi bi-shield-lock-fill text-info me-2"></i>
+                            <strong class="text-white">Phân quyền</strong>
+                        </div>
+                        <span class="badge rounded-pill px-3 py-2" style="background-color: @roleBadgeColor; font-size: 0.85rem;">
+                            @(Model.PhanQuyen ?? "N/A")
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="gsap-auth-card p-4" style="border-radius: var(--cinema-radius); background: rgba(255, 255, 255, 0.02); border: 1px solid var(--cinema-border) !important;">
+                <h4 class="fw-bold text-white mb-4"><i class="bi bi-gear me-2" style="color: var(--cinema-primary);"></i>TÙY CHỌN TÀI KHOẢN</h4>
+                <div class="d-flex flex-wrap gap-3">
+                    <a asp-action="DoiMatKhauNhanVien" class="btn btn-outline-light rounded-pill px-4 py-2">
+                        <i class="bi bi-shield-lock-fill me-2"></i> Đổi mật khẩu
+                    </a>
+                    <a href="@backUrl" class="btn btn-outline-primary rounded-pill px-4 py-2">
+                        <i class="bi bi-arrow-left me-2"></i> Quay lại trang quản lý
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

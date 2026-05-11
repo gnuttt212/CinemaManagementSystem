@@ -63,7 +63,15 @@ namespace Cinema.Web.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Delete(int id)
         {
-            _nhanVienBus.Xoa(id);
+            bool result = _nhanVienBus.Xoa(id);
+            if (result)
+            {
+                TempData["Success"] = "Đã xóa nhân viên thành công.";
+            }
+            else
+            {
+                TempData["Error"] = "Không thể xóa nhân viên này. Tài khoản admin mặc định không được phép xóa.";
+            }
             return RedirectToAction(nameof(Index));
         }
     }

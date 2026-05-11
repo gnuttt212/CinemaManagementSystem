@@ -52,6 +52,20 @@ namespace Cinema.BUS
             catch { return false; }
         }
 
+        public NhanVienDTO? LayThongTinProfileNhanVien(string taiKhoan)
+        {
+            var nv = _db.NhanViens.FirstOrDefault(n => n.TaiKhoan == taiKhoan);
+            if (nv == null) return null;
+            return new NhanVienDTO
+            {
+                MaNV = nv.MaNv,
+                HoTen = nv.HoTen ?? "",
+                ChucVu = nv.ChucVu,
+                TaiKhoan = nv.TaiKhoan,
+                PhanQuyen = nv.PhanQuyen
+            };
+        }
+
         public System.Collections.Generic.List<NhanVienDTO> LayDanhSach()
         {
             return _db.NhanViens.Select(n => new NhanVienDTO
@@ -124,6 +138,12 @@ namespace Cinema.BUS
             {
                 var nv = _db.NhanViens.Find(maNv);
                 if (nv == null) return false;
+                
+                if (nv.TaiKhoan.ToLower() == "admin")
+                {
+                    return false; // Không cho phép xóa tài khoản admin mặc định
+                }
+                
                 _db.NhanViens.Remove(nv);
                 return _db.SaveChanges() > 0;
             }

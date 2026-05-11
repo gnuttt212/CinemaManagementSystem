@@ -46,11 +46,23 @@
                                         <a asp-action="Edit" asp-route-id="@item.MaNV" class="btn btn-outline-primary btn-sm">
                                             <i class="bi bi-pencil-square"></i>
                                         </a>
-                                        <button type="button" class="btn btn-outline-danger btn-sm" onclick="confirmDelete(@item.MaNV)">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
+                                        @if (item.TaiKhoan.ToLower() != "admin")
+                                        {
+                                            <button type="button" class="btn btn-outline-danger btn-sm" onclick="confirmDelete(@item.MaNV)">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <button type="button" class="btn btn-outline-secondary btn-sm" disabled title="Không thể xóa admin mặc định">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        }
                                     </div>
-                                    <form id="delete-form-@item.MaNV" asp-action="Delete" asp-route-id="@item.MaNV" method="post" style="display:none;"></form>
+                                    @if (item.TaiKhoan.ToLower() != "admin")
+                                    {
+                                        <form id="delete-form-@item.MaNV" asp-action="Delete" asp-route-id="@item.MaNV" method="post" style="display:none;"></form>
+                                    }
                                 </td>
                             </tr>
                         }
@@ -64,6 +76,35 @@
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
+        $(document).ready(function () {
+            var successMsg = '@TempData["Success"]';
+            var errorMsg = '@TempData["Error"]';
+
+            if (successMsg) {
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    title: successMsg,
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true
+                });
+            }
+
+            if (errorMsg) {
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'error',
+                    title: errorMsg,
+                    showConfirmButton: false,
+                    timer: 4000,
+                    timerProgressBar: true
+                });
+            }
+        });
+
         function confirmDelete(id) {
             Swal.fire({
                 title: 'Xác nhận xóa?',
