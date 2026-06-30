@@ -95,7 +95,8 @@ namespace Cinema.BUS
                 kh.Email = model.Email;
                 kh.Sdt = model.SDT;
 
-                return _db.SaveChanges() > 0;
+                _db.SaveChanges();
+                return true;
             }
             catch { return false; }
         }
@@ -110,7 +111,8 @@ namespace Cinema.BUS
                 if (!BCrypt.Net.BCrypt.Verify(matKhauCu, kh.MatKhau)) return false;
 
                 kh.MatKhau = BCrypt.Net.BCrypt.HashPassword(matKhauMoi);
-                return _db.SaveChanges() > 0;
+                _db.SaveChanges();
+                return true;
             }
             catch { return false; }
         }
@@ -190,7 +192,8 @@ namespace Cinema.BUS
                 kh.NgaySinh = model.NgaySinh;
                 kh.DiemTichLuy = model.DiemTichLuy;
 
-                return _db.SaveChanges() > 0;
+                _db.SaveChanges();
+                return true;
             }
             catch { return false; }
         }

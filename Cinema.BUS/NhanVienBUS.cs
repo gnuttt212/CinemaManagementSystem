@@ -47,7 +47,8 @@ namespace Cinema.BUS
                 if (!BCrypt.Net.BCrypt.Verify(matKhauCu, nv.MatKhau)) return false;
 
                 nv.MatKhau = BCrypt.Net.BCrypt.HashPassword(matKhauMoi);
-                return _db.SaveChanges() > 0;
+                _db.SaveChanges();
+                return true;
             }
             catch { return false; }
         }
@@ -127,7 +128,8 @@ namespace Cinema.BUS
                     nv.MatKhau = BCrypt.Net.BCrypt.HashPassword(dto.MatKhau);
                 }
 
-                return _db.SaveChanges() > 0;
+                _db.SaveChanges();
+                return true;
             }
             catch { return false; }
         }

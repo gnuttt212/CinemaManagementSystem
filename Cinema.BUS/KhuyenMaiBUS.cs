@@ -75,7 +75,8 @@ namespace Cinema.BUS
                 km.NgayBatDau = dto.NgayBatDau;
                 km.NgayKetThuc = dto.NgayKetThuc;
 
-                return _db.SaveChanges() > 0;
+                _db.SaveChanges();
+                return true;
             }
             catch { return false; }
         }

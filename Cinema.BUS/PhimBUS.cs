@@ -185,7 +185,8 @@ namespace Cinema.BUS
                 phim.MoTa = dto.MoTa;
                 phim.Poster = dto.Poster;
 
-                return _db.SaveChanges() > 0;
+                _db.SaveChanges();
+                return true;
             }
             catch { return false; }
         }

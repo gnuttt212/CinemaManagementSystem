@@ -191,7 +191,8 @@ namespace Cinema.BUS
                 var hd = _context.HoaDons.Find(maHD);
                 if (hd == null) return false;
                 hd.TrangThai = trangThai;
-                return _context.SaveChanges() > 0;
+                _context.SaveChanges();
+                return true;
             }
             catch { return false; }
         }
