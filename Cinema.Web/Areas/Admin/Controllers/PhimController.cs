@@ -36,7 +36,7 @@ namespace Cinema.Web.Areas.Admin.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(PhimDTO phimDto, IFormFile ImageFile)
+        public async Task<IActionResult> Create(PhimDTO phimDto, IFormFile? ImageFile)
         {
             ModelState.Remove("LichChieus");
             ModelState.Remove("DanhSachLichChieu");

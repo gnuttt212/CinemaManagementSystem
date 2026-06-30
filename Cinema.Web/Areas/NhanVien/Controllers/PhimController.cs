@@ -36,7 +36,7 @@ namespace Cinema.Web.Areas.NhanVien.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(PhimDTO phimDto, IFormFile ImageFile)
+        public async Task<IActionResult> Create(PhimDTO phimDto, IFormFile? ImageFile)
         {
             if (ImageFile != null)
             {
