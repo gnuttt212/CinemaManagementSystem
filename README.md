@@ -242,14 +242,3 @@ dotnet test Cinema.Tests
 | Khách hàng | Tự đăng ký hoặc đăng nhập Google                 | —                   |
 
 ---
-
-## Giấy phép
-
-Dự án này được phát triển phục vụ mục đích học tập trong khuôn khổ môn Lập trình Cơ sở dữ liệu.
-
----
-
-## Tác giả
-
-**Trần Thanh Tung** — MSSV: 2351010232
-Năm học 2025–2026
