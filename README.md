@@ -1,244 +1,143 @@
-# Cinema Management System
+# Cinema Management System (Production-Grade)
 
-> **Đồ án môn học Lập trình Cơ sở dữ liệu** — Hệ thống quản lý rạp chiếu phim toàn diện, xây dựng trên nền tảng ASP.NET Core MVC theo kiến trúc **3 lớp (3-Tier Architecture)**, tích hợp nhiều công nghệ hiện đại như **SignalR**, **VNPay**, **Google OAuth 2.0** và **QR Code**.
-
----
-
-## Mục lục
-
-- [Tính năng nổi bật](#-tính-năng-nổi-bật)
-- [Công nghệ sử dụng](#-công-nghệ-sử-dụng)
-- [Kiến trúc dự án](#-kiến-trúc-dự-án)
-- [Sơ đồ CSDL](#-sơ-đồ-cơ-sở-dữ-liệu)
-- [Kỹ thuật T-SQL trọng tâm](#-kỹ-thuật-t-sql--csdl-trọng-tâm)
-- [Hướng dẫn cài đặt](#-hướng-dẫn-cài-đặt--chạy-dự-án)
-- [Tài khoản mặc định](#-tài-khoản-mặc-định)
-- [Tác giả](#-tác-giả)
+> **Hệ thống quản lý rạp chiếu phim toàn diện**, xây dựng trên nền tảng **ASP.NET Core 8 MVC** theo kiến trúc **3 lớp (3-Tier)**. Gần đây, hệ thống đã được nâng cấp mạnh mẽ với kiến trúc phân tán (Distributed Architecture), sẵn sàng **scale horizontal** (mở rộng ngang) cho môi trường Production thực tế.
 
 ---
 
-## Tính năng nổi bật
+## 🚀 Tính năng Nổi bật (Cập nhật mới)
+
+Hệ thống giờ đây không chỉ là một đồ án môn học mà đã được trang bị các tiêu chuẩn của một ứng dụng doanh nghiệp (Enterprise-level):
+
+### Kiến trúc Khả mở (Scalability & Reliability)
+- **Redis Integration**: Thay thế hoàn toàn in-memory state. Sử dụng Redis cho Distributed Cache, Distributed Session, Data Protection Keys, và đặc biệt là **SignalR Backplane** (cho phép nhiều web server cùng đồng bộ trạng thái khóa ghế real-time).
+- **MinIO Object Storage**: Trừu tượng hóa việc lưu trữ poster phim với giao diện `IPosterStorageService`. Môi trường Production sử dụng MinIO (tương thích AWS S3) thay vì lưu file local, giúp stateless web servers.
+- **SeatHub Rewrite**: Cơ chế khóa ghế chuyển từ `ConcurrentDictionary` (local memory) sang **Redis Hash (`HSETNX`)** đảm bảo tính nguyên tử (atomic) và đồng nhất trên toàn cụm server.
+
+### DevOps & CI/CD
+- **Docker & Docker Compose**: Đóng gói toàn bộ ứng dụng thành 10 containers độc lập (Web, DB, Redis, MinIO, Nginx, Certbot, Prometheus, Grafana, Backup, DB-Init).
+- **Nginx Reverse Proxy**: Tích hợp SSL/TLS (Let's Encrypt qua Certbot), bảo vệ chống brute-force đăng nhập (`limit_req`), và cấu hình security headers nghiêm ngặt.
+- **GitHub Actions CI/CD**:
+  - `ci-cd.yml`: Tự động Build, chạy Unit Tests (xUnit), build Docker image lên GHCR (GitHub Container Registry).
+  - Tự động Deploy lên môi trường Staging & Production qua SSH.
+- **Bảo mật Tự động**: Tích hợp **CodeQL** quét lỗ hổng mã nguồn và **Dependabot** tự động cập nhật thư viện cũ.
+- **Automated Backups**: Container chuyên dụng tự động backup Database SQL Server định kỳ (Cron job) hàng ngày và cơ chế xoay vòng backup (Retention 7 ngày).
+
+### Monitoring & Observability
+- **Prometheus**: Tự động thu thập (scrape) HTTP metrics (tốc độ phản hồi, error rate, v.v.) và hệ thống (memory, GC, threadpool) thông qua `prometheus-net`.
+- **Grafana**: Dashboard trực quan hóa dữ liệu real-time với 8 panels chính (Request Rate, 5xx Errors, P95 Latency, GC Collections, v.v.).
+- **Alerting Rules**: Các quy tắc cảnh báo (Alert) cho HTTP 5xx cao, App down, hoặc tràn RAM.
+- **Structured Logging & Health Checks**: Tích hợp Serilog (xuất log chuẩn JSON) và các endpoint `/healthz`, `/healthz/ready` kiểm tra trạng thái của cả SQL Server, Redis và MinIO.
+
+---
+
+## 💻 Tính năng Cốt lõi của Ứng dụng
 
 ### Dành cho Khách hàng
+- **Xác thực hiện đại**: Đăng nhập qua **Google OAuth 2.0**, mật khẩu mã hóa BCrypt an toàn.
+- **Đặt vé & Chọn ghế Real-time**: Sơ đồ ghế đồng bộ thời gian thực cho mọi khách hàng nhờ SignalR + Redis. Tránh triệt để tình trạng "đụng" ghế.
+- **Thanh toán VNPay**: Tích hợp VNPay Sandbox, đảm bảo giao dịch (Transaction) nguyên tử.
+- **E-Ticket (Vé điện tử)**: Cấp vé kèm mã **QR Code** ngay sau khi thanh toán.
 
-| Tính năng                 | Mô tả                                                                                                  |
-| :------------------------ | :----------------------------------------------------------------------------------------------------- |
-| **Xác thực hiện đại**     | Đăng ký / Đăng nhập an toàn (mật khẩu mã hóa BCrypt), hỗ trợ **đăng nhập bằng Google OAuth 2.0**       |
-| **Đặt vé trực tuyến**     | Xem phim đang chiếu & sắp chiếu, lọc lịch chiếu theo ngày/giờ, tải nhanh nhờ **IMemoryCache**          |
-| **Sơ đồ ghế real-time**   | Chọn ghế trực quan, tự động sinh theo sức chứa phòng chiếu, **đồng bộ khóa ghế real-time qua SignalR** |
-| **Dịch vụ đi kèm**        | Chọn bắp, nước, combo trực tiếp trong quy trình đặt vé                                                 |
-| **Thanh toán VNPay**      | Tích hợp cổng thanh toán **VNPay Sandbox** an toàn, nhanh chóng                                        |
-| **Vé điện tử (E-Ticket)** | Nhận vé điện tử kèm **mã QR** ngay sau thanh toán thành công                                           |
-| **Quản lý cá nhân**       | Xem hồ sơ, lịch sử giao dịch, đổi mật khẩu. Giao diện mượt mà với hoạt ảnh **GSAP**                    |
-
-### Dành cho Quản trị viên (Admin)
-
-| Tính năng              | Mô tả                                                                                   |
-| :--------------------- | :-------------------------------------------------------------------------------------- |
-| **Quản lý Phim**       | CRUD phim với upload poster, quản lý thể loại, thời lượng                               |
-| **Phòng chiếu & Ghế**  | Thiết lập phòng chiếu, tự động sinh sơ đồ ghế theo sức chứa                             |
-| **Suất chiếu**         | Sắp xếp lịch chiếu thông minh, tự động tính giờ kết thúc theo thời lượng phim           |
-| **Quản lý Dịch vụ**    | CRUD combo bắp nước / đồ ăn / thức uống                                                 |
-| **Quản lý Khuyến mãi** | Tạo & quản lý chương trình giảm giá (% giảm, điều kiện áp dụng, thời hạn hiệu lực)      |
-| **Quản lý Nhân viên**  | CRUD thông tin nhân viên, phân quyền                                                    |
-| **Quản lý Khách hàng** | Xem, sửa, xóa thông tin khách hàng                                                      |
-| **Thống kê & Báo cáo** | Dashboard tổng quan, biểu đồ doanh thu theo phim (Chart.js), **xuất Excel** (ClosedXML) |
-
-### Dành cho Nhân viên
-
-| Tính năng            | Mô tả                                                     |
-| :------------------- | :-------------------------------------------------------- |
-| **Dashboard riêng**  | Khu vực quản lý riêng biệt với phân quyền rõ ràng         |
-| **Quản lý nội dung** | Quản lý phim, suất chiếu, dịch vụ trong phạm vi quyền hạn |
-| **Xem báo cáo**      | Theo dõi doanh thu                                        |
+### Dành cho Quản trị viên & Nhân viên
+- **Quản lý toàn diện**: CRUD phim, phòng chiếu, sinh sơ đồ ghế tự động, đồ ăn thức uống, khuyến mãi.
+- **Báo cáo Thống kê**: Biểu đồ trực quan (Chart.js) thống kê doanh thu theo phim/thời gian, hỗ trợ xuất báo cáo ra **Excel** (ClosedXML).
+- **Phân quyền chặt chẽ**: Dashboard riêng biệt cho Admin và Staff.
 
 ---
 
-## Công nghệ sử dụng
+## 🛠 Công nghệ Sử dụng
 
-| Lĩnh vực              | Công nghệ / Thư viện                                            |
-| :-------------------- | :-------------------------------------------------------------- |
-| **Framework**         | ASP.NET Core MVC (.NET 8.0)                                     |
-| **Kiến trúc**         | 3-Layer Architecture (Presentation → BUS → DAL)                 |
-| **Cơ sở dữ liệu**     | Microsoft SQL Server (T-SQL)                                    |
-| **Data Access**       | Entity Framework Core 8.0, ADO.NET (`SqlDataReader`, `DataSet`) |
-| **Truy vấn & Export** | LINQ to Objects, LINQ to Entities, LINQ to XML                  |
-| **Giao diện (UI)**    | Razor Views, Bootstrap 5, jQuery, SweetAlert2, Chart.js, GSAP   |
-| **Real-time**         | ASP.NET Core SignalR                                            |
-| **Bảo mật**           | BCrypt.Net, Google OAuth 2.0, Session-based Authentication      |
-| **Thanh toán**        | VNPay Sandbox API                                               |
-| **Tối ưu**            | IMemoryCache (Cache danh sách phim)                             |
-| **Báo cáo**           | ClosedXML (Xuất báo cáo Excel)                                  |
-| **Kiểm thử**          | xUnit, Moq (20+ Unit Tests bao phủ tầng BUS)                    |
+| Lĩnh vực | Công nghệ / Thư viện |
+| :--- | :--- |
+| **Backend & Framework** | ASP.NET Core 8.0 MVC, SignalR |
+| **Cơ sở dữ liệu** | Microsoft SQL Server 2022 |
+| **ORM & Data Access** | Entity Framework Core 8, ADO.NET (`SqlDataReader`) |
+| **Distributed / Cloud** | Redis, MinIO (S3-compatible) |
+| **Bảo mật & Thanh toán** | BCrypt.Net, Google OAuth 2.0, VNPay API |
+| **Frontend UI** | Bootstrap 5, jQuery, Chart.js, GSAP, SweetAlert2 |
+| **Monitoring** | Prometheus, Grafana, Serilog |
+| **Infrastructure / DevOps**| Docker, Docker Compose, Nginx, Certbot, GitHub Actions |
+| **Kiểm thử** | xUnit, Moq (20+ Unit Tests bao phủ BUS) |
 
 ---
 
-## Kiến trúc dự án
+## 🏗 Kiến trúc Dự án (3-Layer)
 
 ```text
 CinemaManagementSystem/
-│
-├── Cinema.DAL/                    #   Data Access Layer
-│   ├── Models/                    #    14 Entity classes + DbContext
-│   │   ├── QuanLyRapPhimContext   #    EF Core DbContext (Database First)
-│   │   ├── Phim, LichChieu, Ghe  #    Các bảng chính
-│   │   ├── HoaDon, ChiTietHoaDon #    Hóa đơn & Chi tiết
-│   │   ├── KhuyenMai, DoAn       #    Khuyến mãi & Dịch vụ
-│   │   └── VwDoanhThuTheoPhim    #    View thống kê doanh thu
-│   ├── AdoNet/                    #    ADO.NET (ICinemaAdoNetDAL)
-│   └── Migrations/                #    EF Core Migrations
-│
-├── Cinema.BUS/                    #   Business Logic Layer
-│   ├── IPhimBUS / PhimBUS         #    7 Interface + 7 Implementation
-│   ├── IHoaDonBUS / HoaDonBUS     #    Xử lý nghiệp vụ đặt vé, thanh toán
-│   ├── IKhuyenMaiBUS / ...        #    Quản lý khuyến mãi
-│   └── ...                        #    NhanVien, KhachHang, DoAn, PhongChieu
-│
-├── Cinema.DTO/                    #   Data Transfer Objects
-│   ├── PhimDTO, HoaDonDTO         #    DTO trao đổi giữa các lớp
-│   ├── KhuyenMaiDTO, GheDTO       #    Tách biệt Entity và View Model
-│   └── ...                        #
-│
-├── Cinema.Web/                    #   Presentation Layer (ASP.NET Core MVC)
-│   ├── Controllers/               #    6 Controllers (Account, Phim, HoaDon, ...)
-│   ├── ApiControllers/            #    3 RESTful API (PhimApi, DichVuApi, LichChieuApi)
-│   ├── Hubs/                      #    SignalR Hub (SeatHub - đồng bộ ghế real-time)
-│   ├── Areas/
-│   │   ├── Admin/                 #     Admin Area (9 Controllers)
-│   │   │   ├── Home, Phim         #    Dashboard, Quản lý phim
-│   │   │   ├── PhongChieu, SuatChieu  # Phòng chiếu & Lịch chiếu
-│   │   │   ├── DichVu, KhuyenMai #    Dịch vụ & Khuyến mãi
-│   │   │   ├── NhanVien, KhachHang #   Nhân sự & Khách hàng
-│   │   │   └── DoanhThu          #    Thống kê & Báo cáo
-│   │   └── NhanVien/              #     Nhân viên Area (5 Controllers)
-│   ├── Views/                     #    Razor Views
-│   └── wwwroot/                   #    Static files (CSS, JS, Images)
-│
-├── Cinema.Tests/                  #  Unit Testing (xUnit + Moq)
-│   ├── PhimBUSTests               #    Test nghiệp vụ phim
-│   ├── NhanVienBUSTests           #    Test nghiệp vụ nhân viên
-│   ├── DoAnBUSTests               #    Test nghiệp vụ dịch vụ
-│   └── PhongChieuBUSTests         #    Test nghiệp vụ phòng chiếu
-│
-├── DatabaseScripts/               #   T-SQL Scripts
-│   └── CinemaManagementSystem_Full.sql  # Script hợp nhất (Schema + Seed Data)
-│
-└── HashTool/                      #  Công cụ tạo hash BCrypt
+├── Cinema.DAL/                    # Data Access Layer (EF Core + ADO.NET)
+├── Cinema.BUS/                    # Business Logic Layer (Nghiệp vụ + Cache)
+├── Cinema.DTO/                    # Data Transfer Objects
+├── Cinema.Web/                    # Presentation Layer (MVC + Web API + SignalR)
+│   ├── Hubs/SeatHub.cs            # Xử lý ghế Real-time (Redis backed)
+│   ├── Services/                  # MinioPosterStorageService, Local...
+│   ├── Program.cs                 # DI config: Redis, Serilog, Prometheus...
+│   └── Areas/                     # Admin & NhanVien Modules
+├── Cinema.Tests/                  # Unit Testing (xUnit)
+├── deploy/                        # Infrastructure as Code (Docker, Nginx, Configs)
+│   ├── docker-compose.prod.yml    # Production Stack (10 services)
+│   ├── nginx/                     # Nginx Reverse Proxy Configs
+│   ├── monitoring/                # Prometheus & Grafana configs
+│   └── backup/                    # Auto DB Backup Scripts
+└── .github/workflows/             # CI/CD Pipelines & Security Scanning
 ```
 
 ---
 
-## Sơ đồ Cơ sở dữ liệu
+## ⚙️ Hướng dẫn Cài đặt & Chạy (Môi trường Dev)
 
-```mermaid
-erDiagram
-    KhachHang ||--o{ HoaDon : "đặt vé"
-    NhanVien ||--o{ HoaDon : "xử lý"
-    Phim ||--o{ LichChieu : "có"
-    PhongChieu ||--o{ LichChieu : "diễn ra tại"
-    PhongChieu ||--o{ Ghe : "chứa"
-    LichChieu ||--o{ ChiTietHoaDon : "thuộc"
-    HoaDon ||--o{ ChiTietHoaDon : "gồm"
-    Ghe ||--o{ ChiTietHoaDon : "được đặt"
-    HoaDon ||--o{ ChiTietDoAn : "kèm"
-    DoAn ||--o{ ChiTietDoAn : "được chọn"
-    HoaDon }o--o| KhuyenMai : "áp dụng"
-```
+Yêu cầu: [.NET 8.0 SDK](https://dotnet.microsoft.com/download/dotnet/8.0), SQL Server, Redis (hoặc dùng Docker).
 
-**Các bảng chính:** `Phim`, `PhongChieu`, `Ghe`, `LichChieu`, `KhachHang`, `NhanVien`, `HoaDon`, `ChiTietHoaDon`, `DoAn`, `ChiTietDoAn`, `KhuyenMai`, `NhatKyHeThong`
-
----
-
-## Kỹ thuật T-SQL & CSDL trọng tâm
-
-| Kỹ thuật             | Chi tiết                                                                          |
-| :------------------- | :-------------------------------------------------------------------------------- |
-| **Database Script**  | Hợp nhất schema + seed data trong `CinemaManagementSystem_Full.sql`               |
-| **View**             | `vw_DoanhThuTheoPhim` — Thống kê doanh thu phục vụ biểu đồ và xuất Excel          |
-| **Stored Procedure** | `sp_LayDanhSachPhimDangChieu` — Lấy phim đang chiếu theo ngày                     |
-| **Function**         | Scalar Function tính tổng tiền hóa đơn                                            |
-| **Trigger**          | `trg_NganXoaHoaDonCoCTHD` — Ngăn xóa hóa đơn đã có chi tiết                       |
-| **Transaction**      | `BeginTransaction` đảm bảo tính nguyên tử khi thanh toán (Hóa đơn + Vé + Dịch vụ) |
-
----
-
-## Hướng dẫn Cài đặt & Chạy dự án
-
-### Yêu cầu hệ thống
-
-- [.NET 8.0 SDK](https://dotnet.microsoft.com/download/dotnet/8.0) trở lên
-- [SQL Server](https://www.microsoft.com/en-us/sql-server/sql-server-downloads) (Express hoặc Developer)
-- Visual Studio 2022 (khuyên dùng) hoặc VS Code
-
-### Các bước khởi chạy
-
-**1. Clone dự án**
-
+**1. Clone dự án & Init Database**
 ```bash
 git clone https://github.com/gnuttt212/CinemaManagementSystem.git
-cd CinemaManagementSystem
+# Chạy file script DatabaseScripts/CinemaManagementSystem_Full.sql trong SSMS
 ```
 
-**2. Khởi tạo Database**
-
-- Mở **SQL Server Management Studio (SSMS)**.
-- Tạo Database mới tên `QuanLyRapPhim`.
-- Mở file `DatabaseScripts/CinemaManagementSystem_Full.sql` → Nhấn **F5** để thực thi.
-- Script sẽ tự động tạo toàn bộ bảng, View, Stored Procedure, Trigger và dữ liệu mẫu.
-
-**3. Cấu hình Connection String**
-
-Mở `Cinema.Web/appsettings.json` và cập nhật `DefaultConnection` cho phù hợp:
-
-```json
-{
-  "ConnectionStrings": {
-    "DefaultConnection": "Server=TEN_MAY\\SQLEXPRESS;Initial Catalog=QuanLyRapPhim;Integrated Security=True;TrustServerCertificate=True"
-  }
-}
+**2. Khởi chạy Redis & MinIO cục bộ (Dùng Docker)**
+```bash
+# Ở thư mục gốc, có thể dùng file docker-compose.yml dành cho môi trường Dev
+docker-compose up -d cinema-redis cinema-minio
 ```
 
-**4. Cấu hình Google OAuth **
-
+**3. Cấu hình Secrets (Tùy chọn cho Dev)**
 ```bash
 cd Cinema.Web
 dotnet user-secrets init
-dotnet user-secrets set "Authentication:Google:ClientId" "YOUR_CLIENT_ID"
-dotnet user-secrets set "Authentication:Google:ClientSecret" "YOUR_CLIENT_SECRET"
+dotnet user-secrets set "Authentication:Google:ClientId" "YOUR_ID"
+dotnet user-secrets set "Authentication:Google:ClientSecret" "YOUR_SECRET"
 ```
 
-**5. Build & Chạy**
-
+**4. Build & Chạy ứng dụng**
 ```bash
 dotnet build
-cd Cinema.Web
 dotnet run
 ```
-
-**6. Chạy Unit Tests**
-
-```bash
-dotnet test Cinema.Tests
-```
-
-### Đường dẫn truy cập
-
-| Vai trò    | URL                               |
-| :--------- | :-------------------------------- |
-| Khách hàng | `https://localhost:7059/`         |
-| Admin      | `https://localhost:7059/Admin`    |
-| Nhân viên  | `https://localhost:7059/NhanVien` |
+Truy cập: `https://localhost:7059/`
 
 ---
 
-## Tài khoản mặc định
+## 🚢 Triển khai Production (Docker Compose)
 
-> Các tài khoản test được tạo sẵn trong Database Script.
+Hệ thống cung cấp sẵn file `deploy/docker-compose.prod.yml` chạy hoàn toàn khép kín.
 
-| Vai trò    | Tài khoản                                        | Ghi chú             |
-| :--------- | :----------------------------------------------- | :------------------ |
-| Admin      | Xem trong file `CinemaManagementSystem_Full.sql` | Toàn quyền quản trị |
-| Nhân viên  | Xem trong file `CinemaManagementSystem_Full.sql` | Quyền hạn giới hạn  |
-| Khách hàng | Tự đăng ký hoặc đăng nhập Google                 | —                   |
+1. **Chuẩn bị server Ubuntu/Linux**, cài đặt Docker & Git.
+2. Copy thư mục `deploy/` lên server.
+3. Chép file `deploy/.env.prod.example` thành `.env.prod` và điền đủ thông tin (Passwords, API Keys, Domain).
+4. Khởi chạy toàn bộ hệ thống:
+   ```bash
+   cd deploy
+   docker compose -f docker-compose.prod.yml up -d
+   ```
+5. Đợi SSL tự động cấp phát qua Let's Encrypt, truy cập domain của bạn. Check trạng thái: `https://yourdomain.com/healthz/ready`.
+
+Xem chi tiết trong tài liệu [PRODUCTION.md](deploy/PRODUCTION.md).
 
 ---
+
+## 🔑 Tài khoản Test Mặc định
+
+Đã được seed sẵn trong script Database:
+- **Admin**: `admin / 123456`
+- **Nhân viên**: `nhanvien / 123456`
+- **Khách hàng**: Tự đăng ký qua Form hoặc đăng nhập Google OAuth.
