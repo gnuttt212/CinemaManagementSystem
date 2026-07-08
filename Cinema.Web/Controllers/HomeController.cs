@@ -3,8 +3,9 @@ using Cinema.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
-using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Caching.Distributed;
 using System.Collections.Generic;
+using System.Text.Json;
 using Cinema.DTO;
 
 namespace Cinema.Web.Controllers
@@ -13,27 +14,37 @@ namespace Cinema.Web.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly IPhimBUS _phimBus;
-        private readonly IMemoryCache _cache;
+        private readonly IDistributedCache _cache;
 
-        public HomeController(ILogger<HomeController> logger, IPhimBUS phimBus, IMemoryCache cache)
+        public HomeController(ILogger<HomeController> logger, IPhimBUS phimBus, IDistributedCache cache)
         {
             _logger = logger;
             _phimBus = phimBus;
             _cache = cache;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             const string cacheKey = "PhimDangChieuList";
-            
-            if (!_cache.TryGetValue(cacheKey, out List<PhimDTO> dsPhim))
+            List<PhimDTO>? dsPhim = null;
+
+            var cachedJson = await _cache.GetStringAsync(cacheKey);
+            if (!string.IsNullOrEmpty(cachedJson))
+            {
+                dsPhim = JsonSerializer.Deserialize<List<PhimDTO>>(cachedJson);
+            }
+
+            if (dsPhim == null)
             {
                 dsPhim = _phimBus.LayDanhSachPhimDangChieu();
-                
-                var cacheEntryOptions = new MemoryCacheEntryOptions()
+
+                var options = new DistributedCacheEntryOptions()
                     .SetAbsoluteExpiration(TimeSpan.FromMinutes(30));
-                    
-                _cache.Set(cacheKey, dsPhim, cacheEntryOptions);
+
+                await _cache.SetStringAsync(
+                    cacheKey,
+                    JsonSerializer.Serialize(dsPhim),
+                    options);
             }
 
             return View(dsPhim.Take(8).ToList());

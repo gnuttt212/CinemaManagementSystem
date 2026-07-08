@@ -2,10 +2,15 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.DataProtection;
 using Cinema.DAL.Models;
 using Cinema.DAL.AdoNet;
 using Cinema.BUS;
+using Cinema.Web.Services;
 using Serilog;
+using StackExchange.Redis;
+using Minio;
+using Prometheus;
 using System.Text.Json;
 
 // ---------------------------------------------------------------------------
@@ -36,13 +41,50 @@ try
 
     builder.Services.AddControllersWithViews();
     builder.Services.AddHttpContextAccessor();
-    builder.Services.AddMemoryCache();
-    builder.Services.AddSignalR();
     builder.Services.AddResponseCompression();
 
+    // -----------------------------------------------------------------------
+    // Redis — distributed cache, session store, data protection keys
+    // -----------------------------------------------------------------------
+    var redisConnectionString = builder.Configuration.GetConnectionString("Redis") ?? "localhost:6379";
+
+    var redisConnection = ConnectionMultiplexer.Connect(new ConfigurationOptions
+    {
+        EndPoints = { redisConnectionString },
+        AbortOnConnectFail = false, // Don't crash if Redis is temporarily unavailable
+        ConnectRetry = 5,
+        ConnectTimeout = 5000,
+    });
+    builder.Services.AddSingleton<IConnectionMultiplexer>(redisConnection);
+
+    builder.Services.AddStackExchangeRedisCache(options =>
+    {
+        options.ConnectionMultiplexerFactory = () => Task.FromResult<IConnectionMultiplexer>(redisConnection);
+        options.InstanceName = "cinema:cache:";
+    });
+
+    builder.Services.AddDataProtection()
+        .SetApplicationName("CinemaManagementSystem")
+        .PersistKeysToStackExchangeRedis(redisConnection, "cinema:dataprotection:keys");
+
+    // -----------------------------------------------------------------------
+    // SignalR — with Redis backplane for horizontal scaling
+    // -----------------------------------------------------------------------
+    builder.Services.AddSignalR()
+        .AddStackExchangeRedis(redisConnectionString, options =>
+        {
+            options.Configuration.ChannelPrefix = RedisChannel.Literal("cinema:signalr:");
+        });
+
+    // -----------------------------------------------------------------------
+    // Database
+    // -----------------------------------------------------------------------
     builder.Services.AddDbContext<QuanLyRapPhimContext>(options =>
         options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+    // -----------------------------------------------------------------------
+    // Session — backed by Redis distributed cache
+    // -----------------------------------------------------------------------
     builder.Services.AddSession(options =>
     {
         options.IdleTimeout = TimeSpan.FromMinutes(30);
@@ -50,6 +92,9 @@ try
         options.Cookie.IsEssential = true;
     });
 
+    // -----------------------------------------------------------------------
+    // Authentication
+    // -----------------------------------------------------------------------
     builder.Services.AddAuthentication(options =>
     {
         options.DefaultScheme = Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme;
@@ -63,28 +108,56 @@ try
     });
 
     // -----------------------------------------------------------------------
-    // Health Checks — liveness + SQL Server readiness
+    // Health Checks — SQL Server + Redis
     // -----------------------------------------------------------------------
     builder.Services.AddHealthChecks()
         .AddSqlServer(
             connectionString: builder.Configuration.GetConnectionString("DefaultConnection")!,
             name: "sqlserver",
             failureStatus: HealthStatus.Unhealthy,
-            tags: new[] { "ready", "db" });
+            tags: new[] { "ready", "db" })
+        .AddRedis(
+            redisConnectionString,
+            name: "redis",
+            failureStatus: HealthStatus.Unhealthy,
+            tags: new[] { "ready", "cache" });
 
     // -----------------------------------------------------------------------
-    // Forwarded Headers — required when running behind a reverse proxy (Nginx)
-    // so the app sees the correct client IP, scheme (HTTPS), and host.
+    // Forwarded Headers — required behind reverse proxy (Nginx)
     // -----------------------------------------------------------------------
     builder.Services.Configure<ForwardedHeadersOptions>(options =>
     {
         options.ForwardedHeaders =
             ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
-        // Trust all proxies in Docker network (clear defaults to accept any)
         options.KnownNetworks.Clear();
         options.KnownProxies.Clear();
     });
 
+    // -----------------------------------------------------------------------
+    // Poster Storage — MinIO (production) or Local filesystem (development)
+    // -----------------------------------------------------------------------
+    var minioEndpoint = builder.Configuration["MinIO:Endpoint"];
+    if (!string.IsNullOrEmpty(minioEndpoint))
+    {
+        builder.Services.AddMinio(configureClient => configureClient
+            .WithEndpoint(minioEndpoint)
+            .WithCredentials(
+                builder.Configuration["MinIO:AccessKey"] ?? "minioadmin",
+                builder.Configuration["MinIO:SecretKey"] ?? "minioadmin")
+            .WithSSL(builder.Configuration.GetValue<bool>("MinIO:UseSSL")));
+
+        builder.Services.AddSingleton<IPosterStorageService, MinioPosterStorageService>();
+        Log.Information("Poster storage: MinIO ({Endpoint})", minioEndpoint);
+    }
+    else
+    {
+        builder.Services.AddSingleton<IPosterStorageService, LocalPosterStorageService>();
+        Log.Information("Poster storage: Local filesystem");
+    }
+
+    // -----------------------------------------------------------------------
+    // Business Services
+    // -----------------------------------------------------------------------
     builder.Services.AddScoped<ICinemaAdoNetDAL, CinemaAdoNetDAL>();
     builder.Services.AddScoped<IPhimBUS, PhimBUS>();
     builder.Services.AddScoped<IHoaDonBUS, HoaDonBUS>();
@@ -100,8 +173,6 @@ try
     // Middleware pipeline
     // -----------------------------------------------------------------------
 
-    // ForwardedHeaders MUST be first so all subsequent middleware sees correct
-    // client IP and scheme.
     app.UseForwardedHeaders();
 
     if (!app.Environment.IsDevelopment())
@@ -110,8 +181,6 @@ try
         app.UseHsts();
     }
 
-    // Only redirect to HTTPS in development (when not behind a reverse proxy).
-    // In production, Nginx handles HTTPS termination.
     if (app.Environment.IsDevelopment())
     {
         app.UseHttpsRedirection();
@@ -124,7 +193,10 @@ try
 
     app.UseSession();
 
-    // Serilog request logging — logs method, path, status code, elapsed time.
+    // Prometheus HTTP metrics
+    app.UseHttpMetrics();
+
+    // Serilog request logging
     app.UseSerilogRequestLogging(options =>
     {
         options.EnrichDiagnosticContext = (diagnosticContext, httpContext) =>
@@ -141,19 +213,20 @@ try
     // Health Check Endpoints
     // -----------------------------------------------------------------------
 
-    // Liveness probe: is the process alive and able to handle requests?
     app.MapHealthChecks("/healthz", new HealthCheckOptions
     {
-        Predicate = _ => false, // No dependency checks — just "is the app running?"
+        Predicate = _ => false,
         ResponseWriter = WriteHealthCheckResponse
     });
 
-    // Readiness probe: is the app ready to serve traffic? (includes DB check)
     app.MapHealthChecks("/healthz/ready", new HealthCheckOptions
     {
         Predicate = check => check.Tags.Contains("ready"),
         ResponseWriter = WriteHealthCheckResponse
     });
+
+    // Prometheus metrics endpoint
+    app.MapMetrics();
 
     app.MapHub<Cinema.Web.Hubs.SeatHub>("/seatHub");
 
