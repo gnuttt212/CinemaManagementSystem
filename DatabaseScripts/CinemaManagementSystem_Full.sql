@@ -300,6 +300,4 @@ INSERT INTO KhuyenMai (TenKM, PhanTramGiam, DieuKien, NgayBatDau, NgayKetThuc) V
 GO
 
 PRINT N'=== DATABASE QUẢN LÝ RẠP PHIM ĐÃ ĐƯỢC TẠO THÀNH CÔNG! ===';
-PRINT N'Tài khoản Admin:    admin / 123456';
-PRINT N'Tài khoản NhanVien: staff / 123456';
 GO

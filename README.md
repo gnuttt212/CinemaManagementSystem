@@ -1,15 +1,11 @@
 # Cinema Management System (Production-Grade)
 
-> **Hệ thống quản lý rạp chiếu phim toàn diện**, xây dựng trên nền tảng **ASP.NET Core 8 MVC** theo kiến trúc **3 lớp (3-Tier)**. Gần đây, hệ thống đã được nâng cấp mạnh mẽ với kiến trúc phân tán (Distributed Architecture), sẵn sàng **scale horizontal** (mở rộng ngang) cho môi trường Production thực tế.
+Hệ thống quản lý rạp chiếu phim toàn diện, xây dựng trên nền tảng ASP.NET Core 8 MVC theo kiến trúc 3 lớp (3-Tier). Gần đây, hệ thống đã được nâng cấp mạnh mẽ với kiến trúc phân tán (Distributed Architecture), sẵn sàng scale horizontal (mở rộng ngang) cho môi trường Production thực tế.
 
 ---
 
-## 🚀 Tính năng Nổi bật (Cập nhật mới)
-
-Hệ thống giờ đây không chỉ là một đồ án môn học mà đã được trang bị các tiêu chuẩn của một ứng dụng doanh nghiệp (Enterprise-level):
-
 ### Kiến trúc Khả mở (Scalability & Reliability)
-- **Redis Integration**: Thay thế hoàn toàn in-memory state. Sử dụng Redis cho Distributed Cache, Distributed Session, Data Protection Keys, và đặc biệt là **SignalR Backplane** (cho phép nhiều web server cùng đồng bộ trạng thái khóa ghế real-time).
+- Redis Integration: Thay thế hoàn toàn in-memory state. Sử dụng Redis cho Distributed Cache, Distributed Session, Data Protection Keys, và đặc biệt là SignalR Backplane (cho phép nhiều web server cùng đồng bộ trạng thái khóa ghế real-time).
 - **MinIO Object Storage**: Trừu tượng hóa việc lưu trữ poster phim với giao diện `IPosterStorageService`. Môi trường Production sử dụng MinIO (tương thích AWS S3) thay vì lưu file local, giúp stateless web servers.
 - **SeatHub Rewrite**: Cơ chế khóa ghế chuyển từ `ConcurrentDictionary` (local memory) sang **Redis Hash (`HSETNX`)** đảm bảo tính nguyên tử (atomic) và đồng nhất trên toàn cụm server.
 
@@ -30,7 +26,7 @@ Hệ thống giờ đây không chỉ là một đồ án môn học mà đã đ
 
 ---
 
-## 💻 Tính năng Cốt lõi của Ứng dụng
+## Tính năng Cốt lõi của Ứng dụng
 
 ### Dành cho Khách hàng
 - **Xác thực hiện đại**: Đăng nhập qua **Google OAuth 2.0**, mật khẩu mã hóa BCrypt an toàn.
@@ -45,7 +41,7 @@ Hệ thống giờ đây không chỉ là một đồ án môn học mà đã đ
 
 ---
 
-## 🛠 Công nghệ Sử dụng
+## Công nghệ Sử dụng
 
 | Lĩnh vực | Công nghệ / Thư viện |
 | :--- | :--- |
@@ -61,7 +57,7 @@ Hệ thống giờ đây không chỉ là một đồ án môn học mà đã đ
 
 ---
 
-## 🏗 Kiến trúc Dự án (3-Layer)
+## Kiến trúc Dự án (3-Layer)
 
 ```text
 CinemaManagementSystem/
@@ -117,7 +113,7 @@ Truy cập: `https://localhost:7059/`
 
 ---
 
-## 🚢 Triển khai Production (Docker Compose)
+## Triển khai Production (Docker Compose)
 
 Hệ thống cung cấp sẵn file `deploy/docker-compose.prod.yml` chạy hoàn toàn khép kín.
 
@@ -134,10 +130,3 @@ Hệ thống cung cấp sẵn file `deploy/docker-compose.prod.yml` chạy hoàn
 Xem chi tiết trong tài liệu [PRODUCTION.md](deploy/PRODUCTION.md).
 
 ---
-
-## 🔑 Tài khoản Test Mặc định
-
-Đã được seed sẵn trong script Database:
-- **Admin**: `admin / 123456`
-- **Nhân viên**: `nhanvien / 123456`
-- **Khách hàng**: Tự đăng ký qua Form hoặc đăng nhập Google OAuth.
