@@ -32,7 +32,7 @@ try
         .ReadFrom.Services(services)
         .Enrich.FromLogContext()
         .Enrich.WithProperty("Application", "CinemaManagementSystem")
-        .WriteTo.Console(new Serilog.Formatting.Compact.CompactJsonFormatter())
+        .WriteTo.Console()
         .WriteTo.File(
             new Serilog.Formatting.Compact.CompactJsonFormatter(),
             path: Path.Combine("logs", "cinema-.log"),

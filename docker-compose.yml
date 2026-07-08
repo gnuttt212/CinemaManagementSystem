@@ -29,39 +29,31 @@ services:
       - -c
       - |
         set -e
-
-        if [ -x /opt/mssql-tools18/bin/sqlcmd ]; then
-          SQLCMD="/opt/mssql-tools18/bin/sqlcmd"
-          SQLCMD_ARGS="-C"
-        else
-          SQLCMD="/opt/mssql-tools/bin/sqlcmd"
-          SQLCMD_ARGS=""
-        fi
-
+        if [ -x /opt/mssql-tools18/bin/sqlcmd ]; then SQLCMD="/opt/mssql-tools18/bin/sqlcmd"; SQLCMD_ARGS="-C"; else SQLCMD="/opt/mssql-tools/bin/sqlcmd"; SQLCMD_ARGS=""; fi
         echo "Waiting for SQL Server..."
         for i in {1..60}; do
-          if $$SQLCMD -S cinema-db,1433 -U sa -P "$$MSSQL_SA_PASSWORD" $$SQLCMD_ARGS -Q "SELECT 1" >/dev/null 2>&1; then
-            echo "SQL Server is ready."
-            break
-          fi
-
-          if [ "$$i" = "60" ]; then
-            echo "SQL Server did not become ready in time."
-            exit 1
-          fi
-
+          if $$SQLCMD -S cinema-db,1433 -U sa -P "$$MSSQL_SA_PASSWORD" $$SQLCMD_ARGS -Q "SELECT 1" >/dev/null 2>&1; then echo "SQL Server is ready."; break; fi
+          if [ "$$i" = "60" ]; then echo "SQL Server did not become ready in time."; exit 1; fi
           sleep 2
         done
-
-        if $$SQLCMD -S cinema-db,1433 -U sa -P "$$MSSQL_SA_PASSWORD" $$SQLCMD_ARGS -Q "SET NOCOUNT ON; IF DB_ID(N'QuanLyRapPhim') IS NULL RAISERROR('Database not initialized', 16, 1);" >/dev/null 2>&1 \
-          && $$SQLCMD -S cinema-db,1433 -U sa -P "$$MSSQL_SA_PASSWORD" $$SQLCMD_ARGS -d QuanLyRapPhim -Q "SET NOCOUNT ON; IF OBJECT_ID(N'dbo.Phim', N'U') IS NULL RAISERROR('Database not initialized', 16, 1);" >/dev/null 2>&1; then
-          echo "Database already initialized. Skipping seed script."
-          exit 0
+        if $$SQLCMD -S cinema-db,1433 -U sa -P "$$MSSQL_SA_PASSWORD" $$SQLCMD_ARGS -Q "SET NOCOUNT ON; IF DB_ID(N'QuanLyRapPhim') IS NULL RAISERROR('not init', 16, 1);" >/dev/null 2>&1 \
+          && $$SQLCMD -S cinema-db,1433 -U sa -P "$$MSSQL_SA_PASSWORD" $$SQLCMD_ARGS -d QuanLyRapPhim -Q "SET NOCOUNT ON; IF OBJECT_ID(N'dbo.Phim', N'U') IS NULL RAISERROR('not init', 16, 1);" >/dev/null 2>&1; then
+          echo "Database already initialized."; exit 0
         fi
-
         echo "Applying database script..."
         $$SQLCMD -S cinema-db,1433 -U sa -P "$$MSSQL_SA_PASSWORD" $$SQLCMD_ARGS -i /scripts/CinemaManagementSystem_Full.sql
         echo "Database initialized."
+
+  cinema-redis:
+    image: redis:7-alpine
+    container_name: cinema-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data-dev:/data
+    networks:
+      - cinema-net
+    restart: unless-stopped
 
   cinema-web:
     build:
@@ -72,10 +64,13 @@ services:
     depends_on:
       cinema-db-init:
         condition: service_completed_successfully
+      cinema-redis:
+        condition: service_started
     environment:
       ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Development}
       ASPNETCORE_URLS: http://+:8080
       ConnectionStrings__DefaultConnection: "Server=cinema-db,1433;Database=QuanLyRapPhim;User Id=sa;Password=${MSSQL_SA_PASSWORD:-CinemaDev@12345};Encrypt=True;TrustServerCertificate=True;MultipleActiveResultSets=True"
+      ConnectionStrings__Redis: "cinema-redis:6379"
       Authentication__Google__ClientId: ${GOOGLE_CLIENT_ID:-PLACEHOLDER_CLIENT_ID}
       Authentication__Google__ClientSecret: ${GOOGLE_CLIENT_SECRET:-PLACEHOLDER_CLIENT_SECRET}
       VnPay__TmnCode: ${VNPAY_TMN_CODE:-PLACEHOLDER_TMN_CODE}
@@ -93,6 +88,7 @@ services:
 volumes:
   cinema-sql-data:
   cinema-poster-data:
+  redis-data-dev:
 
 networks:
   cinema-net:
