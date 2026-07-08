@@ -7,6 +7,7 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using Cinema.DAL.Models;
+using Cinema.Web.Services;
 using System.Linq;
 
 namespace Cinema.Web.Areas.Admin.Controllers
@@ -16,12 +17,12 @@ namespace Cinema.Web.Areas.Admin.Controllers
     public class PhimController : Controller
     {
         private readonly IPhimBUS _phimBus;
-        private readonly IWebHostEnvironment _hostEnvironment;
+        private readonly IPosterStorageService _posterStorage;
         private readonly QuanLyRapPhimContext _db;
-        public PhimController(IPhimBUS phimBus, IWebHostEnvironment hostEnvironment, QuanLyRapPhimContext db)
+        public PhimController(IPhimBUS phimBus, IPosterStorageService posterStorage, QuanLyRapPhimContext db)
         {
             _phimBus = phimBus;
-            _hostEnvironment = hostEnvironment;
+            _posterStorage = posterStorage;
             _db = db;
         }
         public IActionResult Index()
@@ -45,20 +46,7 @@ namespace Cinema.Web.Areas.Admin.Controllers
             {
                 if (ImageFile != null)
                 {
-                    string wwwRootPath = _hostEnvironment.WebRootPath;
-                    string folderPath = Path.Combine(wwwRootPath, "images", "phim");
-                    if (!Directory.Exists(folderPath))
-                    {
-                        Directory.CreateDirectory(folderPath);
-                    }
-                    string fileName = Guid.NewGuid().ToString() + "_" + ImageFile.FileName;
-                    string path = Path.Combine(folderPath, fileName);
-
-                    using (var fileStream = new FileStream(path, FileMode.Create))
-                    {
-                        await ImageFile.CopyToAsync(fileStream);
-                    }
-                    phimDto.Poster = fileName;
+                    phimDto.Poster = await _posterStorage.UploadAsync(ImageFile);
                 }
                 else
                 {
@@ -93,20 +81,7 @@ namespace Cinema.Web.Areas.Admin.Controllers
             {
                 if (ImageFile != null)
                 {
-                    string wwwRootPath = _hostEnvironment.WebRootPath;
-                    string folderPath = Path.Combine(wwwRootPath, "images", "phim");
-                    if (!Directory.Exists(folderPath))
-                    {
-                        Directory.CreateDirectory(folderPath);
-                    }
-                    string fileName = Guid.NewGuid().ToString() + "_" + ImageFile.FileName;
-                    string path = Path.Combine(folderPath, fileName);
-
-                    using (var fileStream = new FileStream(path, FileMode.Create))
-                    {
-                        await ImageFile.CopyToAsync(fileStream);
-                    }
-                    phimDto.Poster = fileName;
+                    phimDto.Poster = await _posterStorage.UploadAsync(ImageFile);
                 }
 
                 bool result = _phimBus.SuaPhim(phimDto);
