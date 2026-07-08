@@ -42,6 +42,11 @@ project.lock.json
 project.assets.json
 artifacts/
 
+# Local environment files
+.env
+.env.*
+!.env.example
+
 # Windows image file caches
 Thumbs.db
 ehthumbs.db
