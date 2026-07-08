@@ -86,6 +86,7 @@ namespace Cinema.Web.Areas.NhanVien.Controllers
             return View(lc);
         }
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Delete(int id)
         {
             var lichChieu = _db.LichChieus.Find(id);

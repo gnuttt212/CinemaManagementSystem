@@ -83,6 +83,7 @@ namespace Cinema.Web.Areas.NhanVien.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Delete(int id)
         {
             bool result = _phimBus.XoaPhim(id);

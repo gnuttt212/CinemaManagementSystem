@@ -65,6 +65,7 @@ namespace Cinema.Web.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult LuuGheVaoSession(List<string> ghes, int maLich, List<DoAnChonDTO> doAns)
         {
             try

@@ -55,6 +55,7 @@ namespace Cinema.Web.Areas.Admin.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Delete(int id)
         {
             var doAn = _db.DoAns.Find(id);

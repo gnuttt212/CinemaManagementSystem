@@ -94,6 +94,7 @@ namespace Cinema.Web.ApiControllers
 
         // POST: api/LichChieuApi
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Create([FromBody] LichChieuCreateRequest req)
         {
             if (req == null || req.MaPhim == null || req.MaPhong == null)
@@ -132,6 +133,7 @@ namespace Cinema.Web.ApiControllers
 
         // PUT: api/LichChieuApi/5
         [HttpPut("{id}")]
+        [ValidateAntiForgeryToken]
         public IActionResult Update(int id, [FromBody] LichChieuCreateRequest req)
         {
             var lichChieu = _db.LichChieus.Find(id);
@@ -159,6 +161,7 @@ namespace Cinema.Web.ApiControllers
 
         // DELETE: api/LichChieuApi/5
         [HttpDelete("{id}")]
+        [ValidateAntiForgeryToken]
         public IActionResult Delete(int id)
         {
             var lichChieu = _db.LichChieus.Find(id);

@@ -31,6 +31,7 @@ namespace Cinema.Web.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult XacNhanThanhToan()
         {
             var cart = HttpContext.Session.Get<CartItemDTO>("GioHang");
@@ -68,6 +69,7 @@ namespace Cinema.Web.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult ThanhToanVnPay()
         {
             var cart = HttpContext.Session.Get<CartItemDTO>("GioHang");

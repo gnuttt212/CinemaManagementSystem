@@ -52,6 +52,7 @@ namespace Cinema.Web.ApiControllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult<PhimDTO> CreatePhim([FromBody] PhimDTO dto)
         {
             if (dto == null || string.IsNullOrWhiteSpace(dto.TenPhim))
@@ -69,6 +70,7 @@ namespace Cinema.Web.ApiControllers
         }
 
         [HttpPut("{id}")]
+        [ValidateAntiForgeryToken]
         public IActionResult UpdatePhim(int id, [FromBody] PhimDTO dto)
         {
             if (dto == null) return BadRequest(new { message = "Dữ liệu không hợp lệ" });
@@ -83,6 +85,7 @@ namespace Cinema.Web.ApiControllers
         }
 
         [HttpDelete("{id}")]
+        [ValidateAntiForgeryToken]
         public IActionResult DeletePhim(int id)
         {
             bool result = _phimBus.XoaPhim(id);
@@ -187,6 +190,7 @@ namespace Cinema.Web.ApiControllers
         }
 
         [HttpPost("import-xml")]
+        [ValidateAntiForgeryToken]
         public IActionResult ImportXml([FromBody] string xmlContent)
         {
             try

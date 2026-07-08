@@ -57,6 +57,7 @@ namespace Cinema.Web.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult EditProfile(KhachHangDTO model)
         {
             if (ModelState.IsValid)
@@ -84,6 +85,7 @@ namespace Cinema.Web.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult DoiMatKhau(Cinema.DTO.DoiMatKhauRequest model)
         {
             var taiKhoan = HttpContext.Session.GetString("UserAccount");
@@ -116,6 +118,7 @@ namespace Cinema.Web.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult DoiMatKhauNhanVien(Cinema.DTO.DoiMatKhauRequest model)
         {
             var taiKhoan = HttpContext.Session.GetString("UserAccount");

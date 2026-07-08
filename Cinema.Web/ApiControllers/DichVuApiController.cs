@@ -50,6 +50,7 @@ namespace Cinema.Web.ApiControllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Create([FromBody] DoAnDTO dto)
         {
             if (dto == null || string.IsNullOrWhiteSpace(dto.TenDoAn))
@@ -72,6 +73,7 @@ namespace Cinema.Web.ApiControllers
         }
 
         [HttpPut("{id}")]
+        [ValidateAntiForgeryToken]
         public IActionResult Update(int id, [FromBody] DoAnDTO dto)
         {
             var doAn = _db.DoAns.Find(id);
@@ -86,6 +88,7 @@ namespace Cinema.Web.ApiControllers
         }
 
         [HttpDelete("{id}")]
+        [ValidateAntiForgeryToken]
         public IActionResult Delete(int id)
         {
             var doAn = _db.DoAns.Find(id);

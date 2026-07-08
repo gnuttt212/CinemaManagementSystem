@@ -29,6 +29,7 @@ namespace Cinema.Web.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Login(KhachHangLoginRequest req)
         {
             if (!ModelState.IsValid) return View();
@@ -107,6 +108,7 @@ namespace Cinema.Web.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Register(KhachHangRegisterRequest req)
         {
             if (ModelState.IsValid)
