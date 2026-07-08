@@ -19,7 +19,6 @@ services:
     networks:
       - cinema-net
     restart: unless-stopped
-    # NO ports exposed to host — only accessible within cinema-net
 
   # ---------------------------------------------------------------------------
   # Database Initializer (one-shot)
@@ -56,6 +55,45 @@ services:
         echo "Database initialized."
 
   # ---------------------------------------------------------------------------
+  # Redis — Session, Cache, SignalR Backplane
+  # ---------------------------------------------------------------------------
+  cinema-redis:
+    image: redis:7-alpine
+    container_name: cinema-redis
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis-data:/data
+    networks:
+      - cinema-net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # ---------------------------------------------------------------------------
+  # MinIO — S3-compatible Object Storage for Posters
+  # ---------------------------------------------------------------------------
+  cinema-minio:
+    image: minio/minio
+    container_name: cinema-minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY:-minioadmin}
+    volumes:
+      - minio-data:/data
+    networks:
+      - cinema-net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # ---------------------------------------------------------------------------
   # ASP.NET Core Web App
   # ---------------------------------------------------------------------------
   cinema-web:
@@ -64,6 +102,10 @@ services:
     depends_on:
       cinema-db-init:
         condition: service_completed_successfully
+      cinema-redis:
+        condition: service_healthy
+      cinema-minio:
+        condition: service_healthy
     env_file:
       - .env.prod
     environment:
@@ -75,7 +117,6 @@ services:
     networks:
       - cinema-net
     restart: unless-stopped
-    # NO ports exposed to host — only nginx talks to it
 
   # ---------------------------------------------------------------------------
   # Nginx Reverse Proxy
@@ -106,7 +147,6 @@ services:
     volumes:
       - certbot-etc:/etc/letsencrypt
       - certbot-www:/var/www/certbot
-    # Run renewal check: docker compose -f docker-compose.prod.yml run --rm certbot renew
     entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
 
   # ---------------------------------------------------------------------------
@@ -133,7 +173,6 @@ services:
       /bin/bash -c '
         echo "Backup container started. Scheduling daily backup at 2:00 AM..."
         while true; do
-          # Calculate seconds until next 2:00 AM
           now=$$(date +%s)
           target=$$(date -d "tomorrow 02:00" +%s 2>/dev/null || date -d "02:00" +%s)
           if [ "$$target" -le "$$now" ]; then
@@ -149,13 +188,53 @@ services:
       '
     restart: unless-stopped
 
+  # ---------------------------------------------------------------------------
+  # Prometheus — Metrics Collection
+  # ---------------------------------------------------------------------------
+  cinema-prometheus:
+    image: prom/prometheus:latest
+    container_name: cinema-prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.retention.time=30d"
+      - "--web.enable-lifecycle"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./monitoring/alerting-rules.yml:/etc/prometheus/alerting-rules.yml:ro
+      - prometheus-data:/prometheus
+    networks:
+      - cinema-net
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # Grafana — Dashboards & Visualization
+  # ---------------------------------------------------------------------------
+  cinema-grafana:
+    image: grafana/grafana:latest
+    container_name: cinema-grafana
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
+      GF_SERVER_ROOT_URL: ${GRAFANA_ROOT_URL:-http://localhost:3000}
+      GF_SERVER_SERVE_FROM_SUB_PATH: "true"
+    volumes:
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - grafana-data:/var/lib/grafana
+    networks:
+      - cinema-net
+    restart: unless-stopped
+
 volumes:
   cinema-sql-data:
   cinema-poster-data:
   cinema-logs:
   cinema-backup-data:
+  redis-data:
+  minio-data:
   certbot-etc:
   certbot-www:
+  prometheus-data:
+  grafana-data:
 
 networks:
   cinema-net:
