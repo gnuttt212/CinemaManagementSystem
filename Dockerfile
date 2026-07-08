@@ -14,7 +14,7 @@ RUN dotnet restore "Cinema.Web/Cinema.Web.csproj"
 COPY . .
 RUN dotnet publish "Cinema.Web/Cinema.Web.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 WORKDIR /app
 
 # Install curl for Docker HEALTHCHECK
