@@ -1,0 +1,162 @@
+# =============================================================================
+# Production Docker Compose — Cinema Management System
+# Usage: docker compose -f docker-compose.prod.yml up -d
+# =============================================================================
+
+services:
+  # ---------------------------------------------------------------------------
+  # SQL Server 2022
+  # ---------------------------------------------------------------------------
+  cinema-db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: cinema-db
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: ${MSSQL_PID:-Express}
+      MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD}
+    volumes:
+      - cinema-sql-data:/var/opt/mssql
+    networks:
+      - cinema-net
+    restart: unless-stopped
+    # NO ports exposed to host — only accessible within cinema-net
+
+  # ---------------------------------------------------------------------------
+  # Database Initializer (one-shot)
+  # ---------------------------------------------------------------------------
+  cinema-db-init:
+    image: mcr.microsoft.com/mssql-tools:latest
+    container_name: cinema-db-init
+    depends_on:
+      - cinema-db
+    environment:
+      MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD}
+    volumes:
+      - ../DatabaseScripts/CinemaManagementSystem_Full.sql:/scripts/CinemaManagementSystem_Full.sql:ro
+    networks:
+      - cinema-net
+    entrypoint:
+      - /bin/bash
+      - -c
+      - |
+        set -e
+        if [ -x /opt/mssql-tools18/bin/sqlcmd ]; then SQLCMD="/opt/mssql-tools18/bin/sqlcmd"; SQLCMD_ARGS="-C"; else SQLCMD="/opt/mssql-tools/bin/sqlcmd"; SQLCMD_ARGS=""; fi
+        echo "Waiting for SQL Server..."
+        for i in $$(seq 1 60); do
+          if $$SQLCMD -S cinema-db,1433 -U sa -P "$$MSSQL_SA_PASSWORD" $$SQLCMD_ARGS -Q "SELECT 1" >/dev/null 2>&1; then echo "SQL Server is ready."; break; fi
+          if [ "$$i" = "60" ]; then echo "SQL Server did not become ready in time."; exit 1; fi
+          sleep 2
+        done
+        if $$SQLCMD -S cinema-db,1433 -U sa -P "$$MSSQL_SA_PASSWORD" $$SQLCMD_ARGS -Q "SET NOCOUNT ON; IF DB_ID(N'QuanLyRapPhim') IS NULL RAISERROR('not init', 16, 1);" >/dev/null 2>&1 \
+          && $$SQLCMD -S cinema-db,1433 -U sa -P "$$MSSQL_SA_PASSWORD" $$SQLCMD_ARGS -d QuanLyRapPhim -Q "SET NOCOUNT ON; IF OBJECT_ID(N'dbo.Phim', N'U') IS NULL RAISERROR('not init', 16, 1);" >/dev/null 2>&1; then
+          echo "Database already initialized."; exit 0
+        fi
+        echo "Applying database script..."
+        $$SQLCMD -S cinema-db,1433 -U sa -P "$$MSSQL_SA_PASSWORD" $$SQLCMD_ARGS -i /scripts/CinemaManagementSystem_Full.sql
+        echo "Database initialized."
+
+  # ---------------------------------------------------------------------------
+  # ASP.NET Core Web App
+  # ---------------------------------------------------------------------------
+  cinema-web:
+    image: ${WEB_IMAGE}
+    container_name: cinema-web
+    depends_on:
+      cinema-db-init:
+        condition: service_completed_successfully
+    env_file:
+      - .env.prod
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+    volumes:
+      - cinema-poster-data:/app/wwwroot/images/phim
+      - cinema-logs:/app/logs
+    networks:
+      - cinema-net
+    restart: unless-stopped
+    # NO ports exposed to host — only nginx talks to it
+
+  # ---------------------------------------------------------------------------
+  # Nginx Reverse Proxy
+  # ---------------------------------------------------------------------------
+  cinema-nginx:
+    image: nginx:alpine
+    container_name: cinema-nginx
+    depends_on:
+      - cinema-web
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - certbot-etc:/etc/letsencrypt:ro
+      - certbot-www:/var/www/certbot:ro
+    networks:
+      - cinema-net
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # Certbot (Let's Encrypt)
+  # ---------------------------------------------------------------------------
+  certbot:
+    image: certbot/certbot
+    container_name: cinema-certbot
+    volumes:
+      - certbot-etc:/etc/letsencrypt
+      - certbot-www:/var/www/certbot
+    # Run renewal check: docker compose -f docker-compose.prod.yml run --rm certbot renew
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+
+  # ---------------------------------------------------------------------------
+  # Scheduled Database Backup
+  # ---------------------------------------------------------------------------
+  cinema-backup:
+    image: mcr.microsoft.com/mssql-tools:latest
+    container_name: cinema-backup
+    depends_on:
+      - cinema-db
+    environment:
+      DB_HOST: cinema-db
+      DB_PORT: "1433"
+      SA_PASSWORD: ${MSSQL_SA_PASSWORD}
+      DB_NAME: QuanLyRapPhim
+      BACKUP_DIR: /backups
+      RETENTION_DAYS: ${BACKUP_RETENTION_DAYS:-7}
+    volumes:
+      - ./backup/backup-db.sh:/scripts/backup-db.sh:ro
+      - cinema-backup-data:/backups
+    networks:
+      - cinema-net
+    entrypoint: |
+      /bin/bash -c '
+        echo "Backup container started. Scheduling daily backup at 2:00 AM..."
+        while true; do
+          # Calculate seconds until next 2:00 AM
+          now=$$(date +%s)
+          target=$$(date -d "tomorrow 02:00" +%s 2>/dev/null || date -d "02:00" +%s)
+          if [ "$$target" -le "$$now" ]; then
+            target=$$(date -d "tomorrow 02:00" +%s)
+          fi
+          sleep_seconds=$$((target - now))
+          echo "[$$(date -Iseconds)] Next backup in $${sleep_seconds}s"
+          sleep "$$sleep_seconds"
+          echo "[$$(date -Iseconds)] Starting scheduled backup..."
+          /scripts/backup-db.sh
+          echo "[$$(date -Iseconds)] Backup completed with exit code $$?"
+        done
+      '
+    restart: unless-stopped
+
+volumes:
+  cinema-sql-data:
+  cinema-poster-data:
+  cinema-logs:
+  cinema-backup-data:
+  certbot-etc:
+  certbot-www:
+
+networks:
+  cinema-net:
+    driver: bridge

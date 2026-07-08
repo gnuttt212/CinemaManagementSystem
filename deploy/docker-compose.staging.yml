@@ -1,0 +1,17 @@
+services:
+  cinema-web:
+    image: ${WEB_IMAGE}
+    container_name: cinema-web
+    env_file:
+      - .env
+    environment:
+      ASPNETCORE_URLS: ${ASPNETCORE_URLS:-http://+:8080}
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Staging}
+    ports:
+      - "${WEB_HOST_PORT:-8080}:8080"
+    volumes:
+      - cinema-poster-data:/app/wwwroot/images/phim
+    restart: unless-stopped
+
+volumes:
+  cinema-poster-data:
