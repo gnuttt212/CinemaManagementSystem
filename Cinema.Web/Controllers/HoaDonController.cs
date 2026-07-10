@@ -11,11 +11,15 @@ namespace Cinema.Web.Controllers
     {
         private readonly IHoaDonBUS _hoaDonBus;
         private readonly IConfiguration _config;
+        private readonly IMessageProducer _messageProducer;
+        private readonly IKhachHangBUS _khachHangBus;
 
-        public HoaDonController(IHoaDonBUS hoaDonBus, IConfiguration config)
+        public HoaDonController(IHoaDonBUS hoaDonBus, IConfiguration config, IMessageProducer messageProducer, IKhachHangBUS khachHangBus)
         {
             _hoaDonBus = hoaDonBus;
             _config = config;
+            _messageProducer = messageProducer;
+            _khachHangBus = khachHangBus;
         }
 
         [HttpGet]
@@ -122,6 +126,23 @@ namespace Cinema.Web.Controllers
                 if (isValid && vnpResponseCode == "00")
                 {
                     _hoaDonBus.CapNhatTrangThaiHoaDon(maHD, "Đã thanh toán");
+                    
+                    var userAccount = HttpContext.Session.GetString("UserAccount");
+                    var khachHang = userAccount != null ? _khachHangBus.LayThongTinProfile(userAccount) : null;
+                    
+                    var hdModel = _hoaDonBus.LayChiTietHoaDonFull(maHD);
+                    
+                    if (khachHang != null && !string.IsNullOrEmpty(khachHang.Email))
+                    {
+                        var eventMsg = new TicketPurchasedEvent
+                        {
+                            MaHD = maHD,
+                            Email = khachHang.Email,
+                            TongTien = hdModel?.TongTien ?? 0
+                        };
+                        _messageProducer.SendMessageAsync(eventMsg, "ticket_emails").GetAwaiter().GetResult();
+                    }
+
                     return RedirectToAction("ThanhToanThanhCong", new { id = maHD });
                 }
                 else

@@ -94,6 +94,26 @@ services:
       retries: 5
 
   # ---------------------------------------------------------------------------
+  # RabbitMQ — Message Broker (Event-Driven Async Tasks)
+  # ---------------------------------------------------------------------------
+  cinema-rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: cinema-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-guest}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-guest}
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    networks:
+      - cinema-net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "check_port_connectivity"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # ---------------------------------------------------------------------------
   # ASP.NET Core Web App
   # ---------------------------------------------------------------------------
   cinema-web:
@@ -105,6 +125,8 @@ services:
       cinema-redis:
         condition: service_healthy
       cinema-minio:
+        condition: service_healthy
+      cinema-rabbitmq:
         condition: service_healthy
     env_file:
       - .env.prod
@@ -230,6 +252,7 @@ volumes:
   cinema-logs:
   cinema-backup-data:
   redis-data:
+  rabbitmq-data:
   minio-data:
   certbot-etc:
   certbot-www:

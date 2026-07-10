@@ -12,6 +12,7 @@ using StackExchange.Redis;
 using Minio;
 using Prometheus;
 using System.Text.Json;
+using Cinema.Web.BackgroundServices;
 
 // ---------------------------------------------------------------------------
 // Bootstrap Serilog early so unhandled startup errors are captured.
@@ -166,6 +167,12 @@ try
     builder.Services.AddScoped<IDoAnBUS, DoAnBUS>();
     builder.Services.AddScoped<IKhuyenMaiBUS, KhuyenMaiBUS>();
     builder.Services.AddScoped<IPhongChieuBUS, PhongChieuBUS>();
+
+    // -----------------------------------------------------------------------
+    // RabbitMQ Services
+    // -----------------------------------------------------------------------
+    builder.Services.AddSingleton<IMessageProducer, RabbitMQProducer>();
+    builder.Services.AddHostedService<TicketEmailWorker>();
 
     var app = builder.Build();
 
