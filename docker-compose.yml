@@ -65,6 +65,17 @@ services:
       - cinema-net
     restart: unless-stopped
 
+  cinema-mongo:
+    image: mongo:7.0
+    container_name: cinema-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - cinema-mongo-data:/data/db
+    networks:
+      - cinema-net
+    restart: unless-stopped
+
   cinema-web:
     build:
       context: .
@@ -78,12 +89,16 @@ services:
         condition: service_started
       cinema-rabbitmq:
         condition: service_started
+      cinema-mongo:
+        condition: service_started
     environment:
       ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Development}
       ASPNETCORE_URLS: http://+:8080
       ConnectionStrings__DefaultConnection: "Server=cinema-db,1433;Database=QuanLyRapPhim;User Id=sa;Password=${MSSQL_SA_PASSWORD:-CinemaDev@12345};Encrypt=True;TrustServerCertificate=True;MultipleActiveResultSets=True"
       ConnectionStrings__Redis: "cinema-redis:6379"
       ConnectionStrings__RabbitMQ: "amqp://guest:guest@cinema-rabbitmq:5672/"
+      ConnectionStrings__MongoDB: "mongodb://cinema-mongo:27017"
+      MongoDB__DatabaseName: "CinemaManagementDB"
       Authentication__Google__ClientId: ${GOOGLE_CLIENT_ID:-PLACEHOLDER_CLIENT_ID}
       Authentication__Google__ClientSecret: ${GOOGLE_CLIENT_SECRET:-PLACEHOLDER_CLIENT_SECRET}
       VnPay__TmnCode: ${VNPAY_TMN_CODE:-PLACEHOLDER_TMN_CODE}
@@ -102,6 +117,7 @@ volumes:
   cinema-sql-data:
   cinema-poster-data:
   redis-data-dev:
+  cinema-mongo-data:
 
 networks:
   cinema-net:

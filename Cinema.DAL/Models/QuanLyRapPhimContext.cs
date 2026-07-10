@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
+using MassTransit;
 
 namespace Cinema.DAL.Models;
 
@@ -58,6 +59,10 @@ public partial class QuanLyRapPhimContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.AddInboxStateEntity();
+        modelBuilder.AddOutboxMessageEntity();
+        modelBuilder.AddOutboxStateEntity();
+
         modelBuilder.Entity<ChiTietDoAn>(entity =>
         {
             entity.HasKey(e => new { e.MaHd, e.MaDoAn });

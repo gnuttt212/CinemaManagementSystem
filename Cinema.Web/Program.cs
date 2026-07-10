@@ -1,10 +1,12 @@
 using Microsoft.EntityFrameworkCore;
+using MassTransit;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.DataProtection;
 using Cinema.DAL.Models;
 using Cinema.DAL.AdoNet;
+using Cinema.DAL;
 using Cinema.BUS;
 using Cinema.Web.Services;
 using Serilog;
@@ -159,6 +161,8 @@ try
     // -----------------------------------------------------------------------
     // Business Services
     // -----------------------------------------------------------------------
+    builder.Services.AddSingleton<MongoDbContext>();
+    builder.Services.AddScoped<IReviewService, ReviewService>();
     builder.Services.AddScoped<ICinemaAdoNetDAL, CinemaAdoNetDAL>();
     builder.Services.AddScoped<IPhimBUS, PhimBUS>();
     builder.Services.AddScoped<IHoaDonBUS, HoaDonBUS>();
@@ -169,10 +173,23 @@ try
     builder.Services.AddScoped<IPhongChieuBUS, PhongChieuBUS>();
 
     // -----------------------------------------------------------------------
-    // RabbitMQ Services
+    // RabbitMQ Services & MassTransit
     // -----------------------------------------------------------------------
-    builder.Services.AddSingleton<IMessageProducer, RabbitMQProducer>();
-    builder.Services.AddHostedService<TicketEmailWorker>();
+    builder.Services.AddMassTransit(x =>
+    {
+        x.AddEntityFrameworkOutbox<QuanLyRapPhimContext>(o =>
+        {
+            o.UseSqlServer();
+            o.UseBusOutbox();
+        });
+
+        x.UsingRabbitMq((context, cfg) =>
+        {
+            var rmqConnectionString = builder.Configuration.GetConnectionString("RabbitMQ") ?? "amqp://guest:guest@localhost:5672/";
+            cfg.Host(rmqConnectionString);
+            cfg.ConfigureEndpoints(context);
+        });
+    });
 
     var app = builder.Build();
 

@@ -5,15 +5,20 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 
+using MassTransit;
+using Cinema.DTO.Events;
+
 namespace Cinema.BUS
 {
     public class HoaDonBUS : IHoaDonBUS
     {
         private readonly QuanLyRapPhimContext _context;
+        private readonly IPublishEndpoint _publishEndpoint;
 
-        public HoaDonBUS(QuanLyRapPhimContext context)
+        public HoaDonBUS(QuanLyRapPhimContext context, IPublishEndpoint publishEndpoint)
         {
             _context = context;
+            _publishEndpoint = publishEndpoint;
         }
 
         public List<HoaDonDTO> LayDanhSachHoaDon()
@@ -170,6 +175,14 @@ namespace Cinema.BUS
                             });
                         }
                     }
+
+                    _publishEndpoint.Publish<InvoiceCreatedEvent>(new
+                    {
+                        MaHD = hoaDon.MaHd,
+                        TaiKhoan = taiKhoan,
+                        TongTien = cart.TongTien,
+                        TrangThai = trangThai
+                    }).GetAwaiter().GetResult();
 
                     _context.SaveChanges();
                     transaction.Commit();
