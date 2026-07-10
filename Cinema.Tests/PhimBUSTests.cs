@@ -2,6 +2,8 @@ using Cinema.BUS;
 using Cinema.DAL.Models;
 using Cinema.DTO;
 using Microsoft.EntityFrameworkCore;
+using MockQueryable.Moq;
+using MockQueryable.EntityFrameworkCore;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -12,26 +14,13 @@ namespace Cinema.Tests
 {
     public class PhimBUSTests
     {
-        private Mock<QuanLyRapPhimContext> _mockContext;
-        private PhimBUS _phimBus;
+        private readonly Mock<QuanLyRapPhimContext> _mockContext;
+        private readonly PhimBUS _phimBus;
 
         public PhimBUSTests()
         {
             _mockContext = new Mock<QuanLyRapPhimContext>();
             _phimBus = new PhimBUS(_mockContext.Object);
-        }
-
-        private Mock<DbSet<T>> GetQueryableMockDbSet<T>(List<T> sourceList) where T : class
-        {
-            var queryable = sourceList.AsQueryable();
-
-            var dbSet = new Mock<DbSet<T>>();
-            dbSet.As<IQueryable<T>>().Setup(m => m.Provider).Returns(queryable.Provider);
-            dbSet.As<IQueryable<T>>().Setup(m => m.Expression).Returns(queryable.Expression);
-            dbSet.As<IQueryable<T>>().Setup(m => m.ElementType).Returns(queryable.ElementType);
-            dbSet.As<IQueryable<T>>().Setup(m => m.GetEnumerator()).Returns(() => queryable.GetEnumerator());
-            
-            return dbSet;
         }
 
         [Fact]
@@ -43,8 +32,9 @@ namespace Cinema.Tests
                 new Phim { MaPhim = 2, TenPhim = "Phim 2", TheLoai = "Tình cảm" }
             };
 
-            var mockDbSet = GetQueryableMockDbSet(data);
+            var mockDbSet = data.BuildMockDbSet();
             _mockContext.Setup(c => c.Phims).Returns(mockDbSet.Object);
+            
             var result = _phimBus.LayDanhSachPhim();
 
             Assert.NotNull(result);
@@ -57,7 +47,7 @@ namespace Cinema.Tests
         public void ThemPhim_Success_ReturnsMaPhim()
         {
             var data = new List<Phim>();
-            var mockDbSet = GetQueryableMockDbSet(data);
+            var mockDbSet = data.BuildMockDbSet();
             
             mockDbSet.Setup(d => d.Add(It.IsAny<Phim>())).Callback<Phim>(p => 
             {
@@ -82,7 +72,7 @@ namespace Cinema.Tests
         public void ThemPhim_Exception_ReturnsZero()
         {
             var data = new List<Phim>();
-            var mockDbSet = GetQueryableMockDbSet(data);
+            var mockDbSet = data.BuildMockDbSet();
             
             _mockContext.Setup(c => c.Phims).Returns(mockDbSet.Object);
             _mockContext.Setup(m => m.SaveChanges()).Throws(new Exception("Database error"));
@@ -102,7 +92,7 @@ namespace Cinema.Tests
                 new Phim { MaPhim = 1, TenPhim = "Phim Cu", ThoiLuong = 100 }
             };
             
-            var mockDbSet = GetQueryableMockDbSet(data);
+            var mockDbSet = data.BuildMockDbSet();
             mockDbSet.Setup(m => m.Find(It.IsAny<object[]>())).Returns<object[]>(ids => data.FirstOrDefault(d => d.MaPhim == (int)ids[0]));
 
             _mockContext.Setup(c => c.Phims).Returns(mockDbSet.Object);
@@ -122,8 +112,7 @@ namespace Cinema.Tests
         public void SuaPhim_NotFound_ReturnsFalse()
         {
             var data = new List<Phim>();
-            
-            var mockDbSet = GetQueryableMockDbSet(data);
+            var mockDbSet = data.BuildMockDbSet();
             mockDbSet.Setup(m => m.Find(It.IsAny<object[]>())).Returns<object[]>(ids => data.FirstOrDefault(d => d.MaPhim == (int)ids[0]));
 
             _mockContext.Setup(c => c.Phims).Returns(mockDbSet.Object);
@@ -144,7 +133,7 @@ namespace Cinema.Tests
                 new Phim { MaPhim = 1, TenPhim = "Phim 1" }
             };
             
-            var mockDbSet = GetQueryableMockDbSet(data);
+            var mockDbSet = data.BuildMockDbSet();
             mockDbSet.Setup(m => m.Find(It.IsAny<object[]>())).Returns<object[]>(ids => data.FirstOrDefault(d => d.MaPhim == (int)ids[0]));
             mockDbSet.Setup(m => m.Remove(It.IsAny<Phim>())).Callback<Phim>(p => data.Remove(p));
 
@@ -162,8 +151,7 @@ namespace Cinema.Tests
         public void XoaPhim_NotFound_ReturnsFalse()
         {
             var data = new List<Phim>();
-            
-            var mockDbSet = GetQueryableMockDbSet(data);
+            var mockDbSet = data.BuildMockDbSet();
             mockDbSet.Setup(m => m.Find(It.IsAny<object[]>())).Returns<object[]>(ids => data.FirstOrDefault(d => d.MaPhim == (int)ids[0]));
 
             _mockContext.Setup(c => c.Phims).Returns(mockDbSet.Object);
@@ -182,12 +170,12 @@ namespace Cinema.Tests
                 new Phim { MaPhim = 1, TenPhim = "Phim 1" }
             };
             
-            var mockDbSet = GetQueryableMockDbSet(data);
+            var mockDbSet = data.BuildMockDbSet();
             mockDbSet.Setup(m => m.Find(It.IsAny<object[]>())).Returns<object[]>(ids => data.FirstOrDefault(d => d.MaPhim == (int)ids[0]));
             _mockContext.Setup(c => c.Phims).Returns(mockDbSet.Object);
 
             var lichChieuData = new List<LichChieu>();
-            var mockLichChieuDbSet = GetQueryableMockDbSet(lichChieuData);
+            var mockLichChieuDbSet = lichChieuData.BuildMockDbSet();
             _mockContext.Setup(c => c.LichChieus).Returns(mockLichChieuDbSet.Object);
 
             var result = _phimBus.LayChiTietPhim(1);
@@ -201,8 +189,7 @@ namespace Cinema.Tests
         public void LayChiTietPhim_NotFound_ReturnsNull()
         {
             var data = new List<Phim>();
-            
-            var mockDbSet = GetQueryableMockDbSet(data);
+            var mockDbSet = data.BuildMockDbSet();
             mockDbSet.Setup(m => m.Find(It.IsAny<object[]>())).Returns<object[]>(ids => data.FirstOrDefault(d => d.MaPhim == (int)ids[0]));
 
             _mockContext.Setup(c => c.Phims).Returns(mockDbSet.Object);
@@ -222,7 +209,7 @@ namespace Cinema.Tests
                 new Phim { MaPhim = 3, TenPhim = "Lật Mặt 6" }
             };
 
-            var mockDbSet = GetQueryableMockDbSet(data);
+            var mockDbSet = data.BuildMockDbSet();
             _mockContext.Setup(c => c.Phims).Returns(mockDbSet.Object);
 
             var result = _phimBus.TimKiemPhim("Lật Mặt");
@@ -231,6 +218,25 @@ namespace Cinema.Tests
             Assert.Equal(2, result.Count);
             Assert.Contains(result, p => p.TenPhim == "Lật Mặt 7");
             Assert.Contains(result, p => p.TenPhim == "Lật Mặt 6");
+        }
+
+        [Fact]
+        public void TimKiemPhim_SqlInjection_DoesNotCrashAndReturnsEmpty()
+        {
+            var data = new List<Phim>
+            {
+                new Phim { MaPhim = 1, TenPhim = "Lật Mặt 7" }
+            };
+
+            var mockDbSet = data.BuildMockDbSet();
+            _mockContext.Setup(c => c.Phims).Returns(mockDbSet.Object);
+
+            // XSS / SQLi attempt string
+            var result = _phimBus.TimKiemPhim("'; DROP TABLE Phims;--");
+
+            // EF Core string parameters are safe, so it will just search for that literal string.
+            Assert.NotNull(result);
+            Assert.Empty(result);
         }
     }
 }

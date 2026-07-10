@@ -2,6 +2,8 @@ using Cinema.BUS;
 using Cinema.DAL.Models;
 using Cinema.DTO;
 using Microsoft.EntityFrameworkCore;
+using MockQueryable.Moq;
+using MockQueryable.EntityFrameworkCore;
 using Moq;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,24 +13,13 @@ namespace Cinema.Tests
 {
     public class DoAnBUSTests
     {
-        private Mock<QuanLyRapPhimContext> _mockContext;
-        private DoAnBUS _doAnBus;
+        private readonly Mock<QuanLyRapPhimContext> _mockContext;
+        private readonly DoAnBUS _doAnBus;
 
         public DoAnBUSTests()
         {
             _mockContext = new Mock<QuanLyRapPhimContext>();
             _doAnBus = new DoAnBUS(_mockContext.Object);
-        }
-
-        private Mock<DbSet<T>> GetQueryableMockDbSet<T>(List<T> sourceList) where T : class
-        {
-            var queryable = sourceList.AsQueryable();
-            var dbSet = new Mock<DbSet<T>>();
-            dbSet.As<IQueryable<T>>().Setup(m => m.Provider).Returns(queryable.Provider);
-            dbSet.As<IQueryable<T>>().Setup(m => m.Expression).Returns(queryable.Expression);
-            dbSet.As<IQueryable<T>>().Setup(m => m.ElementType).Returns(queryable.ElementType);
-            dbSet.As<IQueryable<T>>().Setup(m => m.GetEnumerator()).Returns(() => queryable.GetEnumerator());
-            return dbSet;
         }
 
         [Fact]
@@ -41,7 +32,7 @@ namespace Cinema.Tests
                 new DoAn { MaDoAn = 2, TenDoAn = "Pepsi", Gia = 30000, Loai = "Nước uống" }
             };
 
-            var mockDbSet = GetQueryableMockDbSet(data);
+            var mockDbSet = data.BuildMockDbSet();
             _mockContext.Setup(c => c.DoAns).Returns(mockDbSet.Object);
 
             // Act
@@ -62,7 +53,7 @@ namespace Cinema.Tests
                 new DoAn { MaDoAn = 1, TenDoAn = "Bắp rang bơ", Gia = 50000, Loai = "Đồ ăn" }
             };
 
-            var mockDbSet = GetQueryableMockDbSet(data);
+            var mockDbSet = data.BuildMockDbSet();
             _mockContext.Setup(c => c.DoAns).Returns(mockDbSet.Object);
 
             // Act
@@ -79,7 +70,7 @@ namespace Cinema.Tests
         {
             // Arrange
             var data = new List<DoAn>();
-            var mockDbSet = GetQueryableMockDbSet(data);
+            var mockDbSet = data.BuildMockDbSet();
             _mockContext.Setup(c => c.DoAns).Returns(mockDbSet.Object);
 
             // Act
