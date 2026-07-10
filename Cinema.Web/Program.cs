@@ -174,6 +174,11 @@ try
     builder.Services.AddSingleton<IMessageProducer, RabbitMQProducer>();
     builder.Services.AddHostedService<TicketEmailWorker>();
 
+    // -----------------------------------------------------------------------
+    // Claude API
+    // -----------------------------------------------------------------------
+    builder.Services.AddHttpClient<IClaudeService, ClaudeService>();
+
     var app = builder.Build();
 
     // -----------------------------------------------------------------------
