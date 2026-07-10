@@ -1,43 +1,38 @@
 # Cinema Management System (Production-Grade)
 
-Hệ thống quản lý rạp chiếu phim toàn diện, xây dựng trên nền tảng ASP.NET Core 8 MVC theo kiến trúc 3 lớp (3-Tier). Gần đây, hệ thống đã được nâng cấp mạnh mẽ với kiến trúc phân tán (Distributed Architecture), sẵn sàng scale horizontal (mở rộng ngang) cho môi trường Production thực tế.
+Hệ thống quản lý rạp chiếu phim toàn diện, xây dựng trên nền tảng ASP.NET Core 8 MVC theo kiến trúc 3 lớp (3-Tier) và phát triển vươn lên Kiến Trúc Phân Tán (Distributed Architecture) hiện đại. Hệ thống được thiết kế theo các mẫu thiết kế (Design Patterns) tiêu chuẩn ngành, bảo đảm tính sẵn sàng cao (High Availability), tính nhất quán (Eventual Consistency), và mở rộng ngang (Horizontal Scalability) dễ dàng.
 
 ---
 
-### Kiến trúc Khả mở (Scalability & Reliability)
-- Redis Integration: Thay thế hoàn toàn in-memory state. Sử dụng Redis cho Distributed Cache, Distributed Session, Data Protection Keys, và đặc biệt là SignalR Backplane (cho phép nhiều web server cùng đồng bộ trạng thái khóa ghế real-time).
-- **MinIO Object Storage**: Trừu tượng hóa việc lưu trữ poster phim với giao diện `IPosterStorageService`. Môi trường Production sử dụng MinIO (tương thích AWS S3) thay vì lưu file local, giúp stateless web servers.
-- **SeatHub Rewrite**: Cơ chế khóa ghế chuyển từ `ConcurrentDictionary` (local memory) sang **Redis Hash (`HSETNX`)** đảm bảo tính nguyên tử (atomic) và đồng nhất trên toàn cụm server.
+## Các Nâng Cấp & Kiến Trúc Mới Nhất
 
-### DevOps & CI/CD
-- **Docker & Docker Compose**: Đóng gói toàn bộ ứng dụng thành 10 containers độc lập (Web, DB, Redis, MinIO, Nginx, Certbot, Prometheus, Grafana, Backup, DB-Init).
-- **Nginx Reverse Proxy**: Tích hợp SSL/TLS (Let's Encrypt qua Certbot), bảo vệ chống brute-force đăng nhập (`limit_req`), và cấu hình security headers nghiêm ngặt.
-- **GitHub Actions CI/CD**:
-  - `ci-cd.yml`: Tự động Build, chạy Unit Tests (xUnit), build Docker image lên GHCR (GitHub Container Registry).
-  - Tự động Deploy lên môi trường Staging & Production qua SSH.
-- **Bảo mật Tự động**: Tích hợp **CodeQL** quét lỗ hổng mã nguồn và **Dependabot** tự động cập nhật thư viện cũ.
-- **Automated Backups**: Container chuyên dụng tự động backup Database SQL Server định kỳ (Cron job) hàng ngày và cơ chế xoay vòng backup (Retention 7 ngày).
+### 1. Kiến trúc Khả mở (Scalability & Polyglot Persistence)
+- **MongoDB Integration (Polyglot Persistence):** Phân tách dữ liệu không có cấu trúc chặt chẽ (như Review, Rating của phim) sang cơ sở dữ liệu NoSQL (MongoDB), giảm tải cho CSDL SQL Server cốt lõi, cải thiện hiệu năng truy xuất các dữ liệu đọc/ghi cường độ cao độc lập.
+- **Redis Integration:** Thay thế hoàn toàn in-memory state. Sử dụng Redis cho Distributed Cache, Distributed Session, Data Protection Keys, và đặc biệt là SignalR Backplane (giúp đồng bộ trạng thái đặt ghế real-time xuyên suốt nhiều máy chủ web).
+- **SeatHub Rewrite:** Cơ chế khóa ghế chuyển từ local memory sang **Redis Hash (`HSETNX`)** bảo đảm nguyên tử hóa và đồng nhất dữ liệu phân tán.
+- **MinIO Object Storage:** Trừu tượng hóa việc lưu trữ qua `IPosterStorageService`. Môi trường Production dùng MinIO (AWS S3-compatible) cho môi trường Web Servers Stateless (phi trạng thái).
 
-### Monitoring & Observability
-- **Prometheus**: Tự động thu thập (scrape) HTTP metrics (tốc độ phản hồi, error rate, v.v.) và hệ thống (memory, GC, threadpool) thông qua `prometheus-net`.
-- **Grafana**: Dashboard trực quan hóa dữ liệu real-time với 8 panels chính (Request Rate, 5xx Errors, P95 Latency, GC Collections, v.v.).
-- **Alerting Rules**: Các quy tắc cảnh báo (Alert) cho HTTP 5xx cao, App down, hoặc tràn RAM.
-- **Structured Logging & Health Checks**: Tích hợp Serilog (xuất log chuẩn JSON) và các endpoint `/healthz`, `/healthz/ready` kiểm tra trạng thái của cả SQL Server, Redis và MinIO.
+### 2. Transaction Management & Sự kiện Phân tán (Saga / Outbox)
+- **Transactional Outbox Pattern:** Tích hợp bộ đôi **MassTransit & Entity Framework Core Outbox** để xử lý các giao dịch (ví dụ: Thanh toán VNPay xong, đặt ghế). Tránh tình trạng chẹn luồng khi gọi API VNPay hoặc gửi Email bằng cách xuất log vào bảng Outbox cùng transaction SQL, sau đó MassTransit background worker sẽ tự động đẩy sang RabbitMQ một cách tin cậy.
+- **RabbitMQ Message Broker:** Triển khai luồng giao tiếp không đồng bộ qua các Event (ví dụ `InvoiceCreatedEvent`) bằng RabbitMQ. Nếu hệ thống Email hoặc dịch vụ bên ngoài bị chậm, luồng chính của website vẫn không bị ảnh hưởng.
+
+### 3. Tối ưu Hệ thống Kiểm thử (Testing Suite)
+- Loại bỏ các lớp mock dữ liệu nguyên khối, áp dụng extension **MockQueryable.EntityFrameworkCore** để cô lập và test các Business Logic (`NhanVienBUS`, `PhimBUS`, vv.) với Entity Framework Core nhanh, chính xác.
+- Bổ sung **Security Unit Testing** kiểm định chặt chẽ các rủi ro bảo mật cốt lõi:
+  - **SQL Injection Prevention:** Test xác minh ORM layer chặn các chuỗi truy vấn độc hại.
+  - **Password Hashing:** Xác minh dữ liệu mật khẩu không được lưu Plain-Text, kiểm tra quá trình Salting và Hashing thông qua `BCrypt.Net`.
 
 ---
 
-## Tính năng Cốt lõi của Ứng dụng
+## DevOps, CI/CD & Giám sát
 
-### Dành cho Khách hàng
-- **Xác thực hiện đại**: Đăng nhập qua **Google OAuth 2.0**, mật khẩu mã hóa BCrypt an toàn.
-- **Đặt vé & Chọn ghế Real-time**: Sơ đồ ghế đồng bộ thời gian thực cho mọi khách hàng nhờ SignalR + Redis. Tránh triệt để tình trạng "đụng" ghế.
-- **Thanh toán VNPay**: Tích hợp VNPay Sandbox, đảm bảo giao dịch (Transaction) nguyên tử.
-- **E-Ticket (Vé điện tử)**: Cấp vé kèm mã **QR Code** ngay sau khi thanh toán.
-
-### Dành cho Quản trị viên & Nhân viên
-- **Quản lý toàn diện**: CRUD phim, phòng chiếu, sinh sơ đồ ghế tự động, đồ ăn thức uống, khuyến mãi.
-- **Báo cáo Thống kê**: Biểu đồ trực quan (Chart.js) thống kê doanh thu theo phim/thời gian, hỗ trợ xuất báo cáo ra **Excel** (ClosedXML).
-- **Phân quyền chặt chẽ**: Dashboard riêng biệt cho Admin và Staff.
+- **Docker & Docker Compose:** Container hóa 10 dịch vụ: Web, SQL Server, MongoDB, Redis, RabbitMQ, MinIO, Nginx, Prometheus, Grafana, và Backup cron jobs.
+- **GitHub Actions CI/CD:**
+  - `ci-cd.yml`: Tự động Build, chạy Unit Tests (xUnit), build image và lưu trữ tại GHCR.
+  - **Bảo mật Tự động:** Tích hợp **CodeQL** (quét lỗ hổng tĩnh) và **Dependabot** (vá lỗi thư viện).
+- **Monitoring & Observability:**
+  - **Prometheus + Grafana:** Biểu đồ Real-time theo dõi HTTP metrics, GC, Latency.
+  - **Health Checks & Serilog:** Log chuẩn JSON và các endpoints kiểm tra trạng thái (`/healthz`).
 
 ---
 
@@ -46,87 +41,48 @@ Hệ thống quản lý rạp chiếu phim toàn diện, xây dựng trên nền
 | Lĩnh vực | Công nghệ / Thư viện |
 | :--- | :--- |
 | **Backend & Framework** | ASP.NET Core 8.0 MVC, SignalR |
-| **Cơ sở dữ liệu** | Microsoft SQL Server 2022 |
-| **ORM & Data Access** | Entity Framework Core 8, ADO.NET (`SqlDataReader`) |
+| **Cơ sở dữ liệu** | MS SQL Server 2022, MongoDB |
+| **Message Broker & Bus**| RabbitMQ, MassTransit |
 | **Distributed / Cloud** | Redis, MinIO (S3-compatible) |
 | **Bảo mật & Thanh toán** | BCrypt.Net, Google OAuth 2.0, VNPay API |
 | **Frontend UI** | Bootstrap 5, jQuery, Chart.js, GSAP, SweetAlert2 |
 | **Monitoring** | Prometheus, Grafana, Serilog |
 | **Infrastructure / DevOps**| Docker, Docker Compose, Nginx, Certbot, GitHub Actions |
-| **Kiểm thử** | xUnit, Moq (20+ Unit Tests bao phủ BUS) |
+| **Kiểm thử** | xUnit, Moq, MockQueryable |
 
 ---
 
-## Kiến trúc Dự án (3-Layer)
+## Hướng dẫn Khởi chạy (Môi trường Dev)
 
-```text
-CinemaManagementSystem/
-├── Cinema.DAL/                    # Data Access Layer (EF Core + ADO.NET)
-├── Cinema.BUS/                    # Business Logic Layer (Nghiệp vụ + Cache)
-├── Cinema.DTO/                    # Data Transfer Objects
-├── Cinema.Web/                    # Presentation Layer (MVC + Web API + SignalR)
-│   ├── Hubs/SeatHub.cs            # Xử lý ghế Real-time (Redis backed)
-│   ├── Services/                  # MinioPosterStorageService, Local...
-│   ├── Program.cs                 # DI config: Redis, Serilog, Prometheus...
-│   └── Areas/                     # Admin & NhanVien Modules
-├── Cinema.Tests/                  # Unit Testing (xUnit)
-├── deploy/                        # Infrastructure as Code (Docker, Nginx, Configs)
-│   ├── docker-compose.prod.yml    # Production Stack (10 services)
-│   ├── nginx/                     # Nginx Reverse Proxy Configs
-│   ├── monitoring/                # Prometheus & Grafana configs
-│   └── backup/                    # Auto DB Backup Scripts
-└── .github/workflows/             # CI/CD Pipelines & Security Scanning
-```
+Yêu cầu: [.NET 8.0 SDK](https://dotnet.microsoft.com/download/dotnet/8.0) và Docker.
 
----
-
-## Hướng dẫn Cài đặt & Chạy (Môi trường Dev)
-
-Yêu cầu: [.NET 8.0 SDK](https://dotnet.microsoft.com/download/dotnet/8.0), SQL Server, Redis (hoặc dùng Docker).
-
-**1. Clone dự án & Init Database**
+**1. Clone dự án**
 ```bash
 git clone https://github.com/gnuttt212/CinemaManagementSystem.git
-# Chạy file script DatabaseScripts/CinemaManagementSystem_Full.sql trong SSMS
+cd CinemaManagementSystem
 ```
 
-**2. Khởi chạy Redis & MinIO cục bộ (Dùng Docker)**
+**2. Khởi chạy Dịch vụ Nền (SQL, Redis, MongoDB, RabbitMQ, MinIO)**
 ```bash
-# Ở thư mục gốc, có thể dùng file docker-compose.yml dành cho môi trường Dev
-docker-compose up -d cinema-redis cinema-minio
+docker-compose -f deploy/docker-compose.dev.yml up -d
 ```
 
-**3. Cấu hình Secrets (Tùy chọn cho Dev)**
+**3. Khởi tạo Database & Chạy Website**
 ```bash
-cd Cinema.Web
-dotnet user-secrets init
-dotnet user-secrets set "Authentication:Google:ClientId" "YOUR_ID"
-dotnet user-secrets set "Authentication:Google:ClientSecret" "YOUR_SECRET"
-```
+# Update migrations cho SQL Server
+dotnet ef database update --project Cinema.DAL --startup-project Cinema.Web
 
-**4. Build & Chạy ứng dụng**
-```bash
+# Chạy ứng dụng
 dotnet build
-dotnet run
+dotnet run --project Cinema.Web
 ```
 Truy cập: `https://localhost:7059/`
 
 ---
 
-## Triển khai Production (Docker Compose)
+## Môi trường Production
 
-Hệ thống cung cấp sẵn file `deploy/docker-compose.prod.yml` chạy hoàn toàn khép kín.
-
-1. **Chuẩn bị server Ubuntu/Linux**, cài đặt Docker & Git.
-2. Copy thư mục `deploy/` lên server.
-3. Chép file `deploy/.env.prod.example` thành `.env.prod` và điền đủ thông tin (Passwords, API Keys, Domain).
-4. Khởi chạy toàn bộ hệ thống:
-   ```bash
-   cd deploy
-   docker compose -f docker-compose.prod.yml up -d
-   ```
-5. Đợi SSL tự động cấp phát qua Let's Encrypt, truy cập domain của bạn. Check trạng thái: `https://yourdomain.com/healthz/ready`.
-
-Xem chi tiết trong tài liệu [PRODUCTION.md](deploy/PRODUCTION.md).
-
----
+Triển khai qua `deploy/docker-compose.prod.yml`:
+- Môi trường hoàn toàn tách biệt, tự động cấu hình SSL/TLS (Let's Encrypt).
+- Tích hợp Reverse Proxy Nginx, Rate Limiting chặn brute-force.
+- Xem hướng dẫn chi tiết tại [PRODUCTION.md](deploy/PRODUCTION.md).
