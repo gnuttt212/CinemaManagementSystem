@@ -25,6 +25,7 @@ namespace Cinema.Web.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> PostReview([FromBody] MovieReview review)
         {
             var userAccount = HttpContext.Session.GetString("UserAccount");
