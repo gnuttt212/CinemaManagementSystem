@@ -1,4 +1,9 @@
-using Cinema.BUS;
+using Cinema.Web.Modules.Identity.Data;
+using Cinema.Web.Modules.Catalog.Data;
+using Cinema.Web.Modules.Booking.Data;
+using Cinema.Web.Modules.Identity.Services;
+using Cinema.Web.Modules.Catalog.Services;
+using Cinema.Web.Modules.Booking.Services;
 using Cinema.DTO;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
@@ -137,3 +142,6 @@ namespace Cinema.Web.Controllers
         }
     }
 }
+
+
+

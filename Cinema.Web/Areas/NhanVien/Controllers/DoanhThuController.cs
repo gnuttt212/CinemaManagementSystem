@@ -1,4 +1,9 @@
-using Cinema.DAL.Models;
+using Cinema.Web.Modules.Identity.Data;
+using Cinema.Web.Modules.Catalog.Data;
+using Cinema.Web.Modules.Booking.Data;
+using Cinema.Web.Modules.Identity.Entities;
+using Cinema.Web.Modules.Catalog.Entities;
+using Cinema.Web.Modules.Booking.Entities;
 using Cinema.Web.Areas.Admin.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore; 
@@ -9,9 +14,9 @@ namespace Cinema.Web.Areas.NhanVien.Controllers
     [NhanVienAuthorize]
     public class DoanhThuController : Controller
     {
-        private readonly QuanLyRapPhimContext _db;
+        private readonly BookingDbContext _db;
 
-        public DoanhThuController(QuanLyRapPhimContext db)
+        public DoanhThuController(BookingDbContext db)
         {
             _db = db;
         }
@@ -39,4 +44,7 @@ namespace Cinema.Web.Areas.NhanVien.Controllers
         }
     }
 }
+
+
+
 

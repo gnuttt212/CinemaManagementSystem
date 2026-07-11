@@ -4,10 +4,15 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.DataProtection;
-using Cinema.DAL.Models;
-using Cinema.DAL.AdoNet;
-using Cinema.DAL;
-using Cinema.BUS;
+using Cinema.Web.Modules.Identity.Entities;
+using Cinema.Web.Modules.Catalog.Entities;
+using Cinema.Web.Modules.Booking.Entities;
+using Cinema.Web.Modules.Identity.Data;
+using Cinema.Web.Modules.Catalog.Data;
+using Cinema.Web.Modules.Booking.Data;
+using Cinema.Web.Modules.Identity.Services;
+using Cinema.Web.Modules.Catalog.Services;
+using Cinema.Web.Modules.Booking.Services;
 using Cinema.Web.Services;
 using Serilog;
 using StackExchange.Redis;
@@ -82,7 +87,11 @@ try
     // -----------------------------------------------------------------------
     // Database
     // -----------------------------------------------------------------------
-    builder.Services.AddDbContext<QuanLyRapPhimContext>(options =>
+    builder.Services.AddDbContext<IdentityDbContext>(options =>
+        options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    builder.Services.AddDbContext<CatalogDbContext>(options =>
+        options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    builder.Services.AddDbContext<BookingDbContext>(options =>
         options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
     // -----------------------------------------------------------------------
@@ -177,7 +186,7 @@ try
     // -----------------------------------------------------------------------
     builder.Services.AddMassTransit(x =>
     {
-        x.AddEntityFrameworkOutbox<QuanLyRapPhimContext>(o =>
+        x.AddEntityFrameworkOutbox<BookingDbContext>(o =>
         {
             o.UseSqlServer();
             o.UseBusOutbox();

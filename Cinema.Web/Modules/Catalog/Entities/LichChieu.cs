@@ -1,0 +1,24 @@
+using System;
+using System.Collections.Generic;
+
+namespace Cinema.Web.Modules.Catalog.Entities;
+
+public partial class LichChieu
+{
+    public int MaLich { get; set; }
+
+    public int? MaPhim { get; set; }
+
+    public int? MaPhong { get; set; }
+
+    public DateOnly? NgayChieu { get; set; }
+
+    public TimeOnly? GioChieu { get; set; }
+
+    public decimal? GiaVe { get; set; }
+
+    public virtual Phim? MaPhimNavigation { get; set; }
+
+    public virtual PhongChieu? MaPhongNavigation { get; set; }
+}
+

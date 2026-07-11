@@ -1,3 +1,6 @@
+using Cinema.Web.Modules.Identity.Data;
+using Cinema.Web.Modules.Catalog.Data;
+using Cinema.Web.Modules.Booking.Data;
 namespace Cinema.Web.Areas.Admin.Models
 {
     public class DoanhThuViewModel
@@ -14,3 +17,5 @@ namespace Cinema.Web.Areas.Admin.Models
         public decimal DoanhThu { get; set; }
     }
 }
+
+

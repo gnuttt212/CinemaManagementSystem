@@ -1,4 +1,9 @@
-using Cinema.DAL.Models;
+using Cinema.Web.Modules.Identity.Data;
+using Cinema.Web.Modules.Catalog.Data;
+using Cinema.Web.Modules.Booking.Data;
+using Cinema.Web.Modules.Identity.Entities;
+using Cinema.Web.Modules.Catalog.Entities;
+using Cinema.Web.Modules.Booking.Entities;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 
@@ -8,9 +13,9 @@ namespace Cinema.Web.Areas.NhanVien.Controllers
     [NhanVienAuthorize]
     public class DichVuController : Controller
     {
-        private readonly QuanLyRapPhimContext _db;
+        private readonly CatalogDbContext _db;
 
-        public DichVuController(QuanLyRapPhimContext db)
+        public DichVuController(CatalogDbContext db)
         {
             _db = db;
         }
@@ -83,4 +88,7 @@ namespace Cinema.Web.Areas.NhanVien.Controllers
         }
     }
 }
+
+
+
 

@@ -1,3 +1,6 @@
+using Cinema.Web.Modules.Identity.Data;
+using Cinema.Web.Modules.Catalog.Data;
+using Cinema.Web.Modules.Booking.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
@@ -20,3 +23,5 @@ namespace Cinema.Web.Areas.Admin
         }
     }
 }
+
+

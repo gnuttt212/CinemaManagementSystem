@@ -1,6 +1,12 @@
-using Cinema.BUS;
-using Cinema.DAL.AdoNet;
-using Cinema.DAL.Models;
+using Cinema.Web.Modules.Identity.Services;
+using Cinema.Web.Modules.Catalog.Services;
+using Cinema.Web.Modules.Booking.Services;
+using Cinema.Web.Modules.Identity.Data;
+using Cinema.Web.Modules.Catalog.Data;
+using Cinema.Web.Modules.Booking.Data;
+
+
+
 using Cinema.DTO;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -17,9 +23,9 @@ namespace Cinema.Web.ApiControllers
     {
         private readonly IPhimBUS _phimBus;
         private readonly ICinemaAdoNetDAL _adoNetDal;
-        private readonly QuanLyRapPhimContext _db;
+        private readonly CatalogDbContext _db;
 
-        public PhimApiController(IPhimBUS phimBus, ICinemaAdoNetDAL adoNetDal, QuanLyRapPhimContext db)
+        public PhimApiController(IPhimBUS phimBus, ICinemaAdoNetDAL adoNetDal, CatalogDbContext db)
         {
             _phimBus = phimBus;
             _adoNetDal = adoNetDal;
@@ -238,3 +244,6 @@ namespace Cinema.Web.ApiControllers
         }
     }
 }
+
+
+

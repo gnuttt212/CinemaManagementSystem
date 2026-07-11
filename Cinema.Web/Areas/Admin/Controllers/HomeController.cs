@@ -1,5 +1,11 @@
-using Cinema.DAL.AdoNet;
-using Cinema.DAL.Models;
+using Cinema.Web.Modules.Booking.Data;
+using Cinema.Web.Modules.Catalog.Services;
+using Cinema.Web.Modules.Identity.Data;
+using Cinema.Web.Modules.Catalog.Data;
+
+using Cinema.Web.Modules.Identity.Entities;
+using Cinema.Web.Modules.Catalog.Entities;
+using Cinema.Web.Modules.Booking.Entities;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using System.Text.Json;
@@ -10,21 +16,25 @@ namespace Cinema.Web.Areas.Admin.Controllers
     [AdminAuthorize]
     public class HomeController : Controller
     {
-        private readonly QuanLyRapPhimContext _context;
+        private readonly CatalogDbContext _context;
+        private readonly BookingDbContext _bookingContext;
+        private readonly IdentityDbContext _identityContext;
         private readonly ICinemaAdoNetDAL _adoNetDal;
 
-        public HomeController(QuanLyRapPhimContext context, ICinemaAdoNetDAL adoNetDal)
+        public HomeController(CatalogDbContext context, BookingDbContext bookingContext, IdentityDbContext identityContext, ICinemaAdoNetDAL adoNetDal)
         {
             _context = context;
+            _bookingContext = bookingContext;
+            _identityContext = identityContext;
             _adoNetDal = adoNetDal;
         }
 
         public IActionResult Index()
         {
             ViewBag.TongSoPhim = _context.Phims.Count();
-            ViewBag.VeDaBan = _context.ChiTietHoaDons.Count();
+            ViewBag.VeDaBan = _bookingContext.ChiTietHoaDons.Count();
             
-            decimal doanhThu = _context.HoaDons.Sum(h => h.TongTien) ?? 0;
+            decimal doanhThu = _bookingContext.HoaDons.Sum(h => h.TongTien) ?? 0;
             if (doanhThu >= 1000000)
             {
                 ViewBag.DoanhThu = (doanhThu / 1000000).ToString("0.##") + "M";
@@ -34,7 +44,7 @@ namespace Cinema.Web.Areas.Admin.Controllers
                 ViewBag.DoanhThu = doanhThu.ToString("N0") + "đ";
             }
 
-            ViewBag.KhachHang = _context.KhachHangs.Count();
+            ViewBag.KhachHang = _identityContext.KhachHangs.Count();
 
             var chartData = _adoNetDal.GetDoanhThuTheoPhimChart();
             ViewBag.ChartLabels = JsonSerializer.Serialize(chartData.Keys.ToList());
@@ -44,3 +54,7 @@ namespace Cinema.Web.Areas.Admin.Controllers
         }
     }
 }
+
+
+
+

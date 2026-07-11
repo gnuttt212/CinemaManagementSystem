@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using System.Text.Json;
 
 namespace Cinema.Web
@@ -16,3 +16,4 @@ namespace Cinema.Web
         }
     }
 }
+

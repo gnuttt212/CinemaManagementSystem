@@ -23,3 +23,4 @@ namespace Cinema.Web.Services
         string GetUrl(string fileName);
     }
 }
+

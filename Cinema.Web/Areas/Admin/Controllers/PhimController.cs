@@ -1,4 +1,9 @@
-using Cinema.BUS;
+using Cinema.Web.Modules.Identity.Data;
+using Cinema.Web.Modules.Catalog.Data;
+using Cinema.Web.Modules.Booking.Data;
+using Cinema.Web.Modules.Identity.Services;
+using Cinema.Web.Modules.Catalog.Services;
+using Cinema.Web.Modules.Booking.Services;
 using Cinema.DTO;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -6,7 +11,9 @@ using Microsoft.AspNetCore.Hosting;
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using Cinema.DAL.Models;
+using Cinema.Web.Modules.Identity.Entities;
+using Cinema.Web.Modules.Catalog.Entities;
+using Cinema.Web.Modules.Booking.Entities;
 using Cinema.Web.Services;
 using System.Linq;
 
@@ -18,8 +25,8 @@ namespace Cinema.Web.Areas.Admin.Controllers
     {
         private readonly IPhimBUS _phimBus;
         private readonly IPosterStorageService _posterStorage;
-        private readonly QuanLyRapPhimContext _db;
-        public PhimController(IPhimBUS phimBus, IPosterStorageService posterStorage, QuanLyRapPhimContext db)
+        private readonly CatalogDbContext _db;
+        public PhimController(IPhimBUS phimBus, IPosterStorageService posterStorage, CatalogDbContext db)
         {
             _phimBus = phimBus;
             _posterStorage = posterStorage;
@@ -101,3 +108,6 @@ namespace Cinema.Web.Areas.Admin.Controllers
         }
     }
 }
+
+
+

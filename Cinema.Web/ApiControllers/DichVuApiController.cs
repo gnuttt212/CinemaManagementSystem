@@ -1,4 +1,10 @@
-using Cinema.DAL.Models;
+using Cinema.Web.Modules.Identity.Services;
+using Cinema.Web.Modules.Catalog.Services;
+using Cinema.Web.Modules.Booking.Services;
+using Cinema.Web.Modules.Identity.Data;
+using Cinema.Web.Modules.Catalog.Data;
+using Cinema.Web.Modules.Booking.Data;
+
 using Cinema.DTO;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -11,9 +17,9 @@ namespace Cinema.Web.ApiControllers
     [ApiController]
     public class DoAnApiController : ControllerBase
     {
-        private readonly QuanLyRapPhimContext _db;
+        private readonly CatalogDbContext _db;
 
-        public DoAnApiController(QuanLyRapPhimContext db)
+        public DoAnApiController(CatalogDbContext db)
         {
             _db = db;
         }
@@ -106,3 +112,6 @@ namespace Cinema.Web.ApiControllers
         }
     }
 }
+
+
+

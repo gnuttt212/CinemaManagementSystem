@@ -1,5 +1,10 @@
-using Cinema.BUS;
-using Cinema.DAL.Models.Mongo;
+using Cinema.Web.Modules.Catalog.Entities;
+using Cinema.Web.Modules.Identity.Data;
+using Cinema.Web.Modules.Catalog.Entities;
+using Cinema.Web.Modules.Identity.Services;
+using Cinema.Web.Modules.Catalog.Services;
+using Cinema.Web.Modules.Booking.Services;
+
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -41,3 +46,7 @@ namespace Cinema.Web.Controllers
         }
     }
 }
+
+
+
+
