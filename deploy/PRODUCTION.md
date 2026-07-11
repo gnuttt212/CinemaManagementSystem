@@ -58,6 +58,17 @@ Edit `.env.prod` and fill in **every** value:
 | `MSSQL_SA_PASSWORD` | SQL Server SA password — must be 16+ chars with mixed case, digits, symbols |
 | `MSSQL_PID` | SQL Server edition: `Express`, `Developer`, `Standard`, or `Enterprise` |
 | `ConnectionStrings__DefaultConnection` | ADO.NET connection string — password must match `MSSQL_SA_PASSWORD` |
+| `ConnectionStrings__Redis` | Redis connection string used for distributed cache, session, and SignalR backplane |
+| `ConnectionStrings__RabbitMQ` | RabbitMQ connection string used by MassTransit/background workers |
+| `ConnectionStrings__MongoDB` | MongoDB connection string if review/catalog document storage is enabled |
+| `MongoDB__DatabaseName` | MongoDB database name |
+| `RABBITMQ_USER` | RabbitMQ default user for Docker Compose |
+| `RABBITMQ_PASSWORD` | RabbitMQ default password for Docker Compose |
+| `MinIO__Endpoint` | MinIO endpoint used by the web app |
+| `MinIO__AccessKey` | MinIO access key used by the web app |
+| `MinIO__SecretKey` | MinIO secret key used by the web app |
+| `MinIO__BucketName` | MinIO bucket used for poster storage |
+| `MinIO__PublicBaseUrl` | Public poster URL prefix |
 | `Authentication__Google__ClientId` | Google OAuth 2.0 client ID |
 | `Authentication__Google__ClientSecret` | Google OAuth 2.0 client secret |
 | `VnPay__TmnCode` | VNPay merchant terminal code |
@@ -66,6 +77,9 @@ Edit `.env.prod` and fill in **every** value:
 | `DOMAIN_NAME` | Your production domain (e.g., `cinema.yourdomain.com`) |
 | `CERTBOT_EMAIL` | Email for Let's Encrypt certificate notifications |
 | `BACKUP_RETENTION_DAYS` | Days to keep old backup files (default: 7) |
+| `GRAFANA_ADMIN_USER` | Grafana admin username |
+| `GRAFANA_ADMIN_PASSWORD` | Grafana admin password |
+| `GRAFANA_ROOT_URL` | Public Grafana URL |
 
 > [!IMPORTANT]
 > The `MSSQL_SA_PASSWORD` value must appear identically in both the `MSSQL_SA_PASSWORD` variable and the `ConnectionStrings__DefaultConnection` password field.

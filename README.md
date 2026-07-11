@@ -62,10 +62,13 @@ git clone https://github.com/gnuttt212/CinemaManagementSystem.git
 cd CinemaManagementSystem
 ```
 
-**2. Khởi chạy Dịch vụ Nền (SQL, Redis, MongoDB, RabbitMQ, MinIO)**
+**2. Khởi chạy Docker local**
 ```bash
-docker-compose -f deploy/docker-compose.dev.yml up -d
+docker compose up -d --build
 ```
+
+Local compose mac dinh chay `cinema-web`, `cinema-db`, va `cinema-db-init`.
+Neu branch hien tai bat buoc Redis/RabbitMQ/MongoDB/MinIO, xem them `docs/environment-and-secrets.md` de biet cach bo sung dependency cho staging/production.
 
 **3. Khởi tạo Database & Chạy Website**
 ```bash
@@ -86,3 +89,17 @@ Triển khai qua `deploy/docker-compose.prod.yml`:
 - Môi trường hoàn toàn tách biệt, tự động cấu hình SSL/TLS (Let's Encrypt).
 - Tích hợp Reverse Proxy Nginx, Rate Limiting chặn brute-force.
 - Xem hướng dẫn chi tiết tại [PRODUCTION.md](deploy/PRODUCTION.md).
+
+---
+
+## Documentation
+
+Detailed technical and operational docs:
+
+- [Documentation Index](docs/README.md)
+- [Docker Development Setup](DOCKER.md)
+- [CI/CD Pipeline](docs/ci-cd.md)
+- [Environment and Secrets](docs/environment-and-secrets.md)
+- [Staging Deployment](deploy/README.md)
+- [Production Deployment](deploy/PRODUCTION.md)
+- [Modular Monolith and Messaging Roadmap](docs/modular-monolith-roadmap.md)

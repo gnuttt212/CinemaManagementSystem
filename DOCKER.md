@@ -71,6 +71,13 @@ GitHub Actions CI/CD is defined in `.github/workflows/ci-cd.yml`.
 
 Staging deployment files and required secrets are documented in `deploy/README.md`.
 
+Additional docs:
+
+- `docs/ci-cd.md`
+- `docs/environment-and-secrets.md`
+- `docs/modular-monolith-roadmap.md`
+- `docs/README.md`
+
 ---
 
 ## Production Deployment
