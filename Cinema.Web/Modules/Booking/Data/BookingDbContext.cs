@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Cinema.Web.Modules.Booking.Entities;
+using Cinema.Web.Modules.Catalog.Entities;
 
 namespace Cinema.Web.Modules.Booking.Data;
 
@@ -26,6 +27,11 @@ public class BookingDbContext : DbContext
             entity.Property(e => e.Gia).HasColumnType("money");
             entity.Property(e => e.SoLuong).HasDefaultValue(1);
 
+            entity.HasOne(d => d.MaDoAnNavigation).WithMany(p => p.ChiTietDoAns)
+                .HasForeignKey(d => d.MaDoAn)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_CTDoAn_DoAn");
+
             entity.HasOne(d => d.MaHdNavigation).WithMany(p => p.ChiTietDoAns)
                 .HasForeignKey(d => d.MaHd)
                 .OnDelete(DeleteBehavior.ClientSetNull)
@@ -40,10 +46,58 @@ public class BookingDbContext : DbContext
             entity.Property(e => e.MaHd).HasColumnName("MaHD");
             entity.Property(e => e.GiaVe).HasColumnType("money");
 
+            entity.HasOne(d => d.MaGheNavigation).WithMany(p => p.ChiTietHoaDons)
+                .HasForeignKey(d => d.MaGhe)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_CTHD_Ghe");
+
             entity.HasOne(d => d.MaHdNavigation).WithMany(p => p.ChiTietHoaDons)
                 .HasForeignKey(d => d.MaHd)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_CTHD_HoaDon");
+
+            entity.HasOne(d => d.MaLichNavigation).WithMany(p => p.ChiTietHoaDons)
+                .HasForeignKey(d => d.MaLich)
+                .HasConstraintName("FK_CTHD_LichChieu");
+        });
+
+        modelBuilder.Entity<DoAn>(entity =>
+        {
+            entity.HasKey(e => e.MaDoAn);
+            entity.ToTable("DoAn");
+            entity.Property(e => e.Gia).HasDefaultValue(0m).HasColumnType("money");
+            entity.Property(e => e.Loai).HasMaxLength(50);
+            entity.Property(e => e.TenDoAn).HasMaxLength(100);
+        });
+
+        modelBuilder.Entity<Ghe>(entity =>
+        {
+            entity.HasKey(e => e.MaGhe);
+            entity.ToTable("Ghe");
+            entity.HasIndex(e => e.MaPhong, "IX_Ghe_MaPhong");
+            entity.Property(e => e.Hang).HasMaxLength(5);
+            entity.Property(e => e.LoaiGhe).HasMaxLength(20).HasDefaultValue("Thuong");
+        });
+
+        modelBuilder.Entity<LichChieu>(entity =>
+        {
+            entity.HasKey(e => e.MaLich);
+            entity.ToTable("LichChieu");
+            entity.HasIndex(e => e.MaPhim, "IX_LichChieu_MaPhim");
+            entity.Property(e => e.GiaVe).HasColumnType("money");
+            entity.HasOne(d => d.MaPhimNavigation).WithMany(p => p.LichChieus)
+                .HasForeignKey(d => d.MaPhim)
+                .HasConstraintName("FK_LichChieu_Phim");
+        });
+
+        modelBuilder.Entity<Phim>(entity =>
+        {
+            entity.HasKey(e => e.MaPhim);
+            entity.ToTable("Phim");
+            entity.Property(e => e.DaoDien).HasMaxLength(100);
+            entity.Property(e => e.NgayKhoiChieu).HasColumnType("datetime");
+            entity.Property(e => e.TenPhim).HasMaxLength(200);
+            entity.Property(e => e.TheLoai).HasMaxLength(100);
         });
 
         modelBuilder.Entity<HoaDon>(entity =>

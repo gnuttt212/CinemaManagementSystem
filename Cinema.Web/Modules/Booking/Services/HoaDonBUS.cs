@@ -30,16 +30,29 @@ namespace Cinema.Web.Modules.Booking.Services
         public List<HoaDonDTO> LayDanhSachHoaDon()
         {
             var hoaDons = _context.HoaDons.ToList();
-            var maKhs = hoaDons.Select(h => h.MaKh).Distinct().ToList();
+            var maKhs = hoaDons
+                .Where(h => h.MaKh.HasValue)
+                .Select(h => h.MaKh!.Value)
+                .Distinct()
+                .ToList();
             var khachHangs = _identityContext.KhachHangs.Where(k => maKhs.Contains(k.MaKh)).ToDictionary(k => k.MaKh, k => k.HoTen);
 
-            return hoaDons.Select(h => new HoaDonDTO
+            return hoaDons.Select(h =>
             {
-                MaHD = h.MaHd,
-                NgayDat = h.NgayDat,
-                TongTien = h.TongTien,
-                TrangThai = h.TrangThai,
-                TenKhachHang = h.MaKh != null && khachHangs.ContainsKey(h.MaKh) ? khachHangs[h.MaKh] : null
+                string? tenKhachHang = null;
+                if (h.MaKh.HasValue)
+                {
+                    khachHangs.TryGetValue(h.MaKh.Value, out tenKhachHang);
+                }
+
+                return new HoaDonDTO
+                {
+                    MaHD = h.MaHd,
+                    NgayDat = h.NgayDat,
+                    TongTien = h.TongTien,
+                    TrangThai = h.TrangThai,
+                    TenKhachHang = tenKhachHang
+                };
             }).ToList();
         }
 
