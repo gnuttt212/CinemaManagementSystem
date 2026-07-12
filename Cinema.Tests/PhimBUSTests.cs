@@ -1,5 +1,6 @@
-using Cinema.BUS;
-using Cinema.DAL.Models;
+using Cinema.Web.Modules.Catalog.Data;
+using Cinema.Web.Modules.Catalog.Entities;
+using Cinema.Web.Modules.Catalog.Services;
 using Cinema.DTO;
 using Microsoft.EntityFrameworkCore;
 using MockQueryable.Moq;
@@ -14,12 +15,12 @@ namespace Cinema.Tests
 {
     public class PhimBUSTests
     {
-        private readonly Mock<QuanLyRapPhimContext> _mockContext;
+        private readonly Mock<CatalogDbContext> _mockContext;
         private readonly PhimBUS _phimBus;
 
         public PhimBUSTests()
         {
-            _mockContext = new Mock<QuanLyRapPhimContext>();
+            _mockContext = new Mock<CatalogDbContext>(new DbContextOptionsBuilder<CatalogDbContext>().Options);
             _phimBus = new PhimBUS(_mockContext.Object);
         }
 

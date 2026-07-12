@@ -1,5 +1,7 @@
-using Cinema.BUS;
-using Cinema.DAL.Models;
+using Cinema.Web.Modules.Booking.Data;
+using Cinema.Web.Modules.Identity.Data;
+using Cinema.Web.Modules.Identity.Entities;
+using Cinema.Web.Modules.Identity.Services;
 using Cinema.DTO;
 using Microsoft.EntityFrameworkCore;
 using MockQueryable.Moq;
@@ -14,13 +16,15 @@ namespace Cinema.Tests
 {
     public class KhachHangBUSTests
     {
-        private readonly Mock<QuanLyRapPhimContext> _mockContext;
+        private readonly Mock<IdentityDbContext> _mockContext;
+        private readonly Mock<BookingDbContext> _mockBookingContext;
         private readonly KhachHangBUS _khachHangBus;
 
         public KhachHangBUSTests()
         {
-            _mockContext = new Mock<QuanLyRapPhimContext>();
-            _khachHangBus = new KhachHangBUS(_mockContext.Object);
+            _mockContext = new Mock<IdentityDbContext>(new DbContextOptionsBuilder<IdentityDbContext>().Options);
+            _mockBookingContext = new Mock<BookingDbContext>(new DbContextOptionsBuilder<BookingDbContext>().Options);
+            _khachHangBus = new KhachHangBUS(_mockContext.Object, _mockBookingContext.Object);
         }
 
         [Fact]
@@ -82,7 +86,7 @@ namespace Cinema.Tests
             var data = new List<KhachHang>();
             var mockDbSet = data.BuildMockDbSet();
             
-            KhachHang savedKhachHang = null;
+            KhachHang? savedKhachHang = null;
             mockDbSet.Setup(m => m.Add(It.IsAny<KhachHang>())).Callback<KhachHang>(k => savedKhachHang = k);
 
             _mockContext.Setup(c => c.KhachHangs).Returns(mockDbSet.Object);

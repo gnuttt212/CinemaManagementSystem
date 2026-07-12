@@ -22,9 +22,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Cinema.BUS\Cinema.BUS.csproj" />
-    <ProjectReference Include="..\Cinema.DAL\Cinema.DAL.csproj" />
     <ProjectReference Include="..\Cinema.DTO\Cinema.DTO.csproj" />
+    <ProjectReference Include="..\Cinema.Web\Cinema.Web.csproj" />
   </ItemGroup>
 
 </Project>
