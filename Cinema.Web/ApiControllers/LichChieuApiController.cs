@@ -4,6 +4,7 @@ using Cinema.Web.Modules.Booking.Services;
 using Cinema.Web.Modules.Identity.Data;
 using Cinema.Web.Modules.Catalog.Data;
 using Cinema.Web.Modules.Booking.Data;
+using Cinema.Web.Modules.Catalog.Entities;
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
