@@ -8,7 +8,7 @@ The main workflow is `.github/workflows/ci-cd.yml`.
 - Run the xUnit test project.
 - Build the Docker image from the root `Dockerfile`.
 - Push versioned images to GitHub Container Registry (GHCR).
-- Deploy staging automatically from `main` or manually through `workflow_dispatch`.
+- Deploy staging from `main` only when `STAGING_AUTO_DEPLOY=true`, or manually through `workflow_dispatch`.
 - Deploy production manually through `workflow_dispatch` with the `production` GitHub environment.
 
 ## Triggers
@@ -17,7 +17,7 @@ The main workflow is `.github/workflows/ci-cd.yml`.
 |---|---:|---:|---:|---:|---:|
 | Pull request to `main` | Yes | Yes | No | No | No |
 | Push to `develop` | Yes | Yes | Yes | No | No |
-| Push to `main` | Yes | Yes | Yes | Yes | No |
+| Push to `main` | Yes | Yes | Yes | Only if `STAGING_AUTO_DEPLOY=true` | No |
 | Manual `workflow_dispatch` | Yes | Yes | Yes | Yes | Yes, if approved/run |
 
 ## Jobs
@@ -53,6 +53,8 @@ PR builds do not push images. Pushes and manual runs do.
 ### `deploy-staging`
 
 Copies `deploy/docker-compose.staging.yml` to the staging host, writes a remote `.env`, pulls the exact image SHA that passed CI, then restarts `cinema-web`.
+
+Automatic staging deploys are opt-in. Create a repository variable named `STAGING_AUTO_DEPLOY` with value `true` after the `staging` environment secrets are configured. Manual `workflow_dispatch` runs still validate and deploy staging.
 
 Default remote app directory:
 

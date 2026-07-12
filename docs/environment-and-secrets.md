@@ -76,6 +76,7 @@ Optional environment variables:
 
 | Variable | Default | Purpose |
 |---|---|---|
+| `STAGING_AUTO_DEPLOY` | `false` | Repository variable. Set to `true` to deploy staging automatically on pushes to `main`. |
 | `STAGING_APP_DIR` | `/opt/cinema-management-system` | Remote deployment directory. |
 | `STAGING_WEB_HOST_PORT` | `8080` | Host port exposed by staging compose. |
 | `STAGING_ASPNETCORE_ENVIRONMENT` | `Staging` | ASP.NET Core environment. |

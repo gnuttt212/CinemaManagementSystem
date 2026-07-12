@@ -37,6 +37,7 @@ Optional environment secrets:
 
 Optional environment variables:
 
+- `STAGING_AUTO_DEPLOY`: repository variable. Set to `true` after staging secrets are configured to deploy automatically on pushes to `main`.
 - `STAGING_APP_DIR`: remote app directory. Defaults to `/opt/cinema-management-system`.
 - `STAGING_WEB_HOST_PORT`: public HTTP port on the staging host. Defaults to `8080`.
 - `STAGING_ASPNETCORE_ENVIRONMENT`: defaults to `Staging`.
