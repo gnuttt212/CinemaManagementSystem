@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Cinema.Web.Modules.Booking.Entities;
 
 namespace Cinema.Web.Modules.Catalog.Entities;
 
@@ -13,5 +14,6 @@ public partial class DoAn
 
     public string? Loai { get; set; }
 
+    public virtual ICollection<ChiTietDoAn> ChiTietDoAns { get; set; } = new List<ChiTietDoAn>();
 }
 

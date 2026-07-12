@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Cinema.Web.Modules.Booking.Entities;
 
 namespace Cinema.Web.Modules.Catalog.Entities;
 
@@ -16,6 +17,8 @@ public partial class LichChieu
     public TimeOnly? GioChieu { get; set; }
 
     public decimal? GiaVe { get; set; }
+
+    public virtual ICollection<ChiTietHoaDon> ChiTietHoaDons { get; set; } = new List<ChiTietHoaDon>();
 
     public virtual Phim? MaPhimNavigation { get; set; }
 

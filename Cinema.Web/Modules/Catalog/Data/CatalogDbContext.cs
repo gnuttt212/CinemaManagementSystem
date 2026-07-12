@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Cinema.Web.Modules.Catalog.Entities;
+using Cinema.Web.Modules.Booking.Entities;
 
 namespace Cinema.Web.Modules.Catalog.Data;
 
@@ -16,6 +17,8 @@ public class CatalogDbContext : DbContext
     public virtual DbSet<LichChieu> LichChieus { get; set; }
     public virtual DbSet<Phim> Phims { get; set; }
     public virtual DbSet<PhongChieu> PhongChieus { get; set; }
+    public virtual DbSet<ChiTietDoAn> ChiTietDoAns { get; set; }
+    public virtual DbSet<ChiTietHoaDon> ChiTietHoaDons { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -26,6 +29,39 @@ public class CatalogDbContext : DbContext
             entity.Property(e => e.Gia).HasDefaultValue(0m).HasColumnType("money");
             entity.Property(e => e.Loai).HasMaxLength(50);
             entity.Property(e => e.TenDoAn).HasMaxLength(100);
+        });
+
+        modelBuilder.Entity<ChiTietDoAn>(entity =>
+        {
+            entity.HasKey(e => new { e.MaHd, e.MaDoAn });
+            entity.ToTable("ChiTietDoAn");
+            entity.HasIndex(e => e.MaDoAn, "IX_ChiTietDoAn_MaDoAn");
+            entity.Property(e => e.MaHd).HasColumnName("MaHD");
+            entity.Property(e => e.Gia).HasColumnType("money");
+            entity.Property(e => e.SoLuong).HasDefaultValue(1);
+
+            entity.HasOne(d => d.MaDoAnNavigation).WithMany(p => p.ChiTietDoAns)
+                .HasForeignKey(d => d.MaDoAn)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_CTDoAn_DoAn");
+        });
+
+        modelBuilder.Entity<ChiTietHoaDon>(entity =>
+        {
+            entity.HasKey(e => new { e.MaHd, e.MaGhe });
+            entity.ToTable("ChiTietHoaDon");
+            entity.HasIndex(e => e.MaLich, "IX_ChiTietHoaDon_MaLich");
+            entity.Property(e => e.MaHd).HasColumnName("MaHD");
+            entity.Property(e => e.GiaVe).HasColumnType("money");
+
+            entity.HasOne(d => d.MaGheNavigation).WithMany(p => p.ChiTietHoaDons)
+                .HasForeignKey(d => d.MaGhe)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_CTHD_Ghe");
+
+            entity.HasOne(d => d.MaLichNavigation).WithMany(p => p.ChiTietHoaDons)
+                .HasForeignKey(d => d.MaLich)
+                .HasConstraintName("FK_CTHD_LichChieu");
         });
 
         modelBuilder.Entity<Ghe>(entity =>
