@@ -19,7 +19,7 @@ jobs:
           dotnet-version: '8.0.x'
 
       - name: Setup Java (bắt buộc, vì Sonar Scanner chạy trên JVM)
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: 'zulu'
           java-version: '17'
